@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Onest } from "next/font/google";
 import "./globals.css";
+import { CookieConsent, PrivacyModal } from "./CookieConsent";
 
 const onest = Onest({ variable: "--font-onest", subsets: ["cyrillic", "latin"] });
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["cyrillic", "latin"] });
@@ -19,5 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ru"><body className={`${onest.variable} ${manrope.variable}`}>{children}</body></html>;
+  return <html lang="ru"><body className={`${onest.variable} ${manrope.variable}`}>{children}<CookieConsent/><PrivacyModal/></body></html>;
 }
