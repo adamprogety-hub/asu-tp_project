@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, ChevronRight, Cookie, Settings2, X } from "lucide-react";
+import { Check, ChevronRight, Settings2, X } from "lucide-react";
 
 const STORAGE_KEY = "aeron-cookie-consent";
 const MAX_AGE = 365 * 24 * 60 * 60 * 1000;
@@ -44,13 +44,11 @@ export function CookieConsent() {
 
   return <div className="cookie-layer" role="dialog" aria-modal="true" aria-labelledby="cookie-title">
     <div className="cookie-card">
-      <div className="cookie-icon"><Cookie /></div>
       <div className="cookie-copy">
         <span className="cookie-kicker">Ваш выбор важен</span>
         <h2 id="cookie-title">Настройки файлов cookie</h2>
         <p>Мы используем необходимые технологии для работы сайта. Аналитика включается только с вашего согласия. Подробнее — в <PrivacyLink>политике конфиденциальности</PrivacyLink>.</p>
       </div>
-      <button className="cookie-close" type="button" onClick={()=>save(false)} aria-label="Закрыть и оставить только необходимые"><X/></button>
       {settings && <div className="cookie-options">
         <div><span><b>Необходимые</b><small>Сохраняют ваш выбор и обеспечивают базовую работу сайта.</small></span><span className="cookie-fixed"><Check/> Всегда активны</span></div>
         <label><span><b>Аналитические</b><small>Помогают анонимно оценивать посещаемость и улучшать интерфейс.</small></span><input type="checkbox" checked={analytics} onChange={(e)=>setAnalytics(e.target.checked)}/><i/></label>

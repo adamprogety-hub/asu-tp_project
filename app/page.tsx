@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, MotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import {
   Activity,
+  ArrowDown,
   ArrowDownRight,
   ArrowRight,
   ArrowUp,
+  ArrowUpRight,
   BellRing,
   Building2,
   Check,
@@ -24,6 +26,9 @@ import {
   MapPin,
   Menu,
   MessageCircle,
+  Paperclip,
+  Phone,
+  Play,
   Radio,
   Send,
   Server,
@@ -31,6 +36,7 @@ import {
   SlidersHorizontal,
   Snowflake,
   Thermometer,
+  Upload,
   Wifi,
   X,
   Zap,
@@ -44,12 +50,12 @@ const benefits = [
 ] as const;
 
 const steps = [
-  ["01", "Обследование", "Фиксирую состав установок, контроллеры, сигналы и каналы связи."],
-  ["02", "Архитектура", "Согласуем экраны, аварии, права, уведомления и хранение данных."],
-  ["03", "Проектирование", "Готовлю схемы, перечни сигналов, спецификации и алгоритмы."],
-  ["04", "Автоматика", "Подключаю существующие шкафы или модернизирую то, чего не хватает."],
-  ["05", "SCADA", "Создаю мнемосхемы, архивы, графики и удалённый доступ."],
-  ["06", "ПНР и передача", "Проверяю сценарии на объекте и передаю исходники, схемы и резервные копии."],
+  ["01", "Обследование", "Фиксирую состав установок, контроллеры, сигналы и каналы связи.", "60 000"],
+  ["02", "Архитектура", "Согласуем экраны, аварии, права, уведомления и хранение данных.", "120 000"],
+  ["03", "Проектирование", "Готовлю схемы, перечни сигналов, спецификации и алгоритмы.", "200 000"],
+  ["04", "Автоматика", "Подключаю существующие шкафы или модернизирую то, чего не хватает.", "350 000"],
+  ["05", "SCADA", "Создаю мнемосхемы, архивы, графики и удалённый доступ.", "300 000"],
+  ["06", "ПНР и передача", "Проверяю сценарии на объекте и передаю исходники, схемы и резервные копии.", "200 000"],
 ] as const;
 
 const scenarios = [
@@ -57,6 +63,16 @@ const scenarios = [
   { label: "Действующий", title: "Интеграция без остановки", text: "Сохраняем рабочую автоматику и подключаем её к новой диспетчерской.", stat: "0", meta: "лишних замен" },
   { label: "Модернизация", title: "Обновляем точечно", text: "Меняем устаревшие контроллеры и добавляем только недостающие сигналы.", stat: "1→∞", meta: "масштабирование" },
   { label: "Сеть объектов", title: "Все филиалы в одном окне", text: "Объединяем территориально распределённые здания в общий центр контроля.", stat: "24/7", meta: "единый мониторинг" },
+] as const;
+
+const caseStudies = [
+  { meta: "Бизнес-центр · 18 400 м² · Москва", title: ["42 установки.", "Один центр контроля."], text: "До проекта — отдельные панели и ручной обход. После — единая SCADA, архивы и Telegram-уведомления.", metrics: [["648", "параметров"], ["37", "типов аварий"], ["8", "экранов"]], variant: 0 },
+  { meta: "Офисный комплекс · 8 200 м² · Санкт-Петербург", title: ["12 установок.", "Точный климат по этажам."], text: "Приточные системы связаны общими алгоритмами, расписанием и уставками. Инженер видит всю технологическую цепочку каждой установки.", metrics: [["214", "сигналов"], ["9", "алгоритмов"], ["3", "экрана"]], variant: 1 },
+  { meta: "Медицинский центр · 11 600 м² · Казань", title: ["26 зон.", "Воздух под контролем."], text: "Температура и CO₂ контролируются по помещениям, а отклонения автоматически попадают в журнал ответственного инженера.", metrics: [["26", "климатических зон"], ["52", "датчика"], ["4", "уровня доступа"]], variant: 2 },
+  { meta: "Гостиничный комплекс · 21 000 м² · Сочи", title: ["−18% энергии.", "Без потери комфорта."], text: "Аналитика выявила одновременный нагрев и охлаждение, лишние ночные режимы и завышенную производительность вентиляторов.", metrics: [["5.4", "МВт·ч экономии"], ["−18%", "за месяц"], ["24/7", "аналитика"]], variant: 3 },
+  { meta: "Логистический центр · 36 000 м² · Подмосковье", title: ["Авария видна", "раньше жалобы."], text: "События разделены по приоритетам и автоматически направляются дежурной смене. Эскалация срабатывает, если сообщение не подтверждено.", metrics: [["4:12", "средняя реакция"], ["37", "сценариев аварий"], ["3", "канала связи"]], variant: 4 },
+  { meta: "Торговый центр · 47 500 м² · Екатеринбург", title: ["412 кВт.", "Тепло под контролем."], text: "Насосы, клапаны и теплообменник собраны в едином контуре. Диспетчер видит давление, температуры и фактическую нагрузку.", metrics: [["2.8", "bar давление"], ["15.5°", "дельта контура"], ["74%", "нагрузка"]], variant: 5 },
+  { meta: "Розничная сеть · 4 объекта · Москва", title: ["4 объекта.", "Одна диспетчерская."], text: "Филиалы объединены защищёнными каналами связи. Центральная служба контролирует установки, аварии и доступность каждого объекта.", metrics: [["38", "установок"], ["99.98%", "доступность"], ["1", "центр контроля"]], variant: 6 },
 ] as const;
 
 const faqs = [
@@ -173,14 +189,27 @@ function MiniScada({ variant = 0 }: { variant?: number }) {
   );
 }
 
+function AnimatedMiniScada({ variant, direction }: { variant: number; direction: number }) {
+  const activeNav = variant === 3 ? 3 : variant === 4 ? 2 : variant === 0 ? 0 : 1;
+  return <div className={`scada-shell animated-scada variant-${variant}`}>
+    <div className="scada-top"><div><span className="window-dot"/><span className="window-dot"/><span className="window-dot"/></div><AnimatePresence initial={false} mode="wait"><motion.span key={variant} initial={{opacity:0,y:4}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-4}} transition={{duration:.38}}>Центр управления / {scadaSlides[variant][0]}</motion.span></AnimatePresence><span className="live"><StatusDot/> LIVE</span></div>
+    <div className="scada-body">
+      <aside className="scada-side"><div className="side-brand"><Fan size={18}/> AERON</div>{["Обзор","Установки","Аварии","Аналитика"].map((x,i)=><span className={i===activeNav?"active":""} key={x}>{x}</span>)}<div className="side-bottom">Связь стабильна <Wifi size={13}/></div></aside>
+      <div className="scada-main"><div className="scada-scene-stack"><AnimatePresence initial={false} mode="sync" custom={direction}><motion.div className="scada-scene-layer" key={variant} initial={{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} exit={{opacity:0,x:direction*-8}} transition={{duration:.68,delay:.18,ease:[.22,1,.36,1]}}><ScadaScene variant={variant}/></motion.div></AnimatePresence></div></div>
+    </div>
+    <AnimatePresence initial={false}>{variant===0&&<motion.div className="alarm-toast" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-5}} transition={{delay:.42,duration:.45}}><span><BellRing size={15}/></span><div><b>ПВ-08 · Требует внимания</b><small>Фильтр загрязнён на 82%</small></div><time>14:26</time></motion.div>}</AnimatePresence>
+    <motion.div className={`airflow-sweep ${direction<0?"reverse":""}`} key={`air-${variant}`} initial={{x:direction>0?"-180%":"480%",opacity:0}} animate={{x:direction>0?"480%":"-180%",opacity:[0,.9,.72,0]}} transition={{duration:1.08,times:[0,.18,.72,1],ease:[.32,0,.18,1]}} aria-hidden="true"/>
+  </div>;
+}
+
 function ScadaCarousel() {
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
-  const move = (next: number) => { setDirection(next > active || (active===6&&next===0) ? 1 : -1); setActive((next+7)%7); };
+  const move = (next:number) => { const normalized=(next+7)%7; setDirection(next>active||(active===6&&normalized===0)?1:-1); setActive(normalized); };
   useEffect(() => { if (paused) return; const id = window.setInterval(() => move((active+1)%7), 6000); return () => window.clearInterval(id); }, [active, paused]);
   return <div className="scada-carousel" onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)}>
-    <AnimatePresence initial={false} mode="wait" custom={direction}><motion.div className="scada-slide" key={active} initial={{opacity:0,x:direction*38,scale:.992}} animate={{opacity:1,x:0,scale:1}} exit={{opacity:0,x:direction*-28,scale:.995}} transition={{duration:.55,ease:[.22,1,.36,1]}}><MiniScada variant={active}/></motion.div></AnimatePresence>
+    <div className="scada-stage"><AnimatedMiniScada variant={active} direction={direction}/></div>
     <div className="carousel-controls">
       <div className="carousel-caption"><span>{String(active+1).padStart(2,"0")} / 07</span><div><strong>{scadaSlides[active][0]}</strong><small>{scadaSlides[active][1]}</small></div></div>
       <div className="carousel-dots">{scadaSlides.map((slide,i)=><button key={slide[0]} className={active===i?"active":""} onClick={()=>move(i)} aria-label={`Показать: ${slide[0]}`}><i/></button>)}</div>
@@ -191,21 +220,34 @@ function ScadaCarousel() {
 
 function LeadForm({ compact = false }: { compact?: boolean }) {
   const [sent, setSent] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const addFiles = (incoming: FileList | File[]) => setFiles((current) => {
+    const merged = [...current, ...Array.from(incoming)].filter((file, index, all) => all.findIndex((item) => item.name === file.name && item.size === file.size) === index);
+    return merged.slice(0, 10);
+  });
+  const fileSize = (bytes:number) => bytes < 1024 * 1024 ? `${Math.max(1,Math.round(bytes/1024))} КБ` : `${(bytes/1024/1024).toFixed(1)} МБ`;
   return (
     <form className={`lead-form ${compact ? "compact" : ""}`} onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
       <div className="field-grid">
         <label><span>Ваше имя</span><input required placeholder="Как к вам обращаться?" /></label>
-        <label><span>Телефон или Telegram</span><input required placeholder="+7 999 000 00 00" /></label>
-        {!compact && <label><span>Тип объекта</span><select defaultValue=""><option value="" disabled>Выберите объект</option><option>Бизнес-центр</option><option>Торговый объект</option><option>Медицинский центр</option><option>Гостиница</option><option>Склад / производство</option><option>Другое</option></select></label>}
+        <label><span>Телефон или почта</span><input required placeholder="+7 999 000 00 00 или name@company.ru" /></label>
+        {!compact && <label><span>Тип объекта</span><div className="select-control"><select defaultValue=""><option value="" disabled>Выберите объект</option><option>Бизнес-центр</option><option>Торговый объект</option><option>Медицинский центр</option><option>Гостиница</option><option>Склад / производство</option><option>Другое</option></select><ChevronDown aria-hidden="true"/></div></label>}
         {!compact && <label><span>Количество установок</span><input type="number" min="1" placeholder="Например, 8" /></label>}
       </div>
       {!compact && <label className="wide-field"><span>Коротко о задаче</span><textarea placeholder="Что нужно объединить и контролировать?" /></label>}
+      {!compact && <div className="file-upload-block">
+        <label className="file-drop" onDragOver={(event)=>event.preventDefault()} onDrop={(event)=>{event.preventDefault();addFiles(event.dataTransfer.files)}}>
+          <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.zip,.rar,.7z,.txt" onChange={(event)=>event.target.files&&addFiles(event.target.files)}/>
+          <i><Upload/></i><span><strong>Приложить файлы</strong><small>Перетащите сюда или выберите на устройстве</small></span><b>до 10 файлов</b>
+        </label>
+        {files.length>0&&<div className="file-list" aria-label="Выбранные файлы">{files.map((file)=><div className="file-chip" key={`${file.name}-${file.size}`}><Paperclip/><span><strong>{file.name}</strong><small>{fileSize(file.size)}</small></span><button type="button" onClick={()=>setFiles((current)=>current.filter((item)=>item!==file))} aria-label={`Удалить ${file.name}`}><X/></button></div>)}</div>}
+      </div>}
       <div className="form-consents">
         <label className="consent-check"><input type="checkbox" required/><i><Check/></i><span>Я даю согласие на обработку персональных данных и принимаю <PrivacyLink>Политику конфиденциальности</PrivacyLink>.</span></label>
         <label className="consent-check optional"><input type="checkbox"/><i><Check/></i><span>Согласен получать полезные материалы и информацию о решениях AERON. Необязательно.</span></label>
       </div>
       <button className="button dark wide" type="submit">{sent ? <><Check size={18}/> Заявка принята</> : <>Получить предварительную концепцию <ArrowRight size={18}/></>}</button>
-      <p>{sent ? "Спасибо. Инженер свяжется с вами и уточнит исходные данные." : "Можно приложить схемы и фотографии после первого контакта. Нажимая кнопку, вы соглашаетесь с обработкой данных."}</p>
+      <p>{sent ? "Спасибо. Инженер свяжется с вами и уточнит исходные данные." : "PDF, фото, документы, таблицы, архивы и CAD-файлы. До 10 файлов. Нажимая кнопку, вы соглашаетесь с обработкой данных."}</p>
     </form>
   );
 }
@@ -215,29 +257,90 @@ const contactLinks = {
   max: "",
 };
 
+const contactPhone = {
+  label: "+7 999 000-00-00",
+  href: "tel:+79990000000",
+};
+
+function getFloatingNavigationTargets() {
+  const hero = document.querySelector<HTMLElement>(".hero");
+  const panels = Array.from(document.querySelectorAll<HTMLElement>(".stack-panel"));
+  const panelTargets = panels.map((panel) => {
+    const runway = panel.closest<HTMLElement>(".process-runway");
+    if (runway) return runway;
+
+    const slot = panel.closest<HTMLElement>(".stack-slot");
+    if (slot && slot.getBoundingClientRect().height > 1) return slot;
+    return panel;
+  });
+  const uniqueTargets = Array.from(new Set(panelTargets));
+  return hero ? [hero, ...uniqueTargets] : uniqueTargets;
+}
+
+function getCurrentNavigationIndex(targets: HTMLElement[]) {
+  const marker = window.scrollY + 16;
+  let currentIndex = 0;
+  targets.forEach((target, index) => {
+    const targetTop = target.getBoundingClientRect().top + window.scrollY;
+    if (targetTop <= marker) currentIndex = index;
+  });
+  return currentIndex;
+}
+
 function FloatingActions({ visible }: { visible: boolean }) {
   const [socialsOpen, setSocialsOpen] = useState(false);
+  const [phoneOpen, setPhoneOpen] = useState(false);
   const [onDarkBackground, setOnDarkBackground] = useState(false);
+  const [hasNextSection, setHasNextSection] = useState(true);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const navigationLocked = useRef(false);
 
   useEffect(() => {
-    if (!visible) setSocialsOpen(false);
+    if (!visible) {
+      setSocialsOpen(false);
+      setPhoneOpen(false);
+    }
   }, [visible]);
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSocialsOpen(false);
+      if (event.key === "Escape") {
+        setSocialsOpen(false);
+        setPhoneOpen(false);
+      }
+    };
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (actionsRef.current && !actionsRef.current.contains(event.target as Node)) {
+        setSocialsOpen(false);
+        setPhoneOpen(false);
+      }
     };
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+    };
   }, []);
 
   useEffect(() => {
     let frame = 0;
     const detectBackground = () => {
       frame = 0;
+      const targets = getFloatingNavigationTargets();
+      setHasNextSection(getCurrentNavigationIndex(targets) < targets.length - 1);
       const x = Math.max(1, window.innerWidth - 52);
       const y = Math.max(1, window.innerHeight - 52);
       const underneath = document.elementsFromPoint(x, y).filter((element) => !element.closest(".floating-actions"));
+      const activePanel = underneath
+        .map((element) => element.closest<HTMLElement>(".stack-panel, .hero"))
+        .find((element): element is HTMLElement => Boolean(element));
+
+      if (activePanel) {
+        setOnDarkBackground(activePanel.matches(".footer-dark, .problem-section"));
+        return;
+      }
+
       const background = underneath
         .map((element) => getComputedStyle(element).backgroundColor)
         .map((color) => color.match(/rgba?\((\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)(?:[, /]+(\d+(?:\.\d+)?))?\)/))
@@ -268,54 +371,135 @@ function FloatingActions({ visible }: { visible: boolean }) {
     setSocialsOpen(false);
   };
 
+  const lockNavigationBriefly = () => {
+    navigationLocked.current = true;
+    window.setTimeout(() => {
+      navigationLocked.current = false;
+    }, 900);
+  };
+
+  const navigateToHero = () => {
+    if (navigationLocked.current) return;
+    setSocialsOpen(false);
+    setPhoneOpen(false);
+    lockNavigationBriefly();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const navigateToNextSection = () => {
+    if (navigationLocked.current) return;
+    const targets = getFloatingNavigationTargets();
+    const currentIndex = getCurrentNavigationIndex(targets);
+    const nextTarget = targets[currentIndex + 1];
+    if (!nextTarget) {
+      setHasNextSection(false);
+      return;
+    }
+    const targetTop = nextTarget.getBoundingClientRect().top + window.scrollY;
+    const isFooter = Boolean(nextTarget.querySelector("footer"));
+    setSocialsOpen(false);
+    setPhoneOpen(false);
+    lockNavigationBriefly();
+    window.scrollTo({ top: Math.max(0, targetTop - (isFooter ? 6 : 8)), behavior: "smooth" });
+  };
+
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
+          ref={actionsRef}
           className={`floating-actions ${onDarkBackground ? "on-dark" : "on-light"}`}
           initial={{ opacity: 0, y: 18, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.96 }}
           transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
         >
-          <AnimatePresence>
-            {socialsOpen && (
-              <motion.div
-                className="social-menu"
-                initial={{ opacity: 0, y: 12, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                role="menu"
-                aria-label="Выбор мессенджера"
-              >
-                <span>Написать напрямую</span>
-                <button type="button" role="menuitem" aria-disabled={!contactLinks.telegram} onClick={() => openContact(contactLinks.telegram)}>
-                  <i className="social-mark telegram"><Send /></i>
-                  <strong>Telegram</strong>
-                  {!contactLinks.telegram && <small>ссылка скоро</small>}
-                  <ArrowRight />
-                </button>
-                <button type="button" role="menuitem" aria-disabled={!contactLinks.max} onClick={() => openContact(contactLinks.max)}>
-                  <i className="social-mark max">MAX</i>
-                  <strong>MAX</strong>
-                  {!contactLinks.max && <small>ссылка скоро</small>}
-                  <ArrowRight />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <button
-            className={`floating-button social-toggle ${socialsOpen ? "active" : ""}`}
-            type="button"
-            onClick={() => setSocialsOpen((open) => !open)}
-            aria-label={socialsOpen ? "Закрыть меню социальных сетей" : "Открыть социальные сети"}
-            aria-expanded={socialsOpen}
-          >
-            {socialsOpen ? <X /> : <MessageCircle />}
-          </button>
-          <button className="floating-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Наверх">
+          <button className="floating-button" type="button" onClick={navigateToHero} aria-label="В начало сайта">
             <ArrowUp />
+          </button>
+          <div className="floating-action-item">
+            <AnimatePresence>
+              {socialsOpen && (
+                <motion.div
+                  className="social-menu"
+                  initial={{ opacity: 0, x: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 6, scale: 0.97 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  role="menu"
+                  aria-label="Выбор мессенджера"
+                >
+                  <span>Написать напрямую</span>
+                  <button type="button" role="menuitem" aria-disabled={!contactLinks.telegram} onClick={() => openContact(contactLinks.telegram)}>
+                    <i className="social-mark telegram"><Send /></i>
+                    <strong>Telegram</strong>
+                    {!contactLinks.telegram && <small>ссылка скоро</small>}
+                    <ArrowRight />
+                  </button>
+                  <button type="button" role="menuitem" aria-disabled={!contactLinks.max} onClick={() => openContact(contactLinks.max)}>
+                    <i className="social-mark max">MAX</i>
+                    <strong>MAX</strong>
+                    {!contactLinks.max && <small>ссылка скоро</small>}
+                    <ArrowRight />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button
+              className={`floating-button social-toggle ${socialsOpen ? "active" : ""}`}
+              type="button"
+              onClick={() => {
+                setPhoneOpen(false);
+                setSocialsOpen((open) => !open);
+              }}
+              aria-label={socialsOpen ? "Закрыть меню социальных сетей" : "Открыть социальные сети"}
+              aria-expanded={socialsOpen}
+            >
+              {socialsOpen ? <X /> : <MessageCircle />}
+            </button>
+          </div>
+          <div className="floating-action-item mobile-phone-action">
+            <AnimatePresence>
+              {phoneOpen && (
+                <motion.div
+                  className="phone-menu"
+                  initial={{ opacity: 0, x: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 6, scale: 0.97 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  role="dialog"
+                  aria-label="Позвонить владельцу сайта"
+                >
+                  <span>Позвонить напрямую</span>
+                  <a href={contactPhone.href}>
+                    <i><Phone /></i>
+                    <span><small>Телефон</small><strong>{contactPhone.label}</strong></span>
+                    <ArrowRight />
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button
+              className={`floating-button phone-toggle ${phoneOpen ? "active" : ""}`}
+              type="button"
+              onClick={() => {
+                setSocialsOpen(false);
+                setPhoneOpen((open) => !open);
+              }}
+              aria-label={phoneOpen ? "Закрыть номер телефона" : "Показать номер телефона"}
+              aria-expanded={phoneOpen}
+            >
+              {phoneOpen ? <X /> : <Phone />}
+            </button>
+          </div>
+          <button
+            className="floating-button"
+            type="button"
+            onClick={navigateToNextSection}
+            aria-label="К следующей секции"
+            disabled={!hasNextSection}
+          >
+            <ArrowDown />
           </button>
         </motion.div>
       )}
@@ -323,21 +507,205 @@ function FloatingActions({ visible }: { visible: boolean }) {
   );
 }
 
+function ProcessCard({
+  step,
+  index,
+  progress,
+  reduceMotion,
+}: {
+  step: (typeof steps)[number];
+  index: number;
+  progress: MotionValue<number>;
+  reduceMotion: boolean | null;
+}) {
+  const position = useTransform(progress, (value) => index - value * (steps.length - 1));
+  const x = useTransform(position, (delta) => {
+    if (reduceMotion) return 0;
+    if (delta < 0) return `${Math.max(-124, delta * 124)}%`;
+    return Math.min(delta, 3) * 28;
+  });
+  const rotate = useTransform(position, (delta) => {
+    if (reduceMotion || delta <= 0) return 0;
+    return Math.min(delta, 3) * (index % 2 === 0 ? -1.15 : 1.15);
+  });
+  const opacity = useTransform(position, (delta) => {
+    if (reduceMotion || delta >= -0.28) return 1;
+    if (delta <= -1.04) return 0;
+    const progress = (delta + 1.04) / 0.76;
+    return progress * progress * (3 - 2 * progress);
+  });
+  const [number, title, text, price] = step;
+
+  return (
+    <motion.article
+      className={`process-card${number === "05" ? " accent" : ""}`}
+      style={{ x, rotate, opacity, zIndex: steps.length - index }}
+    >
+      <div className="process-card-layout">
+        <div className="process-card-left">
+          <div className="process-card-top">
+            <span>{number} / 06</span>
+            <span>{number === "05" ? "Ключевой этап" : "Полный цикл"}</span>
+          </div>
+          <div className="process-card-copy">
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </div>
+          <div className="process-card-footer">
+            <div className="process-price"><small>Стоимость</small><strong>от {price} ₽</strong></div>
+            <a className="process-cta" href="#contact">Обсудить задачу <ArrowRight size={18}/></a>
+          </div>
+        </div>
+        <div className="process-card-icon-zone" aria-hidden="true" />
+      </div>
+    </motion.article>
+  );
+}
+
+function ProcessSegment({ index, progress }: { index: number; progress: MotionValue<number> }) {
+  const fill = useTransform(progress, (value) => Math.max(0, Math.min(1, value * (steps.length - 1) - index + 1)));
+  return <span className="process-segment"><b>{String(index + 1).padStart(2, "0")}</b><i><motion.em style={{ scaleX: fill }}/></i></span>;
+}
+
+function ProcessFlow() {
+  const ref = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const deckProgress = useSpring(scrollYProgress, { stiffness: 95, damping: 26, restDelta: 0.001 });
+
+  return (
+    <section className="process-runway" id="process" ref={ref}>
+      <div className="process process-sticky stack-panel panel-paper layer-4">
+        <div className="section-heading split">
+          <div><span className="section-tag">/ Полный цикл</span><h2>Закрываю весь технический контур проекта</h2></div>
+          <p>Шесть последовательных этапов — от первого сигнала в шкафу до готового экрана диспетчерской.</p>
+        </div>
+        <div className="process-deck" aria-label="Этапы и стоимость работ">
+          {steps.map((step, index) => <ProcessCard key={step[0]} step={step} index={index} progress={deckProgress} reduceMotion={reduceMotion}/>) }
+        </div>
+        <div className="process-pagination" aria-hidden="true">
+          {steps.map((step, index) => <ProcessSegment key={step[0]} index={index} progress={deckProgress}/>) }
+          <span className="process-scroll-hint">Листайте вниз</span>
+        </div>
+        <p className="process-note">Ориентировочная стоимость типового стартового объёма. Оборудование, лицензии и выезды рассчитываются отдельно.</p>
+      </div>
+    </section>
+  );
+}
+
+function StackSlot({ children }: { children: ReactNode }) {
+  return <div className="stack-slot">{children}</div>;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scenario, setScenario] = useState(0);
   const [faq, setFaq] = useState(0);
   const [heroPassed, setHeroPassed] = useState(false);
+  const [activeCase, setActiveCase] = useState(0);
+  const [caseDirection, setCaseDirection] = useState(1);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
-  const heroCopyY = useTransform(scrollYProgress, [0, .12], [0, reduceMotion ? 0 : 110]);
-  const heroCopyOpacity = useTransform(scrollYProgress, [0, .085], [1, reduceMotion ? 1 : 0.3]);
+  const heroCopyY = useTransform(scrollYProgress, [0, .09], [0, reduceMotion ? 0 : 130]);
+  const heroCopyOpacity = useTransform(scrollYProgress, [0, .065], [1, reduceMotion ? 1 : 0]);
+  const heroCopyBlur = useTransform(scrollYProgress, [0, .065], ["blur(0px)", reduceMotion ? "blur(0px)" : "blur(10px)"]);
+  const heroEquipmentY = useTransform(scrollYProgress, [0, .075], [0, reduceMotion ? 0 : 95]);
   const heroVisualY = useTransform(scrollYProgress, [0, .12], [0, reduceMotion ? 0 : -70]);
   const heroVisualScale = useTransform(scrollYProgress, [0, .12], [1, reduceMotion ? 1 : 0.965]);
   const heroOrbY = useTransform(scrollYProgress, [0, .12], [0, reduceMotion ? 0 : 180]);
   const caseVisualY = useTransform(scrollYProgress, [.48, .78], [reduceMotion ? 0 : 54, reduceMotion ? 0 : -54]);
+  const moveCase = (next:number) => { const normalized=(next+caseStudies.length)%caseStudies.length; setCaseDirection(next>activeCase||(activeCase===caseStudies.length-1&&normalized===0)?1:-1); setActiveCase(normalized); };
+  const scrollToContact = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const contactPanel = document.querySelector<HTMLElement>("#contact");
+    if (!contactPanel) return;
+    const slot = contactPanel.closest<HTMLElement>(".stack-slot");
+    const target = slot && slot.getBoundingClientRect().height > 1 ? slot : contactPanel;
+    const targetTop = target.getBoundingClientRect().top + window.scrollY;
+    window.history.replaceState(null, "", "#contact");
+    window.scrollTo({ top: Math.max(0, targetTop - 8), behavior: "smooth" });
+  };
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1001px) and (min-height: 760px)");
+    const panels = Array.from(document.querySelectorAll<HTMLElement>(".stack-panel"));
+    const entries = panels.map((panel) => ({
+      panel,
+      anchor: panel.closest<HTMLElement>(".stack-slot, .process-runway"),
+    }));
+    let frame = 0;
+    const resetPanelMotion = (panel: HTMLElement) => {
+      panel.classList.remove("is-pinned", "is-being-covered", "is-entering", "is-depth-active", "is-content-hidden");
+      panel.style.removeProperty("--stack-content-y");
+      panel.style.removeProperty("--stack-content-opacity");
+    };
+    const clamp = (value: number) => Math.max(0, Math.min(1, value));
+    const smoothstep = (value: number) => value * value * (3 - 2 * value);
 
+    const updatePinnedPanels = () => {
+      frame = 0;
+      if (!media.matches) {
+        panels.forEach(resetPanelMotion);
+        return;
+      }
+      const viewportSpan = Math.max(1, window.innerHeight - 8);
+      const remainingScroll = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
+      const anchorTops = entries.map(({ anchor }) => anchor?.getBoundingClientRect().top ?? window.innerHeight);
+      const pinnedStates = entries.map(({ panel }, index) => {
+        const anchorTop = anchorTops[index];
+        const reachedAnchor = anchorTop <= 8.5;
+        const reachedTerminalPosition = panel.tagName === "FOOTER" && remainingScroll <= 12;
+        return reachedAnchor || reachedTerminalPosition;
+      });
+      let activeIndex = -1;
+      pinnedStates.forEach((isPinned, index) => {
+        if (isPinned) activeIndex = index;
+      });
+      const enteringIndex = activeIndex + 1 < entries.length && anchorTops[activeIndex + 1] < window.innerHeight
+        ? activeIndex + 1
+        : -1;
+      const enteringProgress = enteringIndex >= 0
+        ? smoothstep(clamp((window.innerHeight - anchorTops[enteringIndex]) / viewportSpan))
+        : 0;
+      const coverProgress = enteringIndex >= 0
+        ? smoothstep(clamp((enteringProgress - 0.08) / 0.82))
+        : 0;
+
+      entries.forEach(({ panel }, index) => {
+        panel.classList.toggle("is-pinned", pinnedStates[index]);
+        panel.classList.toggle("is-content-hidden", index < activeIndex);
+        panel.classList.toggle("is-being-covered", index === activeIndex && coverProgress > 0.002);
+        panel.classList.toggle("is-entering", index === enteringIndex);
+        panel.classList.toggle("is-depth-active", index === activeIndex || index === enteringIndex);
+
+        if (index === activeIndex) {
+          panel.style.setProperty("--stack-content-y", `${(-coverProgress * 18).toFixed(2)}px`);
+          panel.style.setProperty("--stack-content-opacity", `${(1 - coverProgress).toFixed(4)}`);
+        } else if (index === enteringIndex) {
+          panel.style.setProperty("--stack-content-y", `${((1 - enteringProgress) * 28).toFixed(2)}px`);
+          panel.style.removeProperty("--stack-content-opacity");
+        } else {
+          panel.style.removeProperty("--stack-content-y");
+          panel.style.removeProperty("--stack-content-opacity");
+        }
+      });
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
+    };
+
+    updatePinnedPanels();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    media.addEventListener("change", scheduleUpdate);
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      media.removeEventListener("change", scheduleUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+      panels.forEach(resetPanelMotion);
+    };
+  }, []);
   useEffect(() => {
     const hero = document.querySelector(".hero");
     if (!hero) return;
@@ -362,10 +730,21 @@ export default function Home() {
 
       <section className="hero" id="top">
         <motion.div className="hero-orb one" style={{y:heroOrbY}}/><div className="hero-orb two"/>
-        <motion.div className="hero-copy-scroll" style={{y:heroCopyY,opacity:heroCopyOpacity}}>
+        <motion.div className="hero-equipment" style={{y:heroEquipmentY,opacity:heroCopyOpacity,filter:heroCopyBlur}} aria-hidden="true">
+          <motion.div className="equipment-piece cabinet" initial={{opacity:0,x:-150,rotate:-18,scale:.92}} animate={{opacity:1,x:0,rotate:-10,scale:1}} transition={{duration:1.15,delay:.22,ease:[.22,1,.36,1]}}>
+            <img src="/images/hero/control-cabinet.png" alt="" />
+          </motion.div>
+          <motion.div className="equipment-piece industrial-fan" initial={{opacity:0,x:150,rotate:18,scale:.92}} animate={{opacity:1,x:0,rotate:9,scale:1}} transition={{duration:1.15,delay:.3,ease:[.22,1,.36,1]}}>
+            <img src="/images/hero/industrial-fan.png" alt="" />
+          </motion.div>
+        </motion.div>
+        <motion.div className="hero-copy-scroll" style={{y:heroCopyY,opacity:heroCopyOpacity,filter:heroCopyBlur}}>
         <motion.div className="hero-copy" initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.8}}>
-          <span className="eyebrow"><StatusDot/> Диспетчеризация вентиляции коммерческих объектов</span>
-          <h1>Вся вентиляция<br/>объекта — <em>в одном</em><br/>понятном интерфейсе</h1>
+          <div className="hero-labels" aria-label="SCADA и HVAC для коммерческих объектов">
+            <span className="hero-label primary">SCADA / HVAC</span>
+            <span className="hero-label secondary">Коммерческие объекты</span>
+          </div>
+          <h1>Вся вентиляция<br/>объекта — <span className="title-accent">в одном</span><br/>понятном интерфейсе</h1>
           <p>Объединяю установки, существующую автоматику, SCADA, архивы и аварийные уведомления в систему, которой удобно пользоваться каждый день.</p>
           <div className="hero-actions"><a className="button dark" href="#contact">Получить решение <ArrowRight size={18}/></a><a className="text-link" href="#cases"><span className="play">▶</span> Смотреть демо</a></div>
         </motion.div>
@@ -374,13 +753,17 @@ export default function Home() {
         <div className="hero-ticker"><span>MODBUS TCP</span><i/><span>BACNET</span><i/><span>OPC UA</span><i/><span>SCADA</span><i/><span>24/7 МОНИТОРИНГ</span></div>
       </section>
 
+      <div className="stack-root">
+      <StackSlot>
       <motion.section className="intro section stack-panel panel-paper layer-1" {...reveal}>
         <span className="section-tag">/ Результат</span>
         <h2>Не просто визуализация.<br/><span>Рабочий инструмент эксплуатации.</span></h2>
         <p className="section-lead">Техническая служба видит состояние всего объекта, понимает причину аварии и принимает решение на основании данных — ещё до выезда инженера.</p>
         <div className="benefit-grid" id="result">{benefits.map(([n,title,text,Icon],i)=><motion.article key={n} className="benefit-card" initial={{opacity:0,y:44,scale:.985}} whileInView={{opacity:1,y:0,scale:1}} viewport={{once:true,margin:"-70px"}} transition={{duration:.7,delay:i*.09,ease:[.22,1,.36,1]}}><div className="card-top"><span>{n}</span><Icon size={24}/></div><h3>{title}</h3><p>{text}</p><ArrowDownRight className="card-arrow" size={20}/></motion.article>)}</div>
       </motion.section>
+      </StackSlot>
 
+      <StackSlot>
       <section className="problem-section stack-panel layer-2">
         <motion.div className="problem-copy" {...reveal}><span className="section-tag">/ До диспетчеризации</span><h2>Когда каждая установка работает сама по себе</h2><p>О проблеме узнают после жалоб, диагностика требует выезда, а история параметров теряется. Разрозненные панели не дают общей картины.</p><a className="text-link white" href="#audit">Проверить свой объект <ArrowRight size={17}/></a></motion.div>
         <motion.div className="problem-console" initial={{opacity:0,x:55}} whileInView={{opacity:1,x:0}} viewport={{once:true,margin:"-90px"}} transition={{duration:.85,ease:[.22,1,.36,1]}}>
@@ -394,19 +777,20 @@ export default function Home() {
           <div className="console-stats"><div><small>Среднее время реакции</small><strong>4:12</strong><span>минут</span></div><div><small>Выездов предотвращено</small><strong>12</strong><span>за квартал</span></div></div>
         </motion.div>
       </section>
+      </StackSlot>
 
+      <StackSlot>
       <section className="audit section stack-panel panel-ice layer-3" id="audit">
         <motion.div className="audit-card" {...reveal}>
           <div className="audit-copy"><span className="section-tag">/ Бесплатный экспресс-аудит</span><h2>Можно ли подключить ваш объект к единой диспетчерской?</h2><p>Пришлите перечень оборудования, схемы или фотографии шкафов. Я отмечу, что можно сохранить, где нужна модернизация и какие данные получится вывести.</p><ul><li><Check/> Карта подключения</li><li><Check/> Состав проекта</li><li><Check/> Недостающие данные</li></ul></div>
           <LeadForm compact />
         </motion.div>
       </section>
+      </StackSlot>
 
-      <section className="process section stack-panel panel-paper layer-4" id="process">
-        <motion.div className="section-heading split" {...reveal}><div><span className="section-tag">/ Полный цикл</span><h2>Закрываю весь технический контур проекта</h2></div><p>Один инженер ведёт систему от первого сигнала в шкафу до готового экрана диспетчерской. Меньше потерь между отделами — больше контроля над результатом.</p></motion.div>
-        <div className="steps">{steps.map(([n,title,text],i)=><motion.article key={n} {...reveal} transition={{...reveal.transition,delay:i*.04}}><span className="step-num">{n}</span><div><h3>{title}</h3><p>{text}</p></div><ArrowDownRight/></motion.article>)}</div>
-      </section>
+      <ProcessFlow />
 
+      <StackSlot>
       <section className="scenario-section section stack-panel panel-white layer-5">
         <div className="section-heading"><span className="section-tag">/ Для каких объектов</span><h2>Новый, действующий<br/>или распределённый</h2></div>
         <motion.div className="scenario-layout" initial={{opacity:0,y:48}} whileInView={{opacity:1,y:0}} viewport={{once:true,margin:"-80px"}} transition={{duration:.8,ease:[.22,1,.36,1]}}>
@@ -414,32 +798,90 @@ export default function Home() {
           <AnimatePresence mode="wait"><motion.div key={scenario} className="scenario-card" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-20}} transition={{duration:.35}}><div className="scenario-blueprint"><div className="building"><Building2/><span className="signal s1"/><span className="signal s2"/><span className="signal s3"/></div><div className="radar r1"/><div className="radar r2"/><span className="blueprint-label">Объект / {String(scenario+1).padStart(2,"0")}</span></div><div className="scenario-info"><span>{scenarios[scenario].label}</span><h3>{scenarios[scenario].title}</h3><p>{scenarios[scenario].text}</p><div className="big-stat"><strong>{scenarios[scenario].stat}</strong><small>{scenarios[scenario].meta}</small></div></div></motion.div></AnimatePresence>
         </motion.div>
       </section>
+      </StackSlot>
 
+      <StackSlot>
       <section className="case section stack-panel panel-mist layer-6" id="cases">
-        <motion.div className="case-shell" {...reveal}>
-          <div className="case-top"><span className="section-tag light">/ Реальный результат</span><span>Бизнес-центр · 18 400 м² · Москва</span></div>
-          <div className="case-grid"><div className="case-copy"><h2>42 установки.<br/>Один центр контроля.</h2><p>До проекта — отдельные панели и ручной обход. После — единая SCADA, архивы и Telegram-уведомления.</p><div className="case-numbers"><div><strong>648</strong><span>параметров</span></div><div><strong>37</strong><span>типов аварий</span></div><div><strong>8</strong><span>экранов</span></div></div><a className="button light-button" href="#contact">Получить демонстрацию <ArrowRight/></a></div><motion.div className="case-ui" style={{y:caseVisualY}}><MiniScada/></motion.div></div>
+        <motion.div className="case-carousel" {...reveal}>
+            <motion.div
+              className="case-shell"
+              drag="x"
+              dragDirectionLock
+              dragConstraints={{left:0,right:0}}
+              dragElastic={.06}
+              onDragEnd={(_,info)=>{if(info.offset.x<-60)moveCase(activeCase+1);if(info.offset.x>60)moveCase(activeCase-1)}}
+            >
+              <div className="case-top">
+                <span className="section-tag light">/ Реальный результат</span>
+                <div className="case-top-right"><AnimatePresence initial={false} mode="wait"><motion.span key={activeCase} initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-6}} transition={{duration:.35,ease:[.22,1,.36,1]}}>{caseStudies[activeCase].meta}</motion.span></AnimatePresence><div className="case-arrows"><button onClick={()=>moveCase(activeCase-1)} aria-label="Предыдущий кейс"><ChevronLeft/></button><b>{String(activeCase+1).padStart(2,"0")} / 07</b><button onClick={()=>moveCase(activeCase+1)} aria-label="Следующий кейс"><ChevronRight/></button></div></div>
+              </div>
+              <div className="case-grid">
+                <AnimatePresence initial={false} mode="sync"><motion.div className="case-copy" key={activeCase} initial={{opacity:0,x:caseDirection*12}} animate={{opacity:1,x:0}} exit={{opacity:0,x:caseDirection*-8}} transition={{duration:.68,delay:.16,ease:[.22,1,.36,1]}}>
+                  <h2><span>{caseStudies[activeCase].title[0]}</span><br/><span>{caseStudies[activeCase].title[1]}</span></h2>
+                  <p>{caseStudies[activeCase].text}</p>
+                  <div className="case-numbers">{caseStudies[activeCase].metrics.map(([value,label],index)=><motion.div key={label} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:.3+index*.07,duration:.5}}><strong>{value}</strong><span>{label}</span></motion.div>)}</div>
+                  <div className="case-actions"><a className="button light-button" href="#contact">Получить демонстрацию <ArrowRight/></a><div className="case-dots">{caseStudies.map((item,index)=><button key={item.meta} className={index===activeCase?"active":""} onClick={()=>moveCase(index)} aria-label={`Показать кейс ${index+1}`}><i/></button>)}</div></div>
+                </motion.div></AnimatePresence>
+                <motion.div className="case-ui" style={{y:caseVisualY}}><AnimatedMiniScada variant={caseStudies[activeCase].variant} direction={caseDirection}/></motion.div>
+              </div>
+              <motion.div className={`case-airflow-sweep ${caseDirection<0?"reverse":""}`} key={`case-air-${activeCase}`} initial={{x:caseDirection>0?"-180%":"500%",opacity:0}} animate={{x:caseDirection>0?"500%":"-180%",opacity:[0,.55,.38,0]}} transition={{duration:1.16,times:[0,.2,.7,1],ease:[.32,0,.18,1]}} aria-hidden="true"/>
+            </motion.div>
         </motion.div>
       </section>
+      </StackSlot>
 
+      <StackSlot>
       <section className="trust section stack-panel panel-paper layer-7">
-        <motion.div className="trust-heading" {...reveal}><span className="section-tag">/ Инженерный подход</span><h2>Система не станет<br/><em>«чёрным ящиком»</em></h2></motion.div>
+        <motion.div className="trust-heading" {...reveal}><span className="section-tag">/ Инженерный подход</span><h2>Система не станет<br/><span className="title-accent">«чёрным ящиком»</span></h2></motion.div>
         <div className="trust-grid"><motion.article initial={{opacity:0,y:38}} whileInView={{opacity:1,y:0}} viewport={{once:true,margin:"-70px"}} transition={{duration:.7}}><ShieldCheck/><h3>Автономность</h3><p>Локальная автоматика продолжает работать и выполнять защиты даже без связи с диспетчерской.</p></motion.article><motion.article initial={{opacity:0,y:38}} whileInView={{opacity:1,y:0}} viewport={{once:true,margin:"-70px"}} transition={{duration:.7,delay:.1}}><FileStack/><h3>Исходники у вас</h3><p>Передаю схемы, программы, резервные копии, сетевые параметры и инструкции.</p></motion.article><motion.article initial={{opacity:0,y:38}} whileInView={{opacity:1,y:0}} viewport={{once:true,margin:"-70px"}} transition={{duration:.7,delay:.2}}><SlidersHorizontal/><h3>Прозрачные этапы</h3><p>Функции, сигналы, сроки, границы ответственности и комплект документов фиксируются заранее.</p></motion.article></div>
       </section>
+      </StackSlot>
 
+      <StackSlot>
       <section className="faq section stack-panel panel-white layer-8" id="faq">
         <div className="faq-title"><span className="section-tag">/ FAQ</span><h2>Частые вопросы</h2><p>Коротко о совместимости, отказоустойчивости и формате работы.</p></div>
         <div className="faq-list">{faqs.map(([q,a],i)=><motion.div className={`faq-item ${faq===i?"open":""}`} key={q} initial={{opacity:0,x:28}} whileInView={{opacity:1,x:0}} viewport={{once:true,margin:"-40px"}} transition={{duration:.55,delay:i*.055}}><button onClick={()=>setFaq(faq===i?-1:i)}><span>0{i+1}</span><strong>{q}</strong><ChevronDown/></button><AnimatePresence initial={false}>{faq===i&&<motion.p initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}}>{a}</motion.p>}</AnimatePresence></motion.div>)}</div>
       </section>
-
+      </StackSlot>
+      <StackSlot>
       <section className="contact section stack-panel panel-blue layer-9" id="contact">
         <motion.div className="contact-shell" {...reveal}>
-          <div className="contact-copy"><span className="section-tag light">/ Предварительная концепция</span><h2>Давайте соберём<br/>ваш объект<br/><em>в одну систему</em></h2><p>Вы общаетесь напрямую с инженером, который проектирует решение и участвует в запуске.</p><div className="contact-meta"><span><Radio/> Ответ в течение рабочего дня</span><span><Clock3/> Первый разбор — бесплатно</span></div></div>
+          <div className="contact-copy"><span className="section-tag light">/ Предварительная концепция</span><h2>Давайте соберём<br/>ваш объект<br/><span className="title-accent">в одну систему</span></h2><p>Вы общаетесь напрямую с инженером, который проектирует решение и участвует в запуске.</p><div className="contact-meta"><span><Radio/> Ответ в течение рабочего дня</span><span><Clock3/> Первый разбор — бесплатно</span></div></div>
           <LeadForm />
         </motion.div>
       </section>
+      </StackSlot>
 
-      <footer className="stack-panel panel-blue layer-10"><div className="footer-brand"><span>AER</span><Fan/><span>N</span></div><div className="footer-row"><span>Диспетчеризация вентиляции коммерческих объектов</span><div><PrivacyLink>Конфиденциальность</PrivacyLink><CookieSettingsButton/><a href="#faq">FAQ</a></div><span>© 2026 · Инженерная точность</span></div></footer>
+      <StackSlot>
+      <footer className="stack-panel footer-dark about-footer layer-10" id="about">
+        <div className="founder-section">
+          <div className="founder-heading">
+            <div><span className="section-tag light">/ Лично отвечаю за результат</span><h2>Меня зовут<br/>Павел</h2></div>
+            <p>Я инженер по автоматизации. Сам погружаюсь в объект, проектирую архитектуру и остаюсь на связи после запуска.</p>
+          </div>
+          <div className="founder-content">
+            <div className="founder-video" aria-label="Место для приветственного видео Павла">
+              <div className="founder-video-grid" aria-hidden="true"><span/><span/><span/><span/><span/><span/></div>
+              <span className="founder-video-label"><i/> Приветственное видео</span>
+              <div className="founder-play"><Play fill="currentColor"/></div>
+              <div className="founder-video-caption"><strong>Знакомство без презентаций</strong><span>Скоро здесь появится видео · 02:14</span></div>
+            </div>
+            <aside className="founder-facts">
+              <span>Коротко обо мне</span>
+              <p>Не передаю проект между отделами: один человек отвечает за техническую логику, интерфейс и итог на объекте.</p>
+              <div className="founder-fact-list">
+                <div><b>01</b><strong>Инженер АСУ ТП</strong><small>Проектирование и запуск</small></div>
+                <div><b>02</b><strong>Полный цикл</strong><small>От обследования до ПНР</small></div>
+                <div><b>03</b><strong>Прямая связь</strong><small>Без менеджеров-посредников</small></div>
+              </div>
+              <a className="founder-cta" href="#contact" onClick={scrollToContact}><span><small>Перейти к форме заявки</small><strong>Описать ваш объект</strong></span><ArrowUpRight/></a>
+            </aside>
+          </div>
+        </div>
+        <div className="footer-row"><span>Диспетчеризация вентиляции коммерческих объектов</span><div><PrivacyLink>Конфиденциальность</PrivacyLink><CookieSettingsButton/><a href="#faq">FAQ</a></div><span>© 2026 · Инженерная точность</span></div>
+      </footer>
+      </StackSlot>
+      </div>
     </main>
   );
 }
