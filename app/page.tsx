@@ -2364,11 +2364,38 @@ export default function Home() {
               viewport={{ once: true, margin: "-90px" }}
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
-              <img
-                src="/images/real-mnemo/mnemo-before.png"
-                alt="Реальная мнемосхема до диспетчеризации"
-                className="mnemo-screenshot"
-              />
+              <div className="console-3d-wrap">
+                {/* 3D Icon 1: Background (Far/Sharp, small) */}
+                <img
+                  src="/images/real-mnemo/icon-3d-1.png"
+                  alt=""
+                  className="icon-3d depth-far"
+                  aria-hidden="true"
+                />
+
+                {/* Main Monitor */}
+                <img
+                  src="/images/real-mnemo/mnemo-before.png"
+                  alt="Реальная мнемосхема до диспетчеризации"
+                  className="mnemo-screenshot"
+                />
+
+                {/* 3D Icon 2: Midground (Mid-depth/Slightly blurred, medium) */}
+                <img
+                  src="/images/real-mnemo/icon-3d-2.png"
+                  alt=""
+                  className="icon-3d depth-mid"
+                  aria-hidden="true"
+                />
+
+                {/* 3D Icon 3: Foreground (Near/Very blurred, large) */}
+                <img
+                  src="/images/real-mnemo/icon-3d-3.png"
+                  alt=""
+                  className="icon-3d depth-near"
+                  aria-hidden="true"
+                />
+              </div>
             </motion.div>
           </section>
         </StackSlot>
