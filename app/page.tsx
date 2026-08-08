@@ -1779,8 +1779,61 @@ export default function Home() {
         }
       });
     };
+    let isAutoScrolling = false;
+    let scrollEndTimeout: number;
+
+    const handleScrollSnap = () => {
+      if (isAutoScrolling) return;
+
+      window.clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = window.setTimeout(() => {
+        if (!media.matches) return;
+
+        // Игнорируем автодоводчик, если мы скроллим внутри длинного процесса с анимациями
+        const runway = document.querySelector<HTMLElement>(".process-runway");
+        if (runway) {
+          const rect = runway.getBoundingClientRect();
+          if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
+            return;
+          }
+        }
+
+        const targets = Array.from(
+          document.querySelectorAll<HTMLElement>(".hero, .stack-slot, .process-runway")
+        );
+
+        let closestTarget: HTMLElement | null = null;
+        let minDiff = Infinity;
+
+        targets.forEach((target) => {
+          const rect = target.getBoundingClientRect();
+          const diff = Math.abs(rect.top);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestTarget = target;
+          }
+        });
+
+        if (closestTarget && minDiff > 12) {
+          const rect = (closestTarget as HTMLElement).getBoundingClientRect();
+          const targetTop = window.scrollY + rect.top;
+
+          isAutoScrolling = true;
+          window.scrollTo({
+            top: targetTop,
+            behavior: "smooth",
+          });
+
+          window.setTimeout(() => {
+            isAutoScrolling = false;
+          }, 800);
+        }
+      }, 350) as any;
+    };
+
     const scheduleUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
+      handleScrollSnap();
     };
 
     updatePinnedPanels();
@@ -1792,6 +1845,7 @@ export default function Home() {
       window.removeEventListener("resize", scheduleUpdate);
       media.removeEventListener("change", scheduleUpdate);
       if (frame) window.cancelAnimationFrame(frame);
+      window.clearTimeout(scrollEndTimeout);
       panels.forEach(resetPanelMotion);
     };
   }, []);
