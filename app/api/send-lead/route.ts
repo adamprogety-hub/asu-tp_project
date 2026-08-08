@@ -3,6 +3,19 @@ import { WorkerMailer } from "worker-mailer";
 
 export const runtime = "edge";
 
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const len = bytes.byteLength;
+  const chunk = 8192;
+  for (let i = 0; i < len; i += chunk) {
+    const slice = bytes.subarray(i, i + chunk);
+    // @ts-ignore
+    binary += String.fromCharCode.apply(null, slice);
+  }
+  return btoa(binary);
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -20,9 +33,10 @@ export async function POST(request: Request) {
     for (const file of files) {
       if (file.size > 0) {
         const buffer = await file.arrayBuffer();
+        const base64Content = arrayBufferToBase64(buffer);
         attachments.push({
           filename: file.name,
-          content: new Uint8Array(buffer),
+          content: base64Content,
           type: file.type || "application/octet-stream",
           disposition: "attachment",
         });
