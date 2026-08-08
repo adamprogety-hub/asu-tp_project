@@ -1243,6 +1243,21 @@ p {
   border-color: #8db9cc;
   box-shadow: 0 0 0 3px rgba(141, 185, 204, 0.15);
 }
+.lead-form input.valid-input {
+  border-color: #5ab3a5 !important;
+  box-shadow: 0 0 0 3px rgba(90, 179, 165, 0.15) !important;
+}
+.lead-form input.valid-input:focus {
+  border-color: #4ebfae !important;
+  box-shadow: 0 0 0 3px rgba(78, 191, 174, 0.22) !important;
+}
+.form-error-msg {
+  color: #d97706;
+  font-size: 11px;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}
 .wide-field {
   margin-top: 15px;
 }

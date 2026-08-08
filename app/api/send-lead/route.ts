@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       host,
       port,
       secure: port === 465,
+      authType: ["plain", "login"],
     });
 
     // Format email body

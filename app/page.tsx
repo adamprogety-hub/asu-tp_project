@@ -880,9 +880,63 @@ function ScadaCarousel() {
 function LeadForm({ compact = false }: { compact?: boolean }) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [contact, setContact] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   // Honeypot: боты заполняют скрытые поля — мы их игнорируем
   const [honeypot, setHoneypot] = useState("");
+
+  const isValidContact = useMemo(() => {
+    if (!contact) return false;
+    // Для телефона: должно быть ровно 11 цифр (+7 и 10 цифр номера)
+    const digitsCount = contact.replace(/\D/g, "").length;
+    const isPhone = contact.startsWith("+7") && digitsCount === 11;
+    // Для почты: базовая проверка на формат email
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+    return isPhone || isEmail;
+  }, [contact]);
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // Если начинается с цифры, плюса или скобки — расцениваем как попытку ввести телефон
+    const isPhoneLike = /^[+0-9(]/.test(value);
+
+    if (isPhoneLike) {
+      const digits = value.replace(/\D/g, "");
+      
+      let number = digits;
+      if (number.startsWith("7") || number.startsWith("8")) {
+        number = number.substring(1);
+      }
+      
+      number = number.substring(0, 10);
+      
+      let formatted = "";
+      if (digits.length > 0) {
+        formatted = "+7";
+      }
+      if (number.length > 0) {
+        formatted += " (" + number.substring(0, 3);
+      }
+      if (number.length >= 4) {
+        formatted += ") " + number.substring(3, 6);
+      }
+      if (number.length >= 7) {
+        formatted += "-" + number.substring(6, 8);
+      }
+      if (number.length >= 9) {
+        formatted += "-" + number.substring(8, 10);
+      }
+      
+      setContact(formatted);
+    } else {
+      // Иначе разрешаем свободный ввод букв (для email)
+      setContact(value);
+    }
+    
+    if (errorMsg) setErrorMsg("");
+  };
 
   const addFiles = (incoming: FileList | File[]) =>
     setFiles((current) => {
@@ -903,13 +957,12 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
       className={`lead-form ${compact ? "compact" : ""}`}
       onSubmit={async (e) => {
         e.preventDefault();
-        // Honeypot: если поле заполнено — это бот, тихо игнорируем
         if (honeypot) return;
 
+        setErrorMsg("");
         setSending(true);
         try {
           const formData = new FormData(e.currentTarget);
-          // Добавляем файлы из React стейта
           files.forEach((file) => {
             formData.append("files", file);
           });
@@ -924,11 +977,11 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
             setFiles([]);
           } else {
             const data = await response.json().catch(() => ({}));
-            alert(data.error || "Не удалось отправить заявку. Попробуйте позже.");
+            setErrorMsg(data.error || "Не удалось отправить заявку. Попробуйте позже.");
           }
         } catch (error) {
           console.error("Submit error:", error);
-          alert("Произошла ошибка при отправке. Проверьте интернет-соединение.");
+          setErrorMsg("Произошла ошибка при отправке. Проверьте интернет-соединение.");
         } finally {
           setSending(false);
         }
@@ -960,7 +1013,14 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
         </label>
         <label>
           <span>Телефон или почта</span>
-          <input required name="contact" placeholder="+7 999 000 00 00 или name@company.ru" />
+          <input
+            required
+            name="contact"
+            value={contact}
+            onChange={handleContactChange}
+            placeholder="+7 999 000 00 00 или name@company.ru"
+            className={isValidContact ? "valid-input" : ""}
+          />
         </label>
         {!compact && (
           <label>
@@ -972,7 +1032,7 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
                 </option>
                 <option>Бизнес-центр</option>
                 <option>Торговый объект</option>
-                <option>Медицинский центр</option>
+                <option>Мedicинский центр</option>
                 <option>Гостиница</option>
                 <option>Склад / производство</option>
                 <option>Другое</option>
@@ -1072,7 +1132,7 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
       <button className="button dark wide" type="submit" disabled={sending || sent}>
         {sent ? (
           <>
-            <Check size={18} /> Заявка принята
+            <Check size={18} /> Отправлено! Свяжемся в течение 2 часов
           </>
         ) : sending ? (
           <>
@@ -1084,9 +1144,16 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
           </>
         )}
       </button>
-      <p>
+      
+      {errorMsg && (
+        <p className="form-error-msg">
+          {errorMsg}
+        </p>
+      )}
+
+      <p style={{ marginTop: "10px" }}>
         {sent
-          ? "Спасибо. Инженер свяжется с вами и уточнит исходные данные."
+          ? "Мы свяжемся с вами в течение 2 часов для уточнения деталей."
           : "PDF, фото, документы, таблицы, архивы и CAD-файлы. До 10 файлов. Нажимая кнопку, вы соглашаетесь с обработкой данных."}
       </p>
     </form>
