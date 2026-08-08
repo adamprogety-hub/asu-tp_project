@@ -1502,7 +1502,7 @@ function ProcessCard({
               <small>Стоимость</small>
               <strong>от {price} ₽</strong>
             </div>
-            <a className="process-cta" href="#contact">
+            <a className="process-cta" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
               Обсудить задачу <ArrowRight size={18} />
             </a>
           </div>
@@ -1664,16 +1664,43 @@ export default function Home() {
     );
     setActiveCase(normalized);
   };
+  const scrollToSection = (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => {
+    if (event) event.preventDefault();
+    if (id === "#top") {
+      navigationLocked.current = true;
+      setNavDropOpen(false);
+      setMenuOpen(false);
+      window.history.replaceState(null, "", "/");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.setTimeout(() => {
+        navigationLocked.current = false;
+      }, 1200);
+      return;
+    }
+
+    const target = document.querySelector<HTMLElement>(id);
+    if (!target) return;
+
+    navigationLocked.current = true;
+    setNavDropOpen(false);
+    setMenuOpen(false);
+
+    const slot = target.closest<HTMLElement>(".stack-slot, .process-runway");
+    const scrollTarget = slot || target;
+
+    const rect = scrollTarget.getBoundingClientRect();
+    const targetTop = Math.max(0, window.scrollY + rect.top - 8);
+
+    window.history.replaceState(null, "", id);
+    window.scrollTo({ top: targetTop, behavior: "smooth" });
+
+    window.setTimeout(() => {
+      navigationLocked.current = false;
+    }, 1200);
+  };
+
   const scrollToContact = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    const contactPanel = document.querySelector<HTMLElement>("#contact");
-    if (!contactPanel) return;
-    const slot = contactPanel.closest<HTMLElement>(".stack-slot");
-    const target =
-      slot && slot.getBoundingClientRect().height > 1 ? slot : contactPanel;
-    const targetTop = target.getBoundingClientRect().top + window.scrollY;
-    window.history.replaceState(null, "", "#contact");
-    window.scrollTo({ top: Math.max(0, targetTop - 8), behavior: "smooth" });
+    scrollToSection("#contact", event);
   };
   useEffect(() => {
     const media = window.matchMedia(
@@ -1784,6 +1811,7 @@ export default function Home() {
 
     const handleScrollSnap = () => {
       if (isAutoScrolling) return;
+      if (navigationLocked.current) return;
 
       window.clearTimeout(scrollEndTimeout);
       scrollEndTimeout = window.setTimeout(() => {
@@ -1947,7 +1975,7 @@ export default function Home() {
       <motion.div className="progress" style={{ scaleX }} />
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
       <nav className="nav">
-        <a className="logo" href="#top" aria-label="AERON — на главную">
+        <a className="logo" href="#top" aria-label="AERON — на главную" onClick={(e) => scrollToSection("#top", e)}>
           <span>AER</span>
           <Fan size={20} />
           <span>N</span>
@@ -1979,32 +2007,32 @@ export default function Home() {
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.18, ease: [0.25, 0, 0.1, 1] }}
                 >
-                  <a href="#result" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#result" className="nav-drop-item" onClick={(e) => scrollToSection("#result", e)}>
                     <CircleGauge size={15} strokeWidth={1.5} />
                     <span>Возможности</span>
                   </a>
-                  <a href="#process" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#process" className="nav-drop-item" onClick={(e) => scrollToSection("#process", e)}>
                     <ListChecks size={15} strokeWidth={1.5} />
                     <span>Как работаю</span>
                   </a>
-                  <a href="#cases" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#cases" className="nav-drop-item" onClick={(e) => scrollToSection("#cases", e)}>
                     <LayoutDashboard size={15} strokeWidth={1.5} />
                     <span>Что уже выполнено</span>
                   </a>
-                  <a href="#audit" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#audit" className="nav-drop-item" onClick={(e) => scrollToSection("#audit", e)}>
                     <ShieldCheck size={15} strokeWidth={1.5} />
                     <span>Бесплатный аудит</span>
                   </a>
-                  <a href="#faq" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#faq" className="nav-drop-item" onClick={(e) => scrollToSection("#faq", e)}>
                     <MessageCircle size={15} strokeWidth={1.5} />
                     <span>Вопросы</span>
                   </a>
-                  <a href="#about" className="nav-drop-item" onClick={() => setNavDropOpen(false)}>
+                  <a href="#about" className="nav-drop-item" onClick={(e) => scrollToSection("#about", e)}>
                     <User size={15} strokeWidth={1.5} />
                     <span>Меня зовут Павел</span>
                   </a>
                   <div className="nav-drop-divider" />
-                  <a href="#contact" className="nav-drop-item nav-drop-cta" onClick={() => setNavDropOpen(false)}>
+                  <a href="#contact" className="nav-drop-item nav-drop-cta" onClick={(e) => scrollToSection("#contact", e)}>
                     <Send size={15} strokeWidth={1.5} />
                     <span>Обсудить объект</span>
                   </a>
@@ -2012,7 +2040,7 @@ export default function Home() {
               )}
             </AnimatePresence>
           </div>
-          <a className="nav-cta" href="#contact">
+          <a className="nav-cta" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
             Обсудить объект <ArrowDownRight size={16} />
           </a>
         </div>
@@ -2041,34 +2069,34 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            <a href="#result" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#result" className="mobile-menu-item" onClick={(e) => scrollToSection("#result", e)}>
               <CircleGauge size={16} strokeWidth={1.5} />
               <span>Возможности</span>
             </a>
-            <a href="#process" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#process" className="mobile-menu-item" onClick={(e) => scrollToSection("#process", e)}>
               <ListChecks size={16} strokeWidth={1.5} />
               <span>Как работаю</span>
             </a>
-            <a href="#cases" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#cases" className="mobile-menu-item" onClick={(e) => scrollToSection("#cases", e)}>
               <LayoutDashboard size={16} strokeWidth={1.5} />
               <span>Что уже выполнено</span>
             </a>
-            <a href="#audit" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#audit" className="mobile-menu-item" onClick={(e) => scrollToSection("#audit", e)}>
               <ShieldCheck size={16} strokeWidth={1.5} />
               <span>Бесплатный аудит</span>
             </a>
-            <a href="#faq" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#faq" className="mobile-menu-item" onClick={(e) => scrollToSection("#faq", e)}>
               <MessageCircle size={16} strokeWidth={1.5} />
               <span>Вопросы</span>
             </a>
-            <a href="#about" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
+            <a href="#about" className="mobile-menu-item" onClick={(e) => scrollToSection("#about", e)}>
               <User size={16} strokeWidth={1.5} />
               <span>Меня зовут Павел</span>
             </a>
             <a
               className="mobile-menu-cta"
               href="#contact"
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => scrollToSection("#contact", e)}
             >
               Обсудить объект <ArrowDownRight size={17} />
             </a>
@@ -2157,10 +2185,10 @@ export default function Home() {
               каждый день.
             </p>
             <div className="hero-actions">
-              <a className="button dark" href="#contact">
+              <a className="button dark" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
                 Получить решение <ArrowRight size={18} />
               </a>
-              <a className="button outline" href="#cases">
+              <a className="button outline" href="#cases" onClick={(e) => scrollToSection("#cases", e)}>
                 <Play size={14} fill="currentColor" strokeWidth={0} style={{ transform: "translateX(1px)" }} /> Что уже выполнено
               </a>
             </div>
@@ -2324,7 +2352,7 @@ export default function Home() {
                 параметров нигде не хранится. Каждая установка живёт сама по
                 себе.
               </p>
-              <a className="text-link white" href="#audit">
+              <a className="text-link white" href="#audit" onClick={(e) => scrollToSection("#audit", e)}>
                 Проверить свой объект <ArrowRight size={17} />
               </a>
             </motion.div>
@@ -2390,7 +2418,7 @@ export default function Home() {
                 </div>
                 <div className="scenario-footer">
                   <p>Уже установлен другой контроллер или SCADA? Проверю интерфейсы связи и предложу способ интеграции без полной замены автоматики.</p>
-                  <a href="#contact" className="button dark">
+                  <a href="#contact" className="button dark" onClick={(e) => scrollToSection("#contact", e)}>
                     Обсудить оборудование <ArrowRight size={16} strokeWidth={1.8} />
                   </a>
                 </div>
@@ -2550,7 +2578,7 @@ export default function Home() {
                         )}
                       </div>
                       <div className="case-actions">
-                        <a className="button light-button" href="#contact">
+                        <a className="button light-button" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
                           То, что нам нужно <ArrowRight />
                         </a>
                         <div className="case-dots">
@@ -2888,7 +2916,7 @@ export default function Home() {
               <div>
                 <PrivacyLink>Конфиденциальность</PrivacyLink>
                 <CookieSettingsButton />
-                <a href="#faq">FAQ</a>
+                <a href="#faq" onClick={(e) => scrollToSection("#faq", e)}>FAQ</a>
               </div>
               <span>
                 © 2026 · Инженерная точность · Разработал сайт —{" "}
