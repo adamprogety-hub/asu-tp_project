@@ -1607,6 +1607,7 @@ export default function Home() {
   const [heroPassed, setHeroPassed] = useState(false);
   const [activeCase, setActiveCase] = useState(0);
   const [caseDirection, setCaseDirection] = useState(1);
+  const navigationLocked = useRef(false);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
