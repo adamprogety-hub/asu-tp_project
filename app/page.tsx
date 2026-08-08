@@ -879,6 +879,7 @@ function ScadaCarousel() {
 
 function LeadForm({ compact = false }: { compact?: boolean }) {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   // Honeypot: боты заполняют скрытые поля — мы их игнорируем
   const [honeypot, setHoneypot] = useState("");
@@ -900,11 +901,37 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
   return (
     <form
       className={`lead-form ${compact ? "compact" : ""}`}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         // Honeypot: если поле заполнено — это бот, тихо игнорируем
         if (honeypot) return;
-        setSent(true);
+
+        setSending(true);
+        try {
+          const formData = new FormData(e.currentTarget);
+          // Добавляем файлы из React стейта
+          files.forEach((file) => {
+            formData.append("files", file);
+          });
+
+          const response = await fetch("/api/send-lead", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            setSent(true);
+            setFiles([]);
+          } else {
+            const data = await response.json().catch(() => ({}));
+            alert(data.error || "Не удалось отправить заявку. Попробуйте позже.");
+          }
+        } catch (error) {
+          console.error("Submit error:", error);
+          alert("Произошла ошибка при отправке. Проверьте интернет-соединение.");
+        } finally {
+          setSending(false);
+        }
       }}
     >
       {/* ── Honeypot (скрыто от людей, видно ботам) ── */}
@@ -929,17 +956,17 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
       <div className="field-grid">
         <label>
           <span>Ваше имя</span>
-          <input required placeholder="Как к вам обращаться?" />
+          <input required name="name" placeholder="Как к вам обращаться?" />
         </label>
         <label>
           <span>Телефон или почта</span>
-          <input required placeholder="+7 999 000 00 00 или name@company.ru" />
+          <input required name="contact" placeholder="+7 999 000 00 00 или name@company.ru" />
         </label>
         {!compact && (
           <label>
             <span>Тип объекта</span>
             <div className="select-control">
-              <select defaultValue="">
+              <select defaultValue="" name="objectType">
                 <option value="" disabled>
                   Выберите объект
                 </option>
@@ -957,14 +984,14 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
         {!compact && (
           <label>
             <span>Количество установок</span>
-            <input type="number" min="1" placeholder="Например, 8" />
+            <input type="number" min="1" name="unitsCount" placeholder="Например, 8" />
           </label>
         )}
       </div>
       {!compact && (
         <label className="wide-field">
           <span>Коротко о задаче</span>
-          <textarea placeholder="Что нужно объединить и контролировать?" />
+          <textarea name="description" placeholder="Что нужно объединить и контролировать?" />
         </label>
       )}
       {!compact && (
@@ -1042,10 +1069,14 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
           </span>
         </label>
       </div>
-      <button className="button dark wide" type="submit">
+      <button className="button dark wide" type="submit" disabled={sending || sent}>
         {sent ? (
           <>
             <Check size={18} /> Заявка принята
+          </>
+        ) : sending ? (
+          <>
+            Отправка...
           </>
         ) : (
           <>
