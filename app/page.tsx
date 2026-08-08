@@ -1789,7 +1789,24 @@ export default function Home() {
       scrollEndTimeout = window.setTimeout(() => {
         if (!media.matches) return;
 
-        // Игнорируем автодоводчик, если мы скроллим внутри длинного процесса с анимациями
+        // Если пользователь скроллит выше первого слота (в районе Hero/логотипов),
+        // плавно доводим скролл до самого верха страницы (y = 0)
+        const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
+        if (firstSlot) {
+          const rect = firstSlot.getBoundingClientRect();
+          if (rect.top > window.innerHeight * 0.35) {
+            if (window.scrollY > 12) {
+              isAutoScrolling = true;
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              window.setTimeout(() => {
+                isAutoScrolling = false;
+              }, 800);
+            }
+            return;
+          }
+        }
+
+        // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
         const runway = document.querySelector<HTMLElement>(".process-runway");
         if (runway) {
           const rect = runway.getBoundingClientRect();
@@ -1798,8 +1815,9 @@ export default function Home() {
           }
         }
 
+        // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
         const targets = Array.from(
-          document.querySelectorAll<HTMLElement>(".hero, .stack-slot, .process-runway")
+          document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
         );
 
         let closestTarget: HTMLElement | null = null;
@@ -1815,6 +1833,23 @@ export default function Home() {
         });
 
         if (closestTarget && minDiff > 12) {
+          // Проверяем, помещается ли контент предстоящей секции на экране
+          const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
+          
+          let panelHeight = panel.scrollHeight;
+          // Для process-runway берем высоту самого липкого контейнера
+          if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
+            const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
+            if (processSticky) {
+              panelHeight = processSticky.scrollHeight;
+            }
+          }
+
+          const fitsOnScreen = panelHeight <= window.innerHeight + 25;
+
+          // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
+          if (!fitsOnScreen) return;
+
           const rect = (closestTarget as HTMLElement).getBoundingClientRect();
           const targetTop = window.scrollY + rect.top;
 
@@ -1828,7 +1863,7 @@ export default function Home() {
             isAutoScrolling = false;
           }, 800);
         }
-      }, 350) as any;
+      }, 150) as any; // Быстрый отклик за 150мс!
     };
 
     const scheduleUpdate = () => {
