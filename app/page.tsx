@@ -1878,6 +1878,49 @@ export default function Home() {
     };
   }, []);
   useEffect(() => {
+    // На мобильных устройствах включаем наблюдатель для активации карточек при прохождении центра экрана
+    const media = window.matchMedia("(max-width: 1000px)");
+    let observer: IntersectionObserver | null = null;
+    
+    const setupObserver = () => {
+      if (observer) {
+        observer.disconnect();
+      }
+
+      if (media.matches) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              entry.target.classList.toggle("card-active", entry.isIntersecting);
+            });
+          },
+          {
+            // Отслеживаем пересечение с горизонтальной полосой по центру экрана
+            rootMargin: "-42% 0px -42% 0px",
+            threshold: 0,
+          }
+        );
+
+        const cards = document.querySelectorAll(".benefit-card");
+        cards.forEach((card) => observer?.observe(card));
+      } else {
+        const cards = document.querySelectorAll(".benefit-card");
+        cards.forEach((card) => card.classList.remove("card-active"));
+      }
+    };
+
+    setupObserver();
+    media.addEventListener("change", setupObserver);
+    const timer = setTimeout(setupObserver, 800);
+
+    return () => {
+      if (observer) observer.disconnect();
+      media.removeEventListener("change", setupObserver);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const hero = document.querySelector(".hero");
     if (!hero) return;
     const observer = new IntersectionObserver(
@@ -2261,7 +2304,9 @@ export default function Home() {
                     <h3>{title}</h3>
                     <p>{text}</p>
                   </div>
-                  <ArrowDownRight className="card-arrow" size={20} />
+                  <div className="toggle-switch" aria-hidden="true">
+                    <span className="toggle-thumb" />
+                  </div>
                 </motion.article>
               ))}
             </div>
@@ -2660,7 +2705,9 @@ export default function Home() {
                     связи с диспетчерской — все защиты остаются активными.
                   </p>
                 </div>
-                <ArrowDownRight className="card-arrow" size={20} />
+                <div className="toggle-switch" aria-hidden="true">
+                  <span className="toggle-thumb" />
+                </div>
               </motion.article>
               <motion.article
                 className="benefit-card"
@@ -2680,7 +2727,9 @@ export default function Home() {
                     инструкции.
                   </p>
                 </div>
-                <ArrowDownRight className="card-arrow" size={20} />
+                <div className="toggle-switch" aria-hidden="true">
+                  <span className="toggle-thumb" />
+                </div>
               </motion.article>
               <motion.article
                 className="benefit-card"
@@ -2700,7 +2749,9 @@ export default function Home() {
                     до старта работ — чтобы не было сюрпризов в конце.
                   </p>
                 </div>
-                <ArrowDownRight className="card-arrow" size={20} />
+                <div className="toggle-switch" aria-hidden="true">
+                  <span className="toggle-thumb" />
+                </div>
               </motion.article>
             </div>
           </section>
