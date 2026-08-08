@@ -1109,6 +1109,7 @@ p {
 .console-3d-wrap {
   position: relative;
   width: 100%;
+  max-width: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1117,7 +1118,7 @@ p {
   width: 100%;
   height: auto;
   display: block;
-  transform: scale(1.36);
+  transform: scale(1.15);
   transform-origin: center;
   transition: transform 0.3s ease;
   filter: drop-shadow(0 35px 30px rgba(0, 0, 0, 0.55));
@@ -1127,51 +1128,67 @@ p {
   pointer-events: none;
   user-select: none;
   height: auto;
-  will-change: transform;
+  transition: all 0.5s ease;
 }
 .icon-3d.depth-far {
-  width: 140px;
+  width: 110px;
   z-index: 1;
-  left: -40px;
-  top: 10%;
+  left: -20px;
+  top: 5%;
   opacity: 0.95;
-  filter: blur(0.5px) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+  filter: blur(0px) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+  animation: float-icon-far 7s ease-in-out infinite;
 }
 .icon-3d.depth-mid {
-  width: 170px;
+  width: 135px;
   z-index: 3;
-  right: -60px;
-  bottom: 20%;
+  right: -30px;
+  bottom: 12%;
   opacity: 0.9;
-  filter: blur(2.5px) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  filter: blur(2px) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  animation: float-icon-mid 9s ease-in-out infinite;
 }
 .icon-3d.depth-near {
-  width: 250px;
+  width: 190px;
   z-index: 10;
-  left: -80px;
-  bottom: -15%;
+  left: -40px;
+  bottom: -8%;
   opacity: 0.8;
-  filter: blur(9px) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  filter: blur(8px) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  animation: float-icon-near 8s ease-in-out infinite;
+}
+@keyframes float-icon-far {
+  0% { transform: translateY(0) rotate(0deg) scale(0.7); }
+  50% { transform: translateY(-7px) rotate(1.5deg) scale(0.72); }
+  100% { transform: translateY(0) rotate(0deg) scale(0.7); }
+}
+@keyframes float-icon-mid {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(9px) rotate(-2deg) scale(0.98); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+@keyframes float-icon-near {
+  0% { transform: translateY(0) rotate(0deg) scale(1.4); }
+  50% { transform: translateY(-11px) rotate(3deg) scale(1.43); }
+  100% { transform: translateY(0) rotate(0deg) scale(1.4); }
 }
 @media (max-width: 1000px) {
   .mnemo-screenshot {
-    transform: scale(1.1);
+    transform: scale(1.05);
     filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.45));
   }
   .icon-3d.depth-far {
-    width: 90px;
-    left: -20px;
-    top: 8%;
+    width: 75px;
+    left: -10px;
   }
   .icon-3d.depth-mid {
-    width: 110px;
-    right: -30px;
-    bottom: 15%;
+    width: 95px;
+    right: -15px;
   }
   .icon-3d.depth-near {
-    width: 160px;
-    left: -40px;
-    bottom: -10%;
+    width: 130px;
+    left: -20px;
+    bottom: -4%;
     filter: blur(5px) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
   }
 }

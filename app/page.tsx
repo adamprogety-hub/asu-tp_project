@@ -1655,21 +1655,6 @@ export default function Home() {
     [0.48, 0.78],
     [reduceMotion ? 0 : 54, reduceMotion ? 0 : -54],
   );
-
-  const problemSectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: problemSectionScrollProgress } = useScroll({
-    target: problemSectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const iconFarY = useTransform(problemSectionScrollProgress, [0, 1], [60, -60]);
-  const iconFarRotate = useTransform(problemSectionScrollProgress, [0, 1], [-12, 12]);
-
-  const iconMidY = useTransform(problemSectionScrollProgress, [0, 1], [-70, 70]);
-  const iconMidRotate = useTransform(problemSectionScrollProgress, [0, 1], [15, -15]);
-
-  const iconNearY = useTransform(problemSectionScrollProgress, [0, 1], [140, -140]);
-  const iconNearRotate = useTransform(problemSectionScrollProgress, [0, 1], [-22, 22]);
   const moveCase = (next: number) => {
     const normalized = (next + caseStudies.length) % caseStudies.length;
     setCaseDirection(
@@ -2358,7 +2343,7 @@ export default function Home() {
         </StackSlot>
 
         <StackSlot>
-          <section className="problem-section stack-panel layer-2" ref={problemSectionRef}>
+          <section className="problem-section stack-panel layer-2">
             <motion.div className="problem-copy" {...reveal}>
               <span className="section-tag">/ До диспетчеризации</span>
               <h2>Когда каждая установка работает сама по себе</h2>
@@ -2381,12 +2366,11 @@ export default function Home() {
             >
               <div className="console-3d-wrap">
                 {/* 3D Icon 1: Background (Far/Sharp, small) */}
-                <motion.img
+                <img
                   src="/images/real-mnemo/icon-3d-1.png"
                   alt=""
                   className="icon-3d depth-far"
                   aria-hidden="true"
-                  style={{ y: iconFarY, rotate: iconFarRotate }}
                 />
 
                 {/* Main Monitor */}
@@ -2397,21 +2381,19 @@ export default function Home() {
                 />
 
                 {/* 3D Icon 2: Midground (Mid-depth/Slightly blurred, medium) */}
-                <motion.img
+                <img
                   src="/images/real-mnemo/icon-3d-2.png"
                   alt=""
                   className="icon-3d depth-mid"
                   aria-hidden="true"
-                  style={{ y: iconMidY, rotate: iconMidRotate }}
                 />
 
                 {/* 3D Icon 3: Foreground (Near/Very blurred, large) */}
-                <motion.img
+                <img
                   src="/images/real-mnemo/icon-3d-3.png"
                   alt=""
                   className="icon-3d depth-near"
                   aria-hidden="true"
-                  style={{ y: iconNearY, rotate: iconNearRotate }}
                 />
               </div>
             </motion.div>
