@@ -4027,6 +4027,10 @@ main {
   border-radius: 10px;
   transition: background 0.2s;
 }
+.social-menu > button.no-icon {
+  grid-template-columns: 1fr 15px;
+  padding-left: 14px;
+}
 .social-menu > button:hover {
   background: #fff;
 }
@@ -4107,6 +4111,10 @@ main {
   align-items: center;
   color: inherit;
   transition: background 0.2s;
+}
+.phone-menu > a.no-icon {
+  grid-template-columns: 1fr 15px;
+  padding-left: 14px;
 }
 .phone-menu > a:hover {
   background: #fff;

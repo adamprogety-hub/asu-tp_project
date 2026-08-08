@@ -1162,13 +1162,12 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
 }
 
 const contactLinks = {
-  telegram: "",
-  max: "",
+  telegram: "https://t.me/petrovegineering",
 };
 
 const contactPhone = {
-  label: "+7 999 000-00-00",
-  href: "tel:+79990000000",
+  label: "+7 995 887-83-10",
+  href: "tel:+79958878310",
 };
 
 function getFloatingNavigationTargets() {
@@ -1372,25 +1371,10 @@ function FloatingActions({ visible, menuOpen }: { visible: boolean; menuOpen: bo
                   <button
                     type="button"
                     role="menuitem"
-                    aria-disabled={!contactLinks.telegram}
+                    className="no-icon"
                     onClick={() => openContact(contactLinks.telegram)}
                   >
-                    <i className="social-mark telegram">
-                      <Send />
-                    </i>
                     <strong>Telegram</strong>
-                    {!contactLinks.telegram && <small>ссылка скоро</small>}
-                    <ArrowRight />
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    aria-disabled={!contactLinks.max}
-                    onClick={() => openContact(contactLinks.max)}
-                  >
-                    <i className="social-mark max">MAX</i>
-                    <strong>MAX</strong>
-                    {!contactLinks.max && <small>ссылка скоро</small>}
                     <ArrowRight />
                   </button>
                 </motion.div>
@@ -1426,10 +1410,7 @@ function FloatingActions({ visible, menuOpen }: { visible: boolean; menuOpen: bo
                   aria-label="Позвонить владельцу сайта"
                 >
                   <span>Позвонить напрямую</span>
-                  <a href={contactPhone.href}>
-                    <i>
-                      <Phone />
-                    </i>
+                  <a href={contactPhone.href} className="no-icon">
                     <span>
                       <small>Телефон</small>
                       <strong>{contactPhone.label}</strong>
