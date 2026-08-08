@@ -2364,11 +2364,16 @@ export default function Home() {
               viewport={{ once: true, margin: "-90px" }}
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
-              <img
-                src="/images/real-mnemo/mnemo-before.png"
-                alt="Реальная мнемосхема до диспетчеризации"
-                className="mnemo-screenshot"
-              />
+              <div className="console-scene-wrap">
+                <div className="light-spotlight" />
+                <img
+                  src="/images/real-mnemo/mnemo-before.png"
+                  alt="Реальная мнемосхема до диспетчеризации"
+                  className="mnemo-screenshot"
+                />
+                <div className="table-surface" />
+                <div className="table-shadow" />
+              </div>
             </motion.div>
           </section>
         </StackSlot>

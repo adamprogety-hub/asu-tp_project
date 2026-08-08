@@ -1106,19 +1106,86 @@ p {
   align-items: center;
   justify-content: center;
 }
+.console-scene-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  padding-bottom: 45px;
+}
+.light-spotlight {
+  position: absolute;
+  top: -160px;
+  right: -160px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle at 100% 0%, rgba(90, 179, 165, 0.14) 0%, rgba(255, 255, 255, 0.04) 45%, transparent 75%);
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 1;
+}
+.table-surface {
+  position: absolute;
+  bottom: 0px;
+  width: 116%;
+  height: 60px;
+  background: linear-gradient(to bottom, #1e2221 0%, #111312 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  transform: rotateX(72deg) translateZ(-15px);
+  border-radius: 3px;
+  z-index: 0;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.03),
+    0 12px 36px rgba(0, 0, 0, 0.85);
+}
+.table-shadow {
+  position: absolute;
+  bottom: 12px;
+  width: 220px;
+  height: 22px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 0%, transparent 80%);
+  z-index: 1;
+  pointer-events: none;
+  filter: blur(3px);
+  transform: scaleY(0.35);
+}
 .mnemo-screenshot {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: auto;
   display: block;
-  transform: scale(1.36);
+  transform: scale(1.16) translateY(-12px);
   transform-origin: center;
   transition: transform 0.3s ease;
-  filter: drop-shadow(0 35px 30px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.5));
 }
 @media (max-width: 1000px) {
+  .console-scene-wrap {
+    max-width: 330px;
+    padding-bottom: 30px;
+  }
+  .table-surface {
+    height: 40px;
+  }
+  .table-shadow {
+    width: 160px;
+    height: 16px;
+    bottom: 8px;
+  }
+  .light-spotlight {
+    width: 320px;
+    height: 320px;
+    top: -90px;
+    right: -90px;
+  }
   .mnemo-screenshot {
-    transform: scale(1.1);
-    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.45));
+    transform: scale(1.08) translateY(-6px);
+    filter: drop-shadow(0 12px 15px rgba(0, 0, 0, 0.4));
   }
 }
 .console-head,
