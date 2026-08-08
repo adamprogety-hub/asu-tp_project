@@ -1789,19 +1789,12 @@ export default function Home() {
       scrollEndTimeout = window.setTimeout(() => {
         if (!media.matches) return;
 
-        // Если пользователь скроллит выше первого слота (в районе Hero/логотипов),
-        // плавно доводим скролл до самого верха страницы (y = 0)
+        // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
+        // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
         const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
         if (firstSlot) {
           const rect = firstSlot.getBoundingClientRect();
-          if (rect.top > window.innerHeight * 0.35) {
-            if (window.scrollY > 12) {
-              isAutoScrolling = true;
-              window.scrollTo({ top: 0, behavior: "smooth" });
-              window.setTimeout(() => {
-                isAutoScrolling = false;
-              }, 800);
-            }
+          if (rect.top > 10) {
             return;
           }
         }
