@@ -1,20 +1,5 @@
 import { NextResponse } from "next/server";
-import { WorkerMailer } from "worker-mailer";
-
-export const runtime = "edge";
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const len = bytes.byteLength;
-  const chunk = 8192;
-  for (let i = 0; i < len; i += chunk) {
-    const slice = bytes.subarray(i, i + chunk);
-    // @ts-ignore
-    binary += String.fromCharCode.apply(null, slice);
-  }
-  return btoa(binary);
-}
+import nodemailer from "nodemailer";
 
 export async function POST(request: Request) {
   try {
@@ -33,36 +18,13 @@ export async function POST(request: Request) {
     for (const file of files) {
       if (file.size > 0) {
         const buffer = await file.arrayBuffer();
-        const base64Content = arrayBufferToBase64(buffer);
         attachments.push({
           filename: file.name,
-          content: base64Content,
-          type: file.type || "application/octet-stream",
-          disposition: "attachment",
+          content: Buffer.from(buffer),
         });
       }
     }
 
-    // SMTP Config from environment variables
-    const host = process.env.SMTP_HOST || "smtp.yandex.ru";
-    const port = parseInt(process.env.SMTP_PORT || "465", 10);
-    const user = process.env.SMTP_USER || "PetroffSCADA@yandex.ru";
-    const pass = process.env.SMTP_PASSWORD || "hdrqvfqhapkomjmh";
-    const to = process.env.SMTP_TO || "PetroffSCADA@yandex.ru";
-
-    // Connect to SMTP Server
-    const mailer = await WorkerMailer.connect({
-      credentials: {
-        username: user,
-        password: pass,
-      },
-      host,
-      port,
-      secure: port === 465,
-      authType: ["plain", "login"],
-    });
-
-    // Format email body
     const emailText = `Новая заявка с сайта AERON
 
 Имя: ${name}
@@ -77,20 +39,70 @@ ${description}
 Письмо отправлено автоматически с формы обратной связи.
 `;
 
-    // Send email
-    await mailer.send({
-      from: { name: "AERON Web Form", email: user },
-      to: { name: "Petroff SCADA", email: to },
-      subject: `[AERON Lead] Заявка от ${name}`,
-      text: emailText,
-      attachments,
-    });
+    // 1. Send via NodeMailer SMTP using settings from .env.local
+    const smtpHost = process.env.SMTP_HOST || "smtp.yandex.ru";
+    const smtpPort = parseInt(process.env.SMTP_PORT || "465", 10);
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPassword = process.env.SMTP_PASSWORD;
+    const smtpTo = process.env.SMTP_TO || "PetroffSCADA@yandex.ru";
+
+    if (smtpUser && smtpPassword) {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPassword,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"AERON Web Form" <${smtpUser}>`,
+        to: smtpTo,
+        subject: `[AERON Lead] Заявка от ${name}`,
+        text: emailText,
+        attachments: attachments,
+      });
+    } else {
+      console.warn("SMTP credentials not configured in .env.local. Skipping email notification.");
+    }
+
+    // 2. Send via Telegram Bot API (if configured)
+    const tgBotToken = process.env.TELEGRAM_BOT_TOKEN;
+    const tgChatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (tgBotToken && tgChatId) {
+      const htmlMessage = `<b>Новая заявка с сайта AERON</b>
+
+<b>Имя:</b> ${name}
+<b>Контакты:</b> ${contact}
+<b>Тип объекта:</b> ${objectType}
+<b>Количество установок:</b> ${unitsCount}
+
+<b>Описание задачи:</b>
+${description}`;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${tgBotToken}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: tgChatId,
+            text: htmlMessage,
+            parse_mode: "HTML",
+          }),
+        });
+      } catch (err) {
+        console.error("Failed to send Telegram message:", err);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error("Failed to send email:", error);
+    console.error("Failed to process lead:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to send email" },
+      { success: false, error: error.message || "Failed to process lead" },
       { status: 500 }
     );
   }

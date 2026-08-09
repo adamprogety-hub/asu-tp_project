@@ -1455,11 +1455,13 @@ function ProcessCard({
   index,
   progress,
   reduceMotion,
+  scrollToSection,
 }: {
   step: (typeof steps)[number];
   index: number;
   progress: MotionValue<number>;
   reduceMotion: boolean | null;
+  scrollToSection: (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => void;
 }) {
   const position = useTransform(
     progress,
@@ -1539,7 +1541,11 @@ function ProcessSegment({
   );
 }
 
-function ProcessFlow() {
+function ProcessFlow({
+  scrollToSection,
+}: {
+  scrollToSection: (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => void;
+}) {
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -1573,6 +1579,7 @@ function ProcessFlow() {
               index={index}
               progress={deckProgress}
               reduceMotion={reduceMotion}
+              scrollToSection={scrollToSection}
             />
           ))}
         </div>
@@ -2404,7 +2411,7 @@ export default function Home() {
           </section>
         </StackSlot>
 
-        <ProcessFlow />
+        <ProcessFlow scrollToSection={scrollToSection} />
 
         <StackSlot>
           <section className="scenario-section section stack-panel panel-ice layer-5" id="vendors">
