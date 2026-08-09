@@ -738,7 +738,7 @@ function MiniScada({ variant = 0 }: { variant?: number }) {
       </div>
       <div className="scada-body image-only">
         <img
-          src={`/images/scada-slides/slide-0${variant + 1}.png`}
+          src={`/images/scada-slides/slide-0${variant + 1}.webp`}
           alt={scadaSlides[variant][0]}
           className="scada-slide-img"
         />
@@ -782,7 +782,7 @@ function AnimatedMiniScada({
           <AnimatePresence initial={false} mode="sync" custom={direction}>
             <motion.img
               key={variant}
-              src={`/images/scada-slides/slide-0${variant + 1}.png`}
+              src={`/images/scada-slides/slide-0${variant + 1}.webp`}
               alt={scadaSlides[variant][0]}
               className="scada-slide-img scada-scene-layer"
               initial={{ opacity: 0, x: direction * 15 }}
@@ -1511,7 +1511,7 @@ function ProcessCard({
         </div>
         <div className="process-card-icon-zone" aria-hidden="true">
           <img
-            src={`/images/process-slides/step-${number}.png`}
+            src={`/images/process-slides/step-${number}.webp`}
             alt={title}
             className="process-card-step-img"
           />
@@ -2144,7 +2144,7 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <img src="/images/hero/control-cabinet.png" alt="" />
+            <img src="/images/hero/control-cabinet.webp" alt="" />
           </motion.div>
           <motion.div
             className="equipment-piece industrial-fan"
@@ -2156,7 +2156,7 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <img src="/images/hero/industrial-fan.png" alt="" />
+            <img src="/images/hero/industrial-fan.webp" alt="" />
           </motion.div>
         </motion.div>
         <motion.div
@@ -2372,7 +2372,7 @@ export default function Home() {
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
               <img
-                src="/images/real-mnemo/mnemo-before.png"
+                src="/images/real-mnemo/mnemo-before.webp"
                 alt="Реальная мнемосхема до диспетчеризации"
                 className="mnemo-screenshot"
               />
