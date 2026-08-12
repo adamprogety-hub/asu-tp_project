@@ -17,6 +17,7 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
+import Image from "next/image";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
 import {
@@ -1511,10 +1512,14 @@ function ProcessCard({
           </div>
         </div>
         <div className="process-card-icon-zone" aria-hidden="true">
-          <img
+          <Image
             src={`/images/process-slides/step-${number}.webp`}
             alt={title}
+            fill
             className="process-card-step-img"
+            sizes="(max-width: 768px) 100vw, 40vw"
+            style={{ objectFit: "cover" }}
+            loading="lazy"
           />
         </div>
       </div>
@@ -2192,7 +2197,14 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <img src="/images/hero/control-cabinet.webp" alt="" />
+            <Image
+              src="/images/hero/control-cabinet.webp"
+              alt=""
+              width={520}
+              height={420}
+              priority
+              quality={85}
+            />
           </motion.div>
           <motion.div
             className="equipment-piece industrial-fan"
@@ -2204,7 +2216,14 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <img src="/images/hero/industrial-fan.webp" alt="" />
+            <Image
+              src="/images/hero/industrial-fan.webp"
+              alt=""
+              width={420}
+              height={360}
+              priority
+              quality={85}
+            />
           </motion.div>
         </motion.div>
         <motion.div
@@ -2424,10 +2443,14 @@ export default function Home() {
               viewport={{ once: true, margin: "-90px" }}
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
-              <img
+              <Image
                 src="/images/real-mnemo/mnemo-before.webp"
                 alt="Реальная мнемосхема до диспетчеризации"
                 className="mnemo-screenshot"
+                width={720}
+                height={480}
+                loading="lazy"
+                quality={80}
               />
             </motion.div>
           </section>

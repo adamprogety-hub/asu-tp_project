@@ -5306,12 +5306,14 @@ main {
 .process-card-icon-zone {
   min-width: 0;
   position: relative;
+  /* Create inset for the fill image via padding */
+  padding: 6% 0 6% 12%;
+  overflow: hidden;
 }
 .process-card-step-img {
-  position: absolute;
-  inset: 6% 0 6% 12%;
-  object-fit: cover;
+  /* next/image fill — position is set by Next.js, we just clip */
   border-radius: 16px;
+  object-fit: cover;
 }
 .process-card-icon-zone:before {
   content: "";
