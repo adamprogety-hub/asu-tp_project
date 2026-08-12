@@ -5045,7 +5045,7 @@ main {
     margin-bottom: -18px;
   }
   .process-sticky.stack-panel {
-    padding: 88px 14px 28px !important;
+    padding: 88px 14px 48px !important;
     border-radius: 24px 24px 0 0 !important;
   }
   .process-sticky .section-heading {
@@ -5064,9 +5064,9 @@ main {
   }
   .process-deck {
     width: calc(100% - 12px);
-    min-height: 340px;
-    max-height: 480px;
-    margin-top: 20px;
+    min-height: 300px;
+    max-height: 440px;
+    margin-top: 16px;
   }
   .process-card {
     padding: 22px 20px;
@@ -5101,7 +5101,8 @@ main {
   }
   .process-note {
     font-size: 7px;
-    margin-top: 7px !important;
+    margin-top: 14px !important;
+    padding-bottom: 8px;
   }
   .process-runway + .stack-panel {
     margin-top: -18px !important;
