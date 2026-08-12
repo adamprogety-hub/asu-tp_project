@@ -6442,12 +6442,21 @@ footer.footer-dark.about-footer {
     width: calc(100% - 66px);
     padding-right: 0;
     margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
   .about-footer .footer-row div {
-    justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   .about-footer .footer-row > span:last-child {
     text-align: left;
+    line-height: 1.5;
+    margin-top: 4px;
   }
 }
 .stack-root {
