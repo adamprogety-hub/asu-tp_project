@@ -94,7 +94,12 @@ button {
   border-radius: var(--radius-lg);
   box-shadow: 0 12px 40px rgba(28, 36, 31, 0.08);
 }
-.logo,
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
 .footer-brand {
   display: flex;
   align-items: center;
@@ -102,6 +107,24 @@ button {
   letter-spacing: 0.2em;
   font-family: var(--font-manrope);
   font-size: 17px;
+}
+.logo-divider {
+  width: 1px;
+  height: 18px;
+  background-color: rgba(16, 19, 18, 0.15);
+}
+.logo-text {
+  font-family: var(--font-manrope);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.logo:hover .logo-text {
+  opacity: 1;
 }
 .logo svg {
   animation: spin 12s linear infinite;

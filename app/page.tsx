@@ -2032,7 +2032,9 @@ export default function Home() {
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
       <nav className="nav">
         <a className="logo" href="#top" aria-label="acengine.ru — на главную" onClick={(e) => scrollToSection("#top", e)}>
-          <AcEngineLogo size={28} className="logo-svg" style={{ color: "var(--ink)" }} />
+          <AcEngineLogo size={36} className="logo-svg" style={{ color: "var(--ink)" }} />
+          <span className="logo-divider" />
+          <span className="logo-text">acengine.ru</span>
         </a>
         <div className="nav-right">
           <a href="tel:+79958878310" className="nav-contact-link">
