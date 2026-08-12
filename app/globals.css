@@ -5049,7 +5049,7 @@ main {
     margin-bottom: -18px;
   }
   .process-sticky.stack-panel {
-    padding: 88px 14px 48px !important;
+    padding: 88px 14px 36px !important;
     border-radius: 24px 24px 0 0 !important;
   }
   .process-sticky .section-heading {
@@ -5068,17 +5068,17 @@ main {
   }
   .process-deck {
     width: calc(100% - 12px);
-    min-height: 300px;
-    max-height: 440px;
-    margin-top: 16px;
+    min-height: 0;
+    max-height: 400px;
+    margin-top: 12px;
   }
   .process-card {
     padding: 22px 20px;
     border-radius: 22px;
   }
   .process-card-copy h3 {
-    font-size: clamp(46px, 15vw, 68px);
-    margin-bottom: 14px;
+    font-size: clamp(40px, 13vw, 60px);
+    margin-bottom: 12px;
   }
   .process-card-copy p {
     font-size: 13px;
@@ -5104,9 +5104,7 @@ main {
     margin-top: 12px;
   }
   .process-note {
-    font-size: 7px;
-    margin-top: 14px !important;
-    padding-bottom: 8px;
+    display: none;
   }
   .process-runway + .stack-panel {
     margin-top: -18px !important;
