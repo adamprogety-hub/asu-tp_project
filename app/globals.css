@@ -2832,6 +2832,9 @@ footer {
   .hero {
     padding: 112px 20px 80px;
   }
+  .hero-equipment {
+    display: none;
+  }
   .hero h1 {
     font-size: 48px;
     line-height: 1.15;
