@@ -11,7 +11,15 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://acengine.ru"),
   title: "acengine.ru — диспетчеризация вентиляции",
   description: "Проектирование и внедрение систем диспетчеризации вентиляции коммерческих объектов: SCADA, архивы, аварии и удалённый контроль.",
-  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "acengine.ru — вентиляция под контролем",
     description: "Вся вентиляция объекта в одном понятном интерфейсе.",
@@ -29,10 +37,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru">
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         {/* Pre-establish connection to Yandex Metrika CDN */}
         <link rel="preconnect" href="https://mc.yandex.ru" />
         <link rel="dns-prefetch" href="https://mc.yandex.ru" />
       </head>
+
       <body className={`${onest.variable} ${manrope.variable}`}>
         {children}
         <CookieConsent />
