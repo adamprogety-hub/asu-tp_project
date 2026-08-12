@@ -12,11 +12,13 @@ import {
   AnimatePresence,
   motion,
   MotionValue,
+  useInView,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from "motion/react";
+
 import Image from "next/image";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
@@ -1571,7 +1573,9 @@ function ProcessFlow({
   return (
     <section className="process-runway" id="process" ref={ref}>
       <div className="process process-sticky stack-panel panel-paper layer-4">
+        <SectionBackgroundLogo theme="light" />
         <div className="section-heading split">
+
           <div>
             <span className="section-tag">/ Полный цикл</span>
             <h2>Закрываю весь технический контур проекта</h2>
@@ -1612,7 +1616,80 @@ function ProcessFlow({
   );
 }
 
+/* ─── Section Background Animated Logo (Watermark Blur) ───── */
+function SectionBackgroundLogo({ theme = "dark" }: { theme?: "light" | "dark" }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-10%" });
+
+  const logoColor = theme === "light" ? "#101312" : "#ffffff";
+  const glowColor =
+    theme === "light" ? "rgba(200, 242, 81, 0.35)" : "rgba(200, 242, 81, 0.3)";
+
+  return (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        pointerEvents: "none",
+        zIndex: 0,
+        overflow: "hidden",
+        borderRadius: "inherit",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingRight: "5%",
+      }}
+    >
+      <AnimatePresence>
+        {isInView && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.75, filter: "blur(18px)" }}
+            animate={{
+              opacity: theme === "light" ? 0.06 : 0.08,
+              scale: [0.75, 1.05, 1],
+              filter: ["blur(18px)", "blur(0px)", "blur(0px)"],
+            }}
+            transition={{
+              duration: 1.2,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* Pulsing Blur Glow behind background logo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: [0, 0.8, 0.35], scale: [0.5, 1.35, 1] }}
+              transition={{ duration: 1.4, ease: "easeOut" }}
+              style={{
+                position: "absolute",
+                width: 250,
+                height: 250,
+                borderRadius: "50%",
+                background: `radial-gradient(circle, ${glowColor} 0%, rgba(200, 242, 81, 0) 70%)`,
+                filter: "blur(30px)",
+                pointerEvents: "none",
+              }}
+            />
+            <AcEngineLogo size={220} animatePaths style={{ color: logoColor }} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function StackSlot({ children }: { children: ReactNode }) {
+
   return <div className="stack-slot">{children}</div>;
 }
 
@@ -2369,7 +2446,9 @@ export default function Home() {
             }}
             {...reveal}
           >
+            <SectionBackgroundLogo theme="light" />
             {/* SVG border trace — drawn from bottom-left on scroll */}
+
             <svg
               className="intro-neon-svg"
               aria-hidden="true"
@@ -2428,7 +2507,9 @@ export default function Home() {
 
         <StackSlot>
           <section className="problem-section stack-panel layer-2">
+            <SectionBackgroundLogo theme="dark" />
             <motion.div className="problem-copy" {...reveal}>
+
               <span className="section-tag">/ До диспетчеризации</span>
               <h2>Когда каждая установка работает сама по себе</h2>
               <p>
@@ -2466,6 +2547,7 @@ export default function Home() {
             className="audit section stack-panel panel-ice layer-3"
             id="audit"
           >
+            <SectionBackgroundLogo theme="light" />
             <motion.div className="audit-card" {...reveal}>
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
@@ -2496,7 +2578,9 @@ export default function Home() {
 
         <StackSlot>
           <section className="scenario-section section stack-panel panel-ice layer-5" id="vendors">
+            <SectionBackgroundLogo theme="light" />
             <div className="vendors-container">
+
               <div className="vendors-left-col">
                 <div className="section-heading">
                   <span className="section-tag">/ Вендоры и платформы</span>
@@ -2580,7 +2664,9 @@ export default function Home() {
             className="case section stack-panel panel-mist layer-6"
             id="cases"
           >
+            <SectionBackgroundLogo theme="dark" />
             <motion.div className="case-carousel" {...reveal}>
+
               <motion.div
                 className="case-shell"
                 drag="x"
@@ -2785,7 +2871,9 @@ export default function Home() {
               obs.observe(el);
             }}
           >
+            <SectionBackgroundLogo theme="light" />
             {/* SVG border trace — drawn from bottom-left on scroll */}
+
             <svg
               className="intro-neon-svg"
               aria-hidden="true"
@@ -2884,6 +2972,7 @@ export default function Home() {
             className="faq section stack-panel panel-white layer-8"
             id="faq"
           >
+            <SectionBackgroundLogo theme="light" />
             <div className="faq-title">
               <span className="section-tag">/ FAQ</span>
               <h2>Частые вопросы</h2>
@@ -2927,6 +3016,7 @@ export default function Home() {
             className="contact section stack-panel panel-blue layer-9"
             id="contact"
           >
+            <SectionBackgroundLogo theme="dark" />
             <motion.div className="contact-shell" {...reveal}>
               <div className="contact-copy">
                 <span className="section-tag light">
@@ -2962,7 +3052,9 @@ export default function Home() {
             className="stack-panel footer-dark about-footer layer-10"
             id="about"
           >
+            <SectionBackgroundLogo theme="dark" />
             <div className="founder-section">
+
               <div className="founder-heading">
                 <div>
                   <span className="section-tag light">
