@@ -1969,12 +1969,32 @@ export default function Home() {
 
   useEffect(() => {
     if (menuOpen) {
-      document.body.style.overflow = "hidden";
+      // iOS Safari: position:fixed trick instead of overflow:hidden
+      // to prevent breaking touch events on the overlay
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
     } else {
-      document.body.style.overflow = "";
+      const top = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      if (top) {
+        window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+      }
     }
     return () => {
-      document.body.style.overflow = "";
+      const top = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      if (top) {
+        window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+      }
     };
   }, [menuOpen]);
 

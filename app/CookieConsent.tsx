@@ -93,9 +93,21 @@ export function PrivacyModal() {
   }, []);
   useEffect(() => {
     if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previous; };
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    return () => {
+      const top = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      if (top) {
+        window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as unknown as ScrollBehavior });
+      }
+    };
   }, [open]);
   if (!open) return null;
   return <div className="privacy-modal-layer" role="dialog" aria-modal="true" aria-labelledby="privacy-title" onClick={()=>setOpen(false)}>
