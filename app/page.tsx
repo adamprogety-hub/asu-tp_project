@@ -2322,8 +2322,13 @@ export default function Home() {
               className="intro-neon-svg"
               aria-hidden="true"
             >
-              {/* Outer glow layer */}
-              <path className="neon-trace-glow" />
+              <defs>
+                <filter id="neon-blur-1" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+                </filter>
+              </defs>
+              {/* Outer glow layer — uses SVG-native blur for iOS Safari compat */}
+              <path className="neon-trace-glow" filter="url(#neon-blur-1)" />
               {/* Sharp neon line */}
               <path className="neon-trace-line" />
             </svg>
@@ -2729,8 +2734,13 @@ export default function Home() {
               className="intro-neon-svg"
               aria-hidden="true"
             >
-              {/* Outer glow layer */}
-              <path className="neon-trace-glow" />
+              <defs>
+                <filter id="neon-blur-2" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+                </filter>
+              </defs>
+              {/* Outer glow layer — uses SVG-native blur for iOS Safari compat */}
+              <path className="neon-trace-glow" filter="url(#neon-blur-2)" />
               {/* Sharp neon line */}
               <path className="neon-trace-line" />
             </svg>
