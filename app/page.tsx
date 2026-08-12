@@ -18,6 +18,7 @@ import {
   useTransform,
 } from "motion/react";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
+import { AcEngineLogo } from "./AcEngineLogo";
 import {
   Activity,
   ArrowDown,
@@ -2031,9 +2032,8 @@ export default function Home() {
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
       <nav className="nav">
         <a className="logo" href="#top" aria-label="AERON — на главную" onClick={(e) => scrollToSection("#top", e)}>
-          <span>AER</span>
-          <Fan size={20} />
-          <span>N</span>
+          <AcEngineLogo size={22} className="logo-svg" style={{ marginRight: "10px", color: "var(--ink)" }} />
+          <span>AERON</span>
         </a>
         <div className="nav-right">
           <a href="tel:+79958878310" className="nav-contact-link">

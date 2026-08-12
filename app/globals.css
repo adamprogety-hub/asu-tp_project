@@ -106,6 +106,9 @@ button {
 .logo svg {
   animation: spin 12s linear infinite;
 }
+.logo svg.logo-svg {
+  animation: none !important;
+}
 /* ─── Nav right group ─── */
 .nav-right {
   display: flex;
