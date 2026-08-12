@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const emailText = `Новая заявка с сайта AERON
+    const emailText = `Новая заявка с сайта acengine.ru
 
 Имя: ${name}
 Контакты (телефон или почта): ${contact}
@@ -58,9 +58,9 @@ ${description}
       });
 
       await transporter.sendMail({
-        from: `"AERON Web Form" <${smtpUser}>`,
+        from: `"acengine.ru Web Form" <${smtpUser}>`,
         to: smtpTo,
-        subject: `[AERON Lead] Заявка от ${name}`,
+        subject: `[acengine.ru Lead] Заявка от ${name}`,
         text: emailText,
         attachments: attachments,
       });
@@ -73,7 +73,7 @@ ${description}
     const tgChatId = process.env.TELEGRAM_CHAT_ID;
 
     if (tgBotToken && tgChatId) {
-      const htmlMessage = `<b>Новая заявка с сайта AERON</b>
+      const htmlMessage = `<b>Новая заявка с сайта acengine.ru</b>
 
 <b>Имя:</b> ${name}
 <b>Контакты:</b> ${contact}

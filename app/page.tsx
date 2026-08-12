@@ -689,7 +689,7 @@ function ScadaScene({ variant }: { variant: number }) {
       <div className="network-map">
         <div className="network-core">
           <Server />
-          <strong>AERON CLOUD</strong>
+          <strong>AC ENGINE CLOUD</strong>
           <span>OPC UA / VPN</span>
         </div>
         {[
@@ -1126,7 +1126,7 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
             <Check />
           </i>
           <span>
-            Согласен получать полезные материалы и информацию о решениях AERON.
+            Согласен получать полезные материалы и информацию о решениях acengine.ru.
             Необязательно.
           </span>
         </label>
@@ -2031,9 +2031,8 @@ export default function Home() {
       <motion.div className="progress" style={{ scaleX }} />
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
       <nav className="nav">
-        <a className="logo" href="#top" aria-label="AERON — на главную" onClick={(e) => scrollToSection("#top", e)}>
-          <AcEngineLogo size={22} className="logo-svg" style={{ marginRight: "10px", color: "var(--ink)" }} />
-          <span>AERON</span>
+        <a className="logo" href="#top" aria-label="acengine.ru — на главную" onClick={(e) => scrollToSection("#top", e)}>
+          <AcEngineLogo size={28} className="logo-svg" style={{ color: "var(--ink)" }} />
         </a>
         <div className="nav-right">
           <a href="tel:+79958878310" className="nav-contact-link">
