@@ -39,14 +39,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=111530589', 'ym');
 
             ym(111530589, 'init', {
-              ssr: true,
               webvisor: true,
               clickmap: true,
-              ecommerce: "dataLayer",
-              referrer: document.referrer,
-              url: location.href,
+              trackLinks: true,
               accurateTrackBounce: true,
-              trackLinks: true
+              ecommerce: "dataLayer"
             });
           `}
         </Script>
