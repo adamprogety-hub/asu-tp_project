@@ -36,7 +36,7 @@ svg.lucide {
   stroke-width: 1.5px !important;
 }
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 /* Отступ под фиксированной шапкой при scrollIntoView на мобиле */
 [id] {
@@ -6516,6 +6516,8 @@ footer.footer-dark.about-footer {
   .stack-panel.is-depth-active > * {
     translate: 0 var(--stack-content-y, 0px);
     will-change: translate, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   .stack-panel.is-being-covered > * {
     opacity: var(--stack-content-opacity, 1) !important;

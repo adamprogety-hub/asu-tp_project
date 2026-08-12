@@ -743,6 +743,8 @@ function MiniScada({ variant = 0 }: { variant?: number }) {
           src={`/images/scada-slides/slide-0${variant + 1}.webp`}
           alt={scadaSlides[variant][0]}
           className="scada-slide-img"
+          loading="lazy"
+          decoding="async"
         />
       </div>
     </div>
@@ -787,6 +789,8 @@ function AnimatedMiniScada({
               src={`/images/scada-slides/slide-0${variant + 1}.webp`}
               alt={scadaSlides[variant][0]}
               className="scada-slide-img scada-scene-layer"
+              loading="lazy"
+              decoding="async"
               initial={{ opacity: 0, x: direction * 15 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction * -12 }}
@@ -1847,84 +1851,83 @@ export default function Home() {
     const handleScrollSnap = () => {
       if (isAutoScrolling) return;
       if (navigationLocked.current) return;
+      if (!media.matches) return;
 
-      window.clearTimeout(scrollEndTimeout);
-      scrollEndTimeout = window.setTimeout(() => {
-        if (!media.matches) return;
+      // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
+      // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
+      const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
+      if (firstSlot) {
+        const rect = firstSlot.getBoundingClientRect();
+        if (rect.top > 10) {
+          return;
+        }
+      }
 
-        // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
-        // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
-        const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
-        if (firstSlot) {
-          const rect = firstSlot.getBoundingClientRect();
-          if (rect.top > 10) {
-            return;
+      // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
+      const runway = document.querySelector<HTMLElement>(".process-runway");
+      if (runway) {
+        const rect = runway.getBoundingClientRect();
+        if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
+          return;
+        }
+      }
+
+      // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
+      const targets = Array.from(
+        document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
+      );
+
+      let closestTarget: HTMLElement | null = null;
+      let minDiff = Infinity;
+
+      targets.forEach((target) => {
+        const rect = target.getBoundingClientRect();
+        const diff = Math.abs(rect.top);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestTarget = target;
+        }
+      });
+
+      if (closestTarget && minDiff > 12) {
+        // Проверяем, помещается ли контент предстоящей секции на экране
+        const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
+        
+        let panelHeight = panel.scrollHeight;
+        // Для process-runway берем высоту самого липкого контейнера
+        if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
+          const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
+          if (processSticky) {
+            panelHeight = processSticky.scrollHeight;
           }
         }
 
-        // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
-        const runway = document.querySelector<HTMLElement>(".process-runway");
-        if (runway) {
-          const rect = runway.getBoundingClientRect();
-          if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
-            return;
-          }
-        }
+        const fitsOnScreen = panelHeight <= window.innerHeight + 25;
 
-        // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
-        const targets = Array.from(
-          document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
-        );
+        // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
+        if (!fitsOnScreen) return;
 
-        let closestTarget: HTMLElement | null = null;
-        let minDiff = Infinity;
+        const rect = (closestTarget as HTMLElement).getBoundingClientRect();
+        const targetTop = window.scrollY + rect.top;
 
-        targets.forEach((target) => {
-          const rect = target.getBoundingClientRect();
-          const diff = Math.abs(rect.top);
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestTarget = target;
-          }
+        isAutoScrolling = true;
+        window.scrollTo({
+          top: targetTop,
+          behavior: "smooth",
         });
 
-        if (closestTarget && minDiff > 12) {
-          // Проверяем, помещается ли контент предстоящей секции на экране
-          const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
-          
-          let panelHeight = panel.scrollHeight;
-          // Для process-runway берем высоту самого липкого контейнера
-          if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
-            const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
-            if (processSticky) {
-              panelHeight = processSticky.scrollHeight;
-            }
-          }
-
-          const fitsOnScreen = panelHeight <= window.innerHeight + 25;
-
-          // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
-          if (!fitsOnScreen) return;
-
-          const rect = (closestTarget as HTMLElement).getBoundingClientRect();
-          const targetTop = window.scrollY + rect.top;
-
-          isAutoScrolling = true;
-          window.scrollTo({
-            top: targetTop,
-            behavior: "smooth",
-          });
-
-          window.setTimeout(() => {
-            isAutoScrolling = false;
-          }, 800);
-        }
-      }, 150) as any; // Быстрый отклик за 150мс!
+        window.setTimeout(() => {
+          isAutoScrolling = false;
+        }, 800);
+      }
     };
 
     const scheduleUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
-      handleScrollSnap();
+      if (media.matches && !navigationLocked.current && !isAutoScrolling) {
+        window.clearTimeout(scrollEndTimeout);
+        scrollEndTimeout = window.setTimeout(handleScrollSnap, 220) as any;
+      }
     };
 
     updatePinnedPanels();
@@ -1940,6 +1943,7 @@ export default function Home() {
       panels.forEach(resetPanelMotion);
     };
   }, []);
+
   useEffect(() => {
     // На мобильных устройствах включаем наблюдатель для активации карточек при прохождении центра экрана
     const media = window.matchMedia("(max-width: 1000px)");
@@ -2183,7 +2187,6 @@ export default function Home() {
           style={{
             y: heroEquipmentY,
             opacity: heroCopyOpacity,
-            filter: heroCopyBlur,
           }}
           aria-hidden="true"
         >
@@ -2203,7 +2206,8 @@ export default function Home() {
               width={520}
               height={420}
               priority
-              quality={85}
+              sizes="(max-width: 768px) 280px, 520px"
+              quality={80}
             />
           </motion.div>
           <motion.div
@@ -2222,7 +2226,8 @@ export default function Home() {
               width={420}
               height={360}
               priority
-              quality={85}
+              sizes="(max-width: 768px) 240px, 420px"
+              quality={80}
             />
           </motion.div>
         </motion.div>
@@ -2231,9 +2236,9 @@ export default function Home() {
           style={{
             y: heroCopyY,
             opacity: heroCopyOpacity,
-            filter: heroCopyBlur,
           }}
         >
+
           <motion.div
             className="hero-copy"
             initial={{ opacity: 0, y: 24 }}
