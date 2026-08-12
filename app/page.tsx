@@ -1674,6 +1674,19 @@ export default function Home() {
   };
   const scrollToSection = (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => {
     if (event) event.preventDefault();
+
+    // iOS Safari fix: if mobile menu lock is active (body is position:fixed),
+    // restore scroll position BEFORE calculating target rect — otherwise
+    // getBoundingClientRect() and window.scrollY will be wrong (body is frozen at 0)
+    if (document.body.style.position === "fixed") {
+      const savedTop = parseInt(document.body.style.top || "0") * -1;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      window.scrollTo({ top: savedTop, behavior: "instant" as ScrollBehavior });
+    }
+
     if (id === "#top") {
       navigationLocked.current = true;
       setNavDropOpen(false);
@@ -1977,23 +1990,29 @@ export default function Home() {
       document.body.style.left = "0";
       document.body.style.right = "0";
     } else {
-      const top = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      if (top) {
-        window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+      // Guard: only restore if scrollToSection hasn't already done it
+      if (document.body.style.position === "fixed") {
+        const top = document.body.style.top;
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        if (top) {
+          window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+        }
       }
     }
     return () => {
-      const top = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      if (top) {
-        window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+      // Guard: only clean up if still locked (component unmount safety)
+      if (document.body.style.position === "fixed") {
+        const top = document.body.style.top;
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        if (top) {
+          window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
+        }
       }
     };
   }, [menuOpen]);
