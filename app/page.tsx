@@ -1706,14 +1706,22 @@ export default function Home() {
     setNavDropOpen(false);
     setMenuOpen(false);
 
-    const slot = target.closest<HTMLElement>(".stack-slot, .process-runway");
-    const scrollTarget = slot || target;
-
-    const rect = scrollTarget.getBoundingClientRect();
-    const targetTop = Math.max(0, window.scrollY + rect.top - 8);
-
     window.history.replaceState(null, "", id);
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+
+    // On mobile: use scrollIntoView — it doesn't depend on window.scrollY
+    // and is more reliable on iOS Safari than window.scrollTo().
+    // scroll-margin-top in CSS handles the fixed nav bar offset.
+    // On desktop: keep the stack-slot-aware calculation for smooth panel transitions.
+    const isMobile = window.matchMedia("(max-width: 1000px)").matches;
+    if (isMobile) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      const slot = target.closest<HTMLElement>(".stack-slot, .process-runway");
+      const scrollTarget = slot || target;
+      const rect = scrollTarget.getBoundingClientRect();
+      const targetTop = Math.max(0, window.scrollY + rect.top - 8);
+      window.scrollTo({ top: targetTop, behavior: "smooth" });
+    }
 
     window.setTimeout(() => {
       navigationLocked.current = false;

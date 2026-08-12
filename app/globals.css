@@ -38,6 +38,10 @@ svg.lucide {
 html {
   scroll-behavior: smooth;
 }
+/* Отступ под фиксированной шапкой при scrollIntoView на мобиле */
+[id] {
+  scroll-margin-top: 90px;
+}
 body {
   margin: 0;
   background: var(--paper);
