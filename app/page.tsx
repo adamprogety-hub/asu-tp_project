@@ -1573,120 +1573,180 @@ function ProcessFlow({
   return (
     <section className="process-runway" id="process" ref={ref}>
       <div className="process process-sticky stack-panel panel-paper layer-4">
-        <SectionBackgroundLogo theme="light" />
-        <div className="section-heading split">
-
-          <div>
-            <span className="section-tag">/ Полный цикл</span>
-            <h2>Закрываю весь технический контур проекта</h2>
+        <SectionPreloaderContent theme="light">
+          <div className="section-heading split">
+            <div>
+              <span className="section-tag">/ Полный цикл</span>
+              <h2>Закрываю весь технический контур проекта</h2>
+            </div>
+            <p>
+              Шесть последовательных этапов — от первого сигнала в шкафу до
+              готового экрана диспетчерской.
+            </p>
           </div>
-          <p>
-            Шесть последовательных этапов — от первого сигнала в шкафу до
-            готового экрана диспетчерской.
+          <div className="process-deck" aria-label="Этапы и стоимость работ">
+            {steps.map((step, index) => (
+              <ProcessCard
+                key={step[0]}
+                step={step}
+                index={index}
+                progress={deckProgress}
+                reduceMotion={reduceMotion}
+                scrollToSection={scrollToSection}
+              />
+            ))}
+          </div>
+          <div className="process-pagination" aria-hidden="true">
+            {steps.map((step, index) => (
+              <ProcessSegment
+                key={step[0]}
+                index={index}
+                progress={deckProgress}
+              />
+            ))}
+            <span className="process-scroll-hint">Листайте вниз</span>
+          </div>
+          <p className="process-note">
+            Ориентировочная стоимость типового стартового объёма. Оборудование,
+            лицензии и выезды рассчитываются отдельно.
           </p>
-        </div>
-        <div className="process-deck" aria-label="Этапы и стоимость работ">
-          {steps.map((step, index) => (
-            <ProcessCard
-              key={step[0]}
-              step={step}
-              index={index}
-              progress={deckProgress}
-              reduceMotion={reduceMotion}
-              scrollToSection={scrollToSection}
-            />
-          ))}
-        </div>
-        <div className="process-pagination" aria-hidden="true">
-          {steps.map((step, index) => (
-            <ProcessSegment
-              key={step[0]}
-              index={index}
-              progress={deckProgress}
-            />
-          ))}
-          <span className="process-scroll-hint">Листайте вниз</span>
-        </div>
-        <p className="process-note">
-          Ориентировочная стоимость типового стартового объёма. Оборудование,
-          лицензии и выезды рассчитываются отдельно.
-        </p>
+        </SectionPreloaderContent>
       </div>
     </section>
+
   );
 }
 
-/* ─── Section Background Animated Logo (Watermark Blur) ───── */
-function SectionBackgroundLogo({ theme = "dark" }: { theme?: "light" | "dark" }) {
+/* ─── Section Preloader (Center Logo Animation -> Content Reveal) ─── */
+function SectionPreloaderContent({
+  children,
+  theme = "light",
+}: {
+  children: ReactNode;
+  theme?: "light" | "dark";
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
+  const isInView = useInView(ref, { once: true, margin: "-12%" });
+  const [stage, setStage] = useState<"hidden" | "animating" | "revealed">("hidden");
+
+  useEffect(() => {
+    if (isInView && stage === "hidden") {
+      setStage("animating");
+      const timer = setTimeout(() => {
+        setStage("revealed");
+      }, 880);
+      return () => clearTimeout(timer);
+    }
+  }, [isInView, stage]);
 
   const logoColor = theme === "light" ? "#101312" : "#ffffff";
-  const glowColor =
-    theme === "light" ? "rgba(200, 242, 81, 0.35)" : "rgba(200, 242, 81, 0.3)";
+  const auraGlow =
+    theme === "light" ? "rgba(200, 242, 81, 0.45)" : "rgba(200, 242, 81, 0.35)";
 
   return (
-    <div
-      ref={ref}
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        pointerEvents: "none",
-        zIndex: 0,
-        overflow: "hidden",
-        borderRadius: "inherit",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        paddingRight: "5%",
-      }}
-    >
+    <div ref={ref} style={{ position: "relative", width: "100%", height: "100%" }}>
+      {/* 1. Center Animated Logo Preloader */}
       <AnimatePresence>
-        {isInView && (
+        {stage === "animating" && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.75, filter: "blur(18px)" }}
-            animate={{
-              opacity: theme === "light" ? 0.06 : 0.08,
-              scale: [0.75, 1.05, 1],
-              filter: ["blur(18px)", "blur(0px)", "blur(0px)"],
-            }}
-            transition={{
-              duration: 1.2,
-              ease: [0.22, 1, 0.36, 1],
+            key="preloader-overlay"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{
+              opacity: 0,
+              filter: "blur(12px)",
+              transition: { duration: 0.42, ease: [0.76, 0, 0.24, 1] },
             }}
             style={{
-              position: "relative",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 40,
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              pointerEvents: "none",
             }}
           >
-            {/* Pulsing Blur Glow behind background logo */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: [0, 0.8, 0.35], scale: [0.5, 1.35, 1] }}
-              transition={{ duration: 1.4, ease: "easeOut" }}
+              initial={{ scale: 0.6, opacity: 0, filter: "blur(14px)" }}
+              animate={{
+                scale: [0.6, 1.08, 1],
+                opacity: [0, 1, 1],
+                filter: ["blur(14px)", "blur(0px)", "blur(0px)"],
+              }}
+              exit={{
+                scale: 1.15,
+                opacity: 0,
+                filter: "blur(10px)",
+              }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                position: "absolute",
-                width: 250,
-                height: 250,
-                borderRadius: "50%",
-                background: `radial-gradient(circle, ${glowColor} 0%, rgba(200, 242, 81, 0) 70%)`,
-                filter: "blur(30px)",
-                pointerEvents: "none",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* Pulsing neon aura */}
+              <div
+                style={{
+                  position: "absolute",
+                  width: 100,
+                  height: 100,
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle, ${auraGlow} 0%, rgba(200, 242, 81, 0) 70%)`,
+                  filter: "blur(22px)",
+                  transform: "scale(1.6)",
+                  pointerEvents: "none",
+                }}
+              />
+              <AcEngineLogo size={64} animatePaths style={{ color: logoColor }} />
+            </motion.div>
+
+            {/* Neon line accent */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              exit={{ scaleX: 0, opacity: 0 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              style={{
+                width: 54,
+                height: 2,
+                background: "#c8f251",
+                marginTop: 20,
+                borderRadius: 2,
+                boxShadow: "0 0 12px rgba(200, 242, 81, 0.8)",
               }}
             />
-            <AcEngineLogo size={220} animatePaths style={{ color: logoColor }} />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 2. Section Content — hidden during logo animation, revealed smoothly after */}
+      <motion.div
+        initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+        animate={
+          stage === "revealed"
+            ? { opacity: 1, y: 0, filter: "blur(0px)" }
+            : { opacity: 0, y: 20, filter: "blur(6px)" }
+        }
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          width: "100%",
+          height: "100%",
+          pointerEvents: stage === "revealed" ? "all" : "none",
+        }}
+      >
+        {children}
+      </motion.div>
     </div>
   );
 }
+
 
 function StackSlot({ children }: { children: ReactNode }) {
 
@@ -2446,7 +2506,7 @@ export default function Home() {
             }}
             {...reveal}
           >
-            <SectionBackgroundLogo theme="light" />
+            <SectionPreloaderContent theme="light">
             {/* SVG border trace — drawn from bottom-left on scroll */}
 
             <svg
@@ -2502,12 +2562,13 @@ export default function Home() {
                 </motion.article>
               ))}
             </div>
+            </SectionPreloaderContent>
           </motion.section>
         </StackSlot>
 
         <StackSlot>
           <section className="problem-section stack-panel layer-2">
-            <SectionBackgroundLogo theme="dark" />
+            <SectionPreloaderContent theme="dark">
             <motion.div className="problem-copy" {...reveal}>
 
               <span className="section-tag">/ До диспетчеризации</span>
@@ -2539,6 +2600,7 @@ export default function Home() {
                 quality={80}
               />
             </motion.div>
+            </SectionPreloaderContent>
           </section>
         </StackSlot>
 
@@ -2547,7 +2609,7 @@ export default function Home() {
             className="audit section stack-panel panel-ice layer-3"
             id="audit"
           >
-            <SectionBackgroundLogo theme="light" />
+            <SectionPreloaderContent theme="light">
             <motion.div className="audit-card" {...reveal}>
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
@@ -2571,6 +2633,7 @@ export default function Home() {
               </div>
               <LeadForm compact />
             </motion.div>
+            </SectionPreloaderContent>
           </section>
         </StackSlot>
 
@@ -2578,7 +2641,7 @@ export default function Home() {
 
         <StackSlot>
           <section className="scenario-section section stack-panel panel-ice layer-5" id="vendors">
-            <SectionBackgroundLogo theme="light" />
+            <SectionPreloaderContent theme="light">
             <div className="vendors-container">
 
               <div className="vendors-left-col">
@@ -2656,7 +2719,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            </SectionPreloaderContent>
           </section>
+
         </StackSlot>
 
         <StackSlot>
@@ -2664,7 +2729,7 @@ export default function Home() {
             className="case section stack-panel panel-mist layer-6"
             id="cases"
           >
-            <SectionBackgroundLogo theme="dark" />
+            <SectionPreloaderContent theme="dark">
             <motion.div className="case-carousel" {...reveal}>
 
               <motion.div
@@ -2798,7 +2863,9 @@ export default function Home() {
                 />
               </motion.div>
             </motion.div>
+            </SectionPreloaderContent>
           </section>
+
         </StackSlot>
 
         <StackSlot>
@@ -2871,7 +2938,7 @@ export default function Home() {
               obs.observe(el);
             }}
           >
-            <SectionBackgroundLogo theme="light" />
+            <SectionPreloaderContent theme="light">
             {/* SVG border trace — drawn from bottom-left on scroll */}
 
             <svg
@@ -2964,6 +3031,7 @@ export default function Home() {
                 </div>
               </motion.article>
             </div>
+            </SectionPreloaderContent>
           </section>
         </StackSlot>
 
@@ -2972,7 +3040,7 @@ export default function Home() {
             className="faq section stack-panel panel-white layer-8"
             id="faq"
           >
-            <SectionBackgroundLogo theme="light" />
+            <SectionPreloaderContent theme="light">
             <div className="faq-title">
               <span className="section-tag">/ FAQ</span>
               <h2>Частые вопросы</h2>
@@ -3009,6 +3077,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
+            </SectionPreloaderContent>
           </section>
         </StackSlot>
         <StackSlot>
@@ -3016,7 +3085,7 @@ export default function Home() {
             className="contact section stack-panel panel-blue layer-9"
             id="contact"
           >
-            <SectionBackgroundLogo theme="dark" />
+            <SectionPreloaderContent theme="dark">
             <motion.div className="contact-shell" {...reveal}>
               <div className="contact-copy">
                 <span className="section-tag light">
@@ -3044,6 +3113,7 @@ export default function Home() {
               </div>
               <LeadForm />
             </motion.div>
+            </SectionPreloaderContent>
           </section>
         </StackSlot>
 
@@ -3052,7 +3122,7 @@ export default function Home() {
             className="stack-panel footer-dark about-footer layer-10"
             id="about"
           >
-            <SectionBackgroundLogo theme="dark" />
+            <SectionPreloaderContent theme="dark">
             <div className="founder-section">
 
               <div className="founder-heading">
@@ -3116,7 +3186,9 @@ export default function Home() {
                 </a>
               </span>
             </div>
+            </SectionPreloaderContent>
           </footer>
+
         </StackSlot>
       </div>
     </main>
