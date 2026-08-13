@@ -4,8 +4,22 @@ import "./globals.css";
 import { CookieConsent, PrivacyModal } from "./CookieConsent";
 import Script from "next/script";
 
-const onest = Onest({ variable: "--font-onest", subsets: ["cyrillic", "latin"], display: "swap" });
-const manrope = Manrope({ variable: "--font-manrope", subsets: ["cyrillic", "latin"], display: "swap" });
+const onest = Onest({
+  variable: "--font-onest",
+  subsets: ["cyrillic", "latin"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["cyrillic", "latin"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+});
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://acengine.ru"),
