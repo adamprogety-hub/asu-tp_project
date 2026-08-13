@@ -35,7 +35,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={`${onest.variable} ${manrope.variable}`}>
+
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
@@ -114,7 +115,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
 
 
-      <body className={`${onest.variable} ${manrope.variable}`}>
+      <body>
+
         {children}
         <CookieConsent />
         <PrivacyModal />
