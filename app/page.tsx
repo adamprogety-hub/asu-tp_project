@@ -1924,10 +1924,15 @@ export default function Home() {
 
     const scheduleUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
-      handleScrollSnap();
     };
 
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     updatePinnedPanels();
+
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
     media.addEventListener("change", scheduleUpdate);
