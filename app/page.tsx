@@ -2455,8 +2455,11 @@ export default function Home() {
                 width={720}
                 height={480}
                 loading="lazy"
+                decoding="async"
+                sizes="(max-width: 768px) 100vw, 640px"
                 quality={80}
               />
+
             </motion.div>
           </section>
         </StackSlot>
