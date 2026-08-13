@@ -29,15 +29,17 @@
 .pl-logo { overflow: visible; }
 .pl-logo path { fill: var(--ink); transform-origin: 50% 50%; }
 
-/* Origami fold keyframe — NO filter:blur (causes rasterization at small size) */
+/* Origami fold — pure 2D (no perspective/rotateY = no GPU rasterization of SVG) */
 @keyframes pl-origami {
   from {
     opacity: 0;
-    transform: perspective(900px) rotateY(-80deg) scaleX(0.2);
+    transform: scaleX(0) translateX(-8px);
+    transform-origin: 0% 50%;
   }
   to {
     opacity: 1;
-    transform: perspective(900px) rotateY(0deg) scaleX(1);
+    transform: scaleX(1) translateX(0);
+    transform-origin: 0% 50%;
   }
 }
 
