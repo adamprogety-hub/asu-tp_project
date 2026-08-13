@@ -1573,8 +1573,7 @@ function ProcessFlow({
   return (
     <section className="process-runway" id="process" ref={ref}>
       <div className="process process-sticky stack-panel panel-paper layer-4">
-        <SectionPreloaderOverlay theme="light" />
-          <div className="section-heading split">
+                  <div className="section-heading split">
             <div>
               <span className="section-tag">/ Полный цикл</span>
               <h2>Закрываю весь технический контур проекта</h2>
@@ -1614,141 +1613,6 @@ function ProcessFlow({
       </div>
     </section>
 
-  );
-}
-
-/* ─── Ultra-Performance Staggered Logo (Butter-Smooth 120 FPS) ─── */
-function StaggeredAcLogo({
-  size = 130,
-  theme = "light",
-}: {
-  size?: number;
-  theme?: "light" | "dark";
-}) {
-  const width = size * 1.164;
-  const height = size;
-  const strokeColor = theme === "light" ? "#101312" : "#ffffff";
-
-  const paths = [
-    // 0: Main A backbone
-    { d: "M5066 11020 l-318 -5 -671 -1305 c-610 -1188 -721 -1412 -1239 -2499 -312 -657 -568 -1198 -568 -1202 0 -4 198 114 440 262 l439 270 223 79 c215 76 236 81 592 150 204 39 371 71 372 73 1 1 165 360 364 797 l362 795 256 422 c142 233 260 423 263 423 3 0 71 -93 151 -207 131 -187 160 -238 293 -502 l147 -294 403 -1101 403 -1101 246 -533 246 -533 276 -382 275 -382 257 -244 257 -244 276 -182 275 -183 367 -151 366 -150 334 -66 334 -65 383 0 383 0 334 65 334 66 407 171 407 171 238 159 239 159 292 279 293 279 143 208 c284 411 279 396 53 166 -184 -188 -215 -214 -433 -374 -231 -170 -239 -174 -500 -301 l-264 -129 -341 -86 -340 -86 -315 -8 -315 -8 -320 58 -320 59 -305 128 c-302 126 -307 129 -500 257 -192 129 -199 134 -480 408 l-285 278 -259 381 -258 381 -166 357 c-160 347 -180 398 -686 1753 l-522 1396 -513 942 -514 941 -486 -2 c-267 -2 -629 -5 -805 -8z", delay: 0.0, color: strokeColor },
-    // 1: Top Arc Wing
-    { d: "M10365 11215 c-261 -39 -314 -51 -530 -113 -222 -65 -262 -80 -525 -202 -382 -177 -557 -287 -868 -539 -195 -159 -255 -214 -407 -379 -135 -146 -204 -230 -286 -350 l-107 -157 217 -500 c186 -428 240 -565 377 -952 87 -249 161 -453 164 -453 3 0 31 120 64 268 50 230 70 297 139 482 117 316 247 563 444 846 140 202 171 239 355 430 283 293 422 399 778 597 321 177 460 233 765 306 168 40 252 54 421 71 204 20 218 21 481 6 260 -15 281 -18 495 -65 188 -41 260 -63 452 -135 215 -81 246 -96 500 -243 352 -203 482 -304 727 -568 94 -102 173 -185 175 -185 2 0 -26 48 -63 108 -36 59 -86 139 -109 177 -81 131 -255 339 -442 528 -246 247 -477 424 -763 585 -261 147 -244 139 -510 240 -305 116 -562 180 -882 217 -187 21 -258 25 -495 24 -272 -1 -282 -2 -567 -44z", delay: 0.08, color: strokeColor },
-    // 2: Right Top Curve
-    { d: "M11270 10230 c-269 -43 -495 -115 -778 -246 -365 -171 -602 -336 -863 -601 -152 -154 -272 -298 -214 -256 17 11 44 36 60 53 45 48 307 221 426 281 57 28 187 81 289 116 169 59 206 69 425 104 295 48 406 50 680 14 341 -44 636 -144 922 -311 198 -116 342 -230 492 -389 212 -225 345 -445 461 -765 l67 -185 718 -3 c642 -2 717 -1 711 13 -3 9 -20 62 -37 118 -84 271 -288 660 -469 895 -152 198 -423 457 -637 612 -418 302 -886 493 -1368 559 -123 17 -197 21 -430 20 -255 -1 -296 -4 -455 -29z", delay: 0.15, color: strokeColor },
-    // 3: Bottom Swoop Left
-    { d: "M6165 7092 c-40 -64 -197 -225 -270 -276 -33 -23 -123 -72 -200 -108 -132 -63 -156 -70 -420 -132 -273 -63 -290 -66 -685 -106 -396 -40 -411 -42 -685 -106 -273 -64 -287 -68 -560 -180 l-280 -115 -240 -154 c-225 -145 -253 -167 -439 -338 -154 -141 -228 -218 -329 -342 -195 -239 -278 -373 -500 -801 -168 -326 -223 -445 -377 -814 -99 -238 -180 -441 -180 -452 0 -21 1 -21 858 -13 471 4 858 8 860 10 1 1 35 116 76 256 68 238 80 270 191 504 112 236 126 261 253 435 159 219 227 291 385 412 164 124 413 242 632 298 202 52 435 79 740 86 227 5 256 8 545 55 287 47 316 54 500 116 183 62 208 74 406 190 115 67 223 136 238 152 l28 29 -101 266 c-56 147 -171 470 -256 718 -86 249 -157 453 -158 454 -1 2 -16 -18 -32 -44z", delay: 0.22, color: strokeColor },
-    // 4: Bottom Swoop Right
-    { d: "M13758 6230 c-284 -3 -518 -7 -521 -10 -2 -3 -22 -64 -45 -137 -136 -435 -458 -845 -882 -1123 -184 -120 -362 -201 -605 -273 -286 -86 -424 -107 -685 -107 -165 0 -217 4 -373 30 -356 58 -708 200 -1009 407 -60 41 -108 72 -108 69 0 -20 336 -350 445 -437 164 -131 426 -292 599 -368 446 -198 989 -290 1451 -246 226 22 348 47 605 127 186 58 261 87 435 170 474 227 818 509 1136 931 128 169 164 224 249 389 79 152 112 231 161 378 34 102 64 191 67 198 3 9 -40 12 -199 10 -112 -1 -437 -5 -721 -8z", delay: 0.28, color: strokeColor },
-    // 5: Center Spark Emblem (Neon Accent!)
-    { d: "M10872 8692 c-7 -22 -12 -59 -12 -83 0 -74 -79 -475 -127 -644 -107 -376 -229 -522 -528 -630 -134 -48 -408 -109 -700 -155 -154 -24 -231 -39 -215 -44 14 -3 100 -17 191 -30 391 -58 736 -146 884 -227 98 -54 201 -161 258 -269 70 -133 145 -406 209 -762 29 -164 55 -298 59 -298 3 0 16 78 28 173 13 94 48 278 77 409 46 207 60 255 117 387 59 136 73 160 136 230 79 88 182 151 331 202 121 42 440 112 680 148 113 18 213 35 223 39 11 5 -135 35 -370 76 -447 80 -551 109 -711 202 -77 45 -115 76 -164 130 -56 63 -71 90 -129 230 -81 192 -133 403 -180 724 -18 118 -35 219 -39 223 -4 4 -12 -10 -18 -31z", delay: 0.35, color: "#c8f251" },
-  ];
-
-  return (
-    <svg
-      version="1.0"
-      xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
-      viewBox="0 0 1600 1374"
-      preserveAspectRatio="xMidYMid meet"
-      style={{
-        opacity: 0.28,
-        transform: "translateZ(0)",
-      }}
-    >
-      <g transform="translate(0.000000,1374.000000) scale(0.100000,-0.100000)" stroke="none">
-        {paths.map((p, idx) => (
-          <motion.path
-            key={idx}
-            d={p.d}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.35,
-              delay: p.delay,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            fill={p.color}
-          />
-        ))}
-      </g>
-    </svg>
-  );
-}
-
-/* ─── Section Preloader (Hardware-Accelerated 120 FPS Fade Out) ─── */
-function SectionPreloaderOverlay({
-  theme = "light",
-}: {
-  theme?: "light" | "dark";
-}) {
-  const [done, setDone] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-5%" });
-
-  useEffect(() => {
-    if (isInView) {
-      const timer = setTimeout(() => {
-        setDone(true);
-      }, 700);
-      return () => clearTimeout(timer);
-    }
-  }, [isInView]);
-
-  if (done) return null;
-
-  const bgStyle =
-    theme === "light"
-      ? "rgba(245, 243, 239, 0.97)"
-      : "rgba(16, 19, 18, 0.97)";
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: "none",
-        zIndex: 50,
-        borderRadius: "inherit",
-        overflow: "hidden",
-        transform: "translateZ(0)",
-      }}
-    >
-      <AnimatePresence>
-        {isInView && !done && (
-          <motion.div
-            key="preloader-overlay"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{
-              opacity: 0,
-              transition: { duration: 0.35, ease: "easeOut" },
-            }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: bgStyle,
-              borderRadius: "inherit",
-              transform: "translateZ(0)",
-              willChange: "opacity",
-            }}
-          >
-            <StaggeredAcLogo size={130} theme={theme} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 }
 
@@ -2511,8 +2375,7 @@ export default function Home() {
             }}
             {...reveal}
           >
-            <SectionPreloaderOverlay theme="light" />
-            {/* SVG border trace — drawn from bottom-left on scroll */}
+                        {/* SVG border trace — drawn from bottom-left on scroll */}
 
             <svg
               className="intro-neon-svg"
@@ -2573,8 +2436,7 @@ export default function Home() {
 
         <StackSlot>
           <section className="problem-section stack-panel layer-2">
-            <SectionPreloaderOverlay theme="dark" />
-            <motion.div className="problem-copy" {...reveal}>
+                        <motion.div className="problem-copy" {...reveal}>
 
               <span className="section-tag">/ До диспетчеризации</span>
               <h2>Когда каждая установка работает сама по себе</h2>
@@ -2614,8 +2476,7 @@ export default function Home() {
             className="audit section stack-panel panel-ice layer-3"
             id="audit"
           >
-            <SectionPreloaderOverlay theme="light" />
-            <motion.div className="audit-card" {...reveal}>
+                        <motion.div className="audit-card" {...reveal}>
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
                 <h2>Можно ли подключить ваш объект к единой диспетчерской?</h2>
@@ -2646,8 +2507,7 @@ export default function Home() {
 
         <StackSlot>
           <section className="scenario-section section stack-panel panel-ice layer-5" id="vendors">
-            <SectionPreloaderOverlay theme="light" />
-            <div className="vendors-container">
+                        <div className="vendors-container">
 
               <div className="vendors-left-col">
                 <div className="section-heading">
@@ -2734,8 +2594,7 @@ export default function Home() {
             className="case section stack-panel panel-mist layer-6"
             id="cases"
           >
-            <SectionPreloaderOverlay theme="dark" />
-            <motion.div className="case-carousel" {...reveal}>
+                        <motion.div className="case-carousel" {...reveal}>
 
               <motion.div
                 className="case-shell"
@@ -2943,8 +2802,7 @@ export default function Home() {
               obs.observe(el);
             }}
           >
-            <SectionPreloaderOverlay theme="light" />
-            {/* SVG border trace — drawn from bottom-left on scroll */}
+                        {/* SVG border trace — drawn from bottom-left on scroll */}
 
             <svg
               className="intro-neon-svg"
@@ -3045,8 +2903,7 @@ export default function Home() {
             className="faq section stack-panel panel-white layer-8"
             id="faq"
           >
-            <SectionPreloaderOverlay theme="light" />
-            <div className="faq-title">
+                        <div className="faq-title">
               <span className="section-tag">/ FAQ</span>
               <h2>Частые вопросы</h2>
               <p>
@@ -3090,8 +2947,7 @@ export default function Home() {
             className="contact section stack-panel panel-blue layer-9"
             id="contact"
           >
-            <SectionPreloaderOverlay theme="dark" />
-            <motion.div className="contact-shell" {...reveal}>
+                        <motion.div className="contact-shell" {...reveal}>
               <div className="contact-copy">
                 <span className="section-tag light">
                   / Предварительная концепция
@@ -3127,8 +2983,7 @@ export default function Home() {
             className="stack-panel footer-dark about-footer layer-10"
             id="about"
           >
-            <SectionPreloaderOverlay theme="dark" />
-            <div className="founder-section">
+                        <div className="founder-section">
 
               <div className="founder-heading">
                 <div>
