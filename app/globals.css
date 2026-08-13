@@ -3091,8 +3091,9 @@ footer {
     padding-right: 15px;
   }
   .contact {
-    padding: 50px 6px 10px;
+    padding: 40px 10px 48px;
   }
+
   .contact-shell {
     padding: 38px 20px;
   }
@@ -4637,7 +4638,9 @@ main {
   .contact {
     display: grid;
     align-items: center;
+    padding-bottom: clamp(48px, 6vh, 72px) !important;
   }
+
   .contact-shell {
     max-height: 100%;
     padding: clamp(38px, 5.5vh, 60px);
