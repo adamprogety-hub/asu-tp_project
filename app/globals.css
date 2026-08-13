@@ -5195,13 +5195,16 @@ main {
   width: min(980px, 76vw);
   margin: 18px auto 0;
   display: grid;
-  grid-template-columns: repeat(6, minmax(54px, 1fr)) auto;
-  align-items: end;
+  grid-template-columns: repeat(6, minmax(32px, 1fr)) auto;
+  align-items: center;
+  justify-items: center;
   gap: 10px;
 }
 .process-segment {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 .process-segment b {
   font-size: 7px;
@@ -5209,20 +5212,11 @@ main {
   letter-spacing: 0.1em;
   color: #8a928d;
 }
-.process-segment > i {
-  position: relative;
+.process-star {
+  width: 18px;
+  height: 18px;
   display: block;
-  height: 4px;
-  border-radius: 999px;
-  background: #d9ddda;
-  overflow: hidden;
-}
-.process-segment > i > em {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--ink);
-  transform-origin: 0 50%;
+  will-change: transform;
 }
 .process-scroll-hint {
   margin-left: 12px;
@@ -5275,8 +5269,9 @@ main {
   .process-segment b {
     font-size: 6px;
   }
-  .process-segment > i {
-    height: 3px;
+  .process-star {
+    width: 14px;
+    height: 14px;
   }
   .process-note {
     margin-top: 9px !important;

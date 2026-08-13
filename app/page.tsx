@@ -1534,15 +1534,37 @@ function ProcessSegment({
   index: number;
   progress: MotionValue<number>;
 }) {
-  const fill = useTransform(progress, (value) =>
+  const fillValue = useTransform(progress, (value) =>
     Math.max(0, Math.min(1, value * (steps.length - 1) - index + 1)),
   );
+  // Star is "active" when fillValue > 0.5
+  const starFill = useTransform(fillValue, [0, 0.5, 1], ["#d9ddda", "#101312", "#101312"]);
+  const starScale = useTransform(fillValue, [0, 0.5, 1], [0.75, 1.1, 1]);
+
   return (
     <span className="process-segment">
       <b>{String(index + 1).padStart(2, "0")}</b>
-      <i>
-        <motion.em style={{ scaleX: fill }} />
-      </i>
+      {/* 4-pointed brand star instead of progress bar line */}
+      <motion.svg
+        className="process-star"
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ scale: starScale }}
+        aria-hidden="true"
+      >
+        <motion.path
+          d="M50 5
+             C50 5, 56 38, 62 44
+             C68 50, 95 50, 95 50
+             C95 50, 68 50, 62 56
+             C56 62, 50 95, 50 95
+             C50 95, 44 62, 38 56
+             C32 50, 5 50, 5 50
+             C5 50, 32 50, 38 44
+             C44 38, 50 5, 50 5 Z"
+          style={{ fill: starFill }}
+        />
+      </motion.svg>
     </span>
   );
 }
