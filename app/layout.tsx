@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, Onest } from "next/font/google";
 import "./globals.css";
 import { CookieConsent, PrivacyModal } from "./CookieConsent";
+import { Preloader } from "./Preloader";
 import Script from "next/script";
 
 const onest = Onest({
@@ -137,7 +138,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
 
       <body>
-
+        <Preloader />
         {children}
         <CookieConsent />
         <PrivacyModal />
