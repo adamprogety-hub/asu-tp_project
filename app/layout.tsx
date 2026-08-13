@@ -88,13 +88,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             text-align: center;
           }
           .hero h1 {
-            font-size: clamp(32px, 5.5vw, 68px);
-            line-height: 1.08;
-            letter-spacing: -0.03em;
+            font-size: clamp(48px, 5.8vw, 96px);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
             font-family: var(--font-manrope);
-            font-weight: 800;
-            margin: 0 0 var(--spacing-md);
+            font-weight: 440;
+            margin: var(--spacing-xs) auto var(--spacing-sm);
           }
+          .title-accent {
+            font-family: var(--font-manrope);
+            font-style: normal;
+            font-weight: 320;
+            letter-spacing: -0.055em;
+          }
+
           .nav {
             position: fixed;
             z-index: 50;
