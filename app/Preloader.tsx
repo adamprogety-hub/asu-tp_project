@@ -44,10 +44,11 @@ export function Preloader() {
       <svg
         className="pl-logo"
         viewBox="0 0 1600 1374"
-        width="160"
-        height="137"
+        width="240"
+        height="206"
         xmlns="http://www.w3.org/2000/svg"
         overflow="visible"
+        style={{ imageRendering: "auto" }}
       >
         <g transform="translate(0,1374) scale(0.1,-0.1)" stroke="none">
           {/* P1 — top arc of C */}
