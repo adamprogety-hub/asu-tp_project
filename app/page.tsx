@@ -2355,10 +2355,11 @@ export default function Home() {
                     p.style.transition = 'none';
                     p.style.strokeDashoffset = `${perim}`;
                     p.style.opacity = '1';
-                    void p.getBoundingClientRect(); // force reflow
-                    p.style.transition =
-                      'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
-                    p.style.strokeDashoffset = '0';
+                    requestAnimationFrame(() => {
+                      p.style.transition =
+                        'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
+                      p.style.strokeDashoffset = '0';
+                    });
                   } else {
                     p.style.transition = 'opacity 0.4s ease';
                     p.style.opacity = '0';
@@ -2775,10 +2776,11 @@ export default function Home() {
                     p.style.transition = 'none';
                     p.style.strokeDashoffset = `${perim}`;
                     p.style.opacity = '1';
-                    void p.getBoundingClientRect(); // force reflow
-                    p.style.transition =
-                      'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
-                    p.style.strokeDashoffset = '0';
+                    requestAnimationFrame(() => {
+                      p.style.transition =
+                        'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
+                      p.style.strokeDashoffset = '0';
+                    });
                   } else {
                     p.style.transition = 'opacity 0.4s ease';
                     p.style.opacity = '0';
