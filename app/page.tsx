@@ -12,13 +12,11 @@ import {
   AnimatePresence,
   motion,
   MotionValue,
-  useInView,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from "motion/react";
-
 import Image from "next/image";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
@@ -745,8 +743,6 @@ function MiniScada({ variant = 0 }: { variant?: number }) {
           src={`/images/scada-slides/slide-0${variant + 1}.webp`}
           alt={scadaSlides[variant][0]}
           className="scada-slide-img"
-          loading="lazy"
-          decoding="async"
         />
       </div>
     </div>
@@ -791,8 +787,6 @@ function AnimatedMiniScada({
               src={`/images/scada-slides/slide-0${variant + 1}.webp`}
               alt={scadaSlides[variant][0]}
               className="scada-slide-img scada-scene-layer"
-              loading="lazy"
-              decoding="async"
               initial={{ opacity: 0, x: direction * 15 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction * -12 }}
@@ -1573,52 +1567,48 @@ function ProcessFlow({
   return (
     <section className="process-runway" id="process" ref={ref}>
       <div className="process process-sticky stack-panel panel-paper layer-4">
-                  <div className="section-heading split">
-            <div>
-              <span className="section-tag">/ Полный цикл</span>
-              <h2>Закрываю весь технический контур проекта</h2>
-            </div>
-            <p>
-              Шесть последовательных этапов — от первого сигнала в шкафу до
-              готового экрана диспетчерской.
-            </p>
+        <div className="section-heading split">
+          <div>
+            <span className="section-tag">/ Полный цикл</span>
+            <h2>Закрываю весь технический контур проекта</h2>
           </div>
-          <div className="process-deck" aria-label="Этапы и стоимость работ">
-            {steps.map((step, index) => (
-              <ProcessCard
-                key={step[0]}
-                step={step}
-                index={index}
-                progress={deckProgress}
-                reduceMotion={reduceMotion}
-                scrollToSection={scrollToSection}
-              />
-            ))}
-          </div>
-          <div className="process-pagination" aria-hidden="true">
-            {steps.map((step, index) => (
-              <ProcessSegment
-                key={step[0]}
-                index={index}
-                progress={deckProgress}
-              />
-            ))}
-            <span className="process-scroll-hint">Листайте вниз</span>
-          </div>
-          <p className="process-note">
-            Ориентировочная стоимость типового стартового объёма. Оборудование,
-            лицензии и выезды рассчитываются отдельно.
+          <p>
+            Шесть последовательных этапов — от первого сигнала в шкафу до
+            готового экрана диспетчерской.
           </p>
-        
+        </div>
+        <div className="process-deck" aria-label="Этапы и стоимость работ">
+          {steps.map((step, index) => (
+            <ProcessCard
+              key={step[0]}
+              step={step}
+              index={index}
+              progress={deckProgress}
+              reduceMotion={reduceMotion}
+              scrollToSection={scrollToSection}
+            />
+          ))}
+        </div>
+        <div className="process-pagination" aria-hidden="true">
+          {steps.map((step, index) => (
+            <ProcessSegment
+              key={step[0]}
+              index={index}
+              progress={deckProgress}
+            />
+          ))}
+          <span className="process-scroll-hint">Листайте вниз</span>
+        </div>
+        <p className="process-note">
+          Ориентировочная стоимость типового стартового объёма. Оборудование,
+          лицензии и выезды рассчитываются отдельно.
+        </p>
       </div>
     </section>
-
   );
 }
 
-
 function StackSlot({ children }: { children: ReactNode }) {
-
   return <div className="stack-slot">{children}</div>;
 }
 
@@ -1857,83 +1847,84 @@ export default function Home() {
     const handleScrollSnap = () => {
       if (isAutoScrolling) return;
       if (navigationLocked.current) return;
-      if (!media.matches) return;
 
-      // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
-      // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
-      const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
-      if (firstSlot) {
-        const rect = firstSlot.getBoundingClientRect();
-        if (rect.top > 10) {
-          return;
-        }
-      }
+      window.clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = window.setTimeout(() => {
+        if (!media.matches) return;
 
-      // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
-      const runway = document.querySelector<HTMLElement>(".process-runway");
-      if (runway) {
-        const rect = runway.getBoundingClientRect();
-        if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
-          return;
-        }
-      }
-
-      // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
-      const targets = Array.from(
-        document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
-      );
-
-      let closestTarget: HTMLElement | null = null;
-      let minDiff = Infinity;
-
-      targets.forEach((target) => {
-        const rect = target.getBoundingClientRect();
-        const diff = Math.abs(rect.top);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestTarget = target;
-        }
-      });
-
-      if (closestTarget && minDiff > 12) {
-        // Проверяем, помещается ли контент предстоящей секции на экране
-        const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
-        
-        let panelHeight = panel.scrollHeight;
-        // Для process-runway берем высоту самого липкого контейнера
-        if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
-          const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
-          if (processSticky) {
-            panelHeight = processSticky.scrollHeight;
+        // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
+        // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
+        const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
+        if (firstSlot) {
+          const rect = firstSlot.getBoundingClientRect();
+          if (rect.top > 10) {
+            return;
           }
         }
 
-        const fitsOnScreen = panelHeight <= window.innerHeight + 25;
+        // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
+        const runway = document.querySelector<HTMLElement>(".process-runway");
+        if (runway) {
+          const rect = runway.getBoundingClientRect();
+          if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
+            return;
+          }
+        }
 
-        // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
-        if (!fitsOnScreen) return;
+        // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
+        const targets = Array.from(
+          document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
+        );
 
-        const rect = (closestTarget as HTMLElement).getBoundingClientRect();
-        const targetTop = window.scrollY + rect.top;
+        let closestTarget: HTMLElement | null = null;
+        let minDiff = Infinity;
 
-        isAutoScrolling = true;
-        window.scrollTo({
-          top: targetTop,
-          behavior: "smooth",
+        targets.forEach((target) => {
+          const rect = target.getBoundingClientRect();
+          const diff = Math.abs(rect.top);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestTarget = target;
+          }
         });
 
-        window.setTimeout(() => {
-          isAutoScrolling = false;
-        }, 800);
-      }
+        if (closestTarget && minDiff > 12) {
+          // Проверяем, помещается ли контент предстоящей секции на экране
+          const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
+          
+          let panelHeight = panel.scrollHeight;
+          // Для process-runway берем высоту самого липкого контейнера
+          if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
+            const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
+            if (processSticky) {
+              panelHeight = processSticky.scrollHeight;
+            }
+          }
+
+          const fitsOnScreen = panelHeight <= window.innerHeight + 25;
+
+          // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
+          if (!fitsOnScreen) return;
+
+          const rect = (closestTarget as HTMLElement).getBoundingClientRect();
+          const targetTop = window.scrollY + rect.top;
+
+          isAutoScrolling = true;
+          window.scrollTo({
+            top: targetTop,
+            behavior: "smooth",
+          });
+
+          window.setTimeout(() => {
+            isAutoScrolling = false;
+          }, 800);
+        }
+      }, 150) as any; // Быстрый отклик за 150мс!
     };
 
     const scheduleUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
-      if (media.matches && !navigationLocked.current && !isAutoScrolling) {
-        window.clearTimeout(scrollEndTimeout);
-        scrollEndTimeout = window.setTimeout(handleScrollSnap, 220) as any;
-      }
+      handleScrollSnap();
     };
 
     updatePinnedPanels();
@@ -1949,7 +1940,6 @@ export default function Home() {
       panels.forEach(resetPanelMotion);
     };
   }, []);
-
   useEffect(() => {
     // На мобильных устройствах включаем наблюдатель для активации карточек при прохождении центра экрана
     const media = window.matchMedia("(max-width: 1000px)");
@@ -2193,6 +2183,7 @@ export default function Home() {
           style={{
             y: heroEquipmentY,
             opacity: heroCopyOpacity,
+            filter: heroCopyBlur,
           }}
           aria-hidden="true"
         >
@@ -2212,8 +2203,7 @@ export default function Home() {
               width={520}
               height={420}
               priority
-              sizes="(max-width: 768px) 280px, 520px"
-              quality={80}
+              quality={85}
             />
           </motion.div>
           <motion.div
@@ -2232,8 +2222,7 @@ export default function Home() {
               width={420}
               height={360}
               priority
-              sizes="(max-width: 768px) 240px, 420px"
-              quality={80}
+              quality={85}
             />
           </motion.div>
         </motion.div>
@@ -2242,9 +2231,9 @@ export default function Home() {
           style={{
             y: heroCopyY,
             opacity: heroCopyOpacity,
+            filter: heroCopyBlur,
           }}
         >
-
           <motion.div
             className="hero-copy"
             initial={{ opacity: 0, y: 24 }}
@@ -2375,8 +2364,7 @@ export default function Home() {
             }}
             {...reveal}
           >
-                        {/* SVG border trace — drawn from bottom-left on scroll */}
-
+            {/* SVG border trace — drawn from bottom-left on scroll */}
             <svg
               className="intro-neon-svg"
               aria-hidden="true"
@@ -2430,14 +2418,12 @@ export default function Home() {
                 </motion.article>
               ))}
             </div>
-            
           </motion.section>
         </StackSlot>
 
         <StackSlot>
           <section className="problem-section stack-panel layer-2">
-                        <motion.div className="problem-copy" {...reveal}>
-
+            <motion.div className="problem-copy" {...reveal}>
               <span className="section-tag">/ До диспетчеризации</span>
               <h2>Когда каждая установка работает сама по себе</h2>
               <p>
@@ -2467,7 +2453,6 @@ export default function Home() {
                 quality={80}
               />
             </motion.div>
-            
           </section>
         </StackSlot>
 
@@ -2476,7 +2461,7 @@ export default function Home() {
             className="audit section stack-panel panel-ice layer-3"
             id="audit"
           >
-                        <motion.div className="audit-card" {...reveal}>
+            <motion.div className="audit-card" {...reveal}>
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
                 <h2>Можно ли подключить ваш объект к единой диспетчерской?</h2>
@@ -2499,7 +2484,6 @@ export default function Home() {
               </div>
               <LeadForm compact />
             </motion.div>
-            
           </section>
         </StackSlot>
 
@@ -2507,8 +2491,7 @@ export default function Home() {
 
         <StackSlot>
           <section className="scenario-section section stack-panel panel-ice layer-5" id="vendors">
-                        <div className="vendors-container">
-
+            <div className="vendors-container">
               <div className="vendors-left-col">
                 <div className="section-heading">
                   <span className="section-tag">/ Вендоры и платформы</span>
@@ -2584,9 +2567,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            
           </section>
-
         </StackSlot>
 
         <StackSlot>
@@ -2594,8 +2575,7 @@ export default function Home() {
             className="case section stack-panel panel-mist layer-6"
             id="cases"
           >
-                        <motion.div className="case-carousel" {...reveal}>
-
+            <motion.div className="case-carousel" {...reveal}>
               <motion.div
                 className="case-shell"
                 drag="x"
@@ -2727,9 +2707,7 @@ export default function Home() {
                 />
               </motion.div>
             </motion.div>
-            
           </section>
-
         </StackSlot>
 
         <StackSlot>
@@ -2802,8 +2780,7 @@ export default function Home() {
               obs.observe(el);
             }}
           >
-                        {/* SVG border trace — drawn from bottom-left on scroll */}
-
+            {/* SVG border trace — drawn from bottom-left on scroll */}
             <svg
               className="intro-neon-svg"
               aria-hidden="true"
@@ -2894,7 +2871,6 @@ export default function Home() {
                 </div>
               </motion.article>
             </div>
-            
           </section>
         </StackSlot>
 
@@ -2903,7 +2879,7 @@ export default function Home() {
             className="faq section stack-panel panel-white layer-8"
             id="faq"
           >
-                        <div className="faq-title">
+            <div className="faq-title">
               <span className="section-tag">/ FAQ</span>
               <h2>Частые вопросы</h2>
               <p>
@@ -2939,7 +2915,6 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
-            
           </section>
         </StackSlot>
         <StackSlot>
@@ -2947,7 +2922,7 @@ export default function Home() {
             className="contact section stack-panel panel-blue layer-9"
             id="contact"
           >
-                        <motion.div className="contact-shell" {...reveal}>
+            <motion.div className="contact-shell" {...reveal}>
               <div className="contact-copy">
                 <span className="section-tag light">
                   / Предварительная концепция
@@ -2974,7 +2949,6 @@ export default function Home() {
               </div>
               <LeadForm />
             </motion.div>
-            
           </section>
         </StackSlot>
 
@@ -2983,8 +2957,7 @@ export default function Home() {
             className="stack-panel footer-dark about-footer layer-10"
             id="about"
           >
-                        <div className="founder-section">
-
+            <div className="founder-section">
               <div className="founder-heading">
                 <div>
                   <span className="section-tag light">
@@ -3046,9 +3019,7 @@ export default function Home() {
                 </a>
               </span>
             </div>
-            
           </footer>
-
         </StackSlot>
       </div>
     </main>
