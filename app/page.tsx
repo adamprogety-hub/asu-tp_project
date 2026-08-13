@@ -857,7 +857,7 @@ function ScadaCarousel() {
               onClick={() => move(i)}
               aria-label={`Показать: ${slide[0]}`}
             >
-              <i />
+              <BrandStar size={10} />
             </button>
           ))}
         </div>
@@ -866,13 +866,13 @@ function ScadaCarousel() {
             onClick={() => move(active - 1)}
             aria-label="Предыдущая мнемосхема"
           >
-            <ChevronLeft />
+            <BrandStar size={14} />
           </button>
           <button
             onClick={() => move(active + 1)}
             aria-label="Следующая мнемосхема"
           >
-            <ChevronRight />
+            <BrandStar size={14} />
           </button>
         </div>
       </div>
@@ -1527,7 +1527,25 @@ function ProcessCard({
   );
 }
 
+/** Reusable 4-pointed brand star from the logo mark */
+function BrandStar({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`brand-star-icon ${className}`}
+      aria-hidden="true"
+      fill="currentColor"
+    >
+      <path d="M50 5 C50 5,56 38,62 44 C68 50,95 50,95 50 C95 50,68 50,62 56 C56 62,50 95,50 95 C50 95,44 62,38 56 C32 50,5 50,5 50 C5 50,32 50,38 44 C44 38,50 5,50 5 Z" />
+    </svg>
+  );
+}
+
 function ProcessSegment({
+
   index,
   progress,
 }: {
@@ -2553,10 +2571,10 @@ export default function Home() {
                           <span className="accordion-title">{x.label}</span>
                           <motion.div
                             className="accordion-icon"
-                            animate={{ rotate: isOpen ? 180 : 0 }}
-                            transition={{ duration: 0.2 }}
+                            animate={{ rotate: isOpen ? 45 : 0 }}
+                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                           >
-                            <ChevronDown size={20} />
+                            <BrandStar size={18} />
                           </motion.div>
                         </button>
                         
@@ -2639,14 +2657,14 @@ export default function Home() {
                         onClick={() => moveCase(activeCase - 1)}
                         aria-label="Предыдущий проект"
                       >
-                        <ChevronLeft />
+                        <BrandStar size={14} />
                       </button>
                       <b>{String(activeCase + 1).padStart(2, "0")} / 07</b>
                       <button
                         onClick={() => moveCase(activeCase + 1)}
                         aria-label="Следующий проект"
                       >
-                        <ChevronRight />
+                        <BrandStar size={14} />
                       </button>
                     </div>
                   </div>
@@ -2701,7 +2719,7 @@ export default function Home() {
                               onClick={() => moveCase(index)}
                               aria-label={`Показать кейс ${index + 1}`}
                             >
-                              <i />
+                              <BrandStar size={11} />
                             </button>
                           ))}
                         </div>
@@ -2928,7 +2946,7 @@ export default function Home() {
                   <button onClick={() => setFaq(faq === i ? -1 : i)}>
                     <span>0{i + 1}</span>
                     <strong>{q}</strong>
-                    <ChevronDown />
+                    <BrandStar size={14} className="faq-chevron" />
                   </button>
                   <AnimatePresence initial={false}>
                     {faq === i && (
