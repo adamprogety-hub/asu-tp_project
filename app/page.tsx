@@ -2239,12 +2239,8 @@ export default function Home() {
             filter: heroCopyBlur,
           }}
         >
-          <motion.div
-            className="hero-copy"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="hero-copy">
+
             <div
               className="hero-labels"
               aria-label="SCADA и HVAC для коммерческих объектов"
@@ -2272,8 +2268,9 @@ export default function Home() {
                 <Play size={14} fill="currentColor" strokeWidth={0} style={{ transform: "translateX(1px)" }} /> Что уже выполнено
               </a>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
+
         <motion.div
           className="hero-visual"
           style={{ y: heroVisualY, scale: heroVisualScale }}
