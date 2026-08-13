@@ -7,8 +7,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
 
     // Responsive breakpoints for srcSet generation
-    deviceSizes: [375, 640, 768, 1024, 1280, 1536, 1920],
+    deviceSizes: [375, 640, 768, 1024, 1280, 1440, 1536, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
+
+    // Allowed quality values (must list every quality used in <Image quality={n}>)
+    qualities: [75, 80, 85, 92],
 
     // Cache optimised images for 1 year
     minimumCacheTTL: 31536000,

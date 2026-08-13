@@ -177,7 +177,7 @@ button {
 }
 .nav {
   position: fixed;
-  z-index: 60;
+  z-index: 100;
 
   left: var(--spacing-md);
   right: var(--spacing-md);
@@ -231,6 +231,71 @@ button {
 .logo svg.logo-svg {
   animation: none !important;
 }
+/* ── Problem section: dark accordion override ─────────────── */
+/* Reuses existing .accordion-item structure, overrides colors only */
+.problem-steps-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-xl) 0 var(--spacing-xl) var(--spacing-xl);
+}
+.work-accordion-dark {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* Dark card overrides */
+.work-accordion-dark .accordion-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow: none;
+}
+.work-accordion-dark .accordion-item.open {
+  border-color: rgba(90, 179, 165, 0.28);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+.work-accordion-dark .accordion-num {
+  color: rgba(90, 179, 165, 0.75);
+}
+.work-accordion-dark .accordion-title {
+  color: #edf2ef;
+}
+.work-accordion-dark .accordion-item.open .accordion-title {
+  color: #fff;
+}
+.work-accordion-dark .accordion-icon {
+  color: rgba(255, 255, 255, 0.28);
+  transition: color 0.25s;
+}
+.work-accordion-dark .accordion-item.open .accordion-icon {
+  color: rgba(90, 179, 165, 0.85);
+}
+.work-accordion-dark .accordion-body {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 24px;
+}
+.work-accordion-dark .accordion-left p {
+  color: rgba(179, 193, 185, 0.82);
+  font-size: 14px;
+  line-height: 1.72;
+}
+/* 3D icon reveal in expanded body */
+.step-icon-reveal {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.step-icon-img {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.65))
+          drop-shadow(0 0 50px rgba(90, 179, 165, 0.06));
+}
+
 /* ─── Nav right group ─── */
 .nav-right {
   display: flex;
@@ -361,7 +426,7 @@ button {
 }
 .mobile-menu {
   position: fixed;
-  z-index: 55;
+  z-index: 90;
   top: 92px;
 
   left: var(--spacing-md);
@@ -383,7 +448,7 @@ button {
   background: rgba(16, 19, 18, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 48;
+  z-index: 80;
 }
 .mobile-menu-item {
   display: flex;
@@ -1157,15 +1222,16 @@ p {
 .benefit-card:after {
   content: "";
   position: absolute;
-  width: 120px;
-  height: 120px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  background: var(--blue);
-  filter: blur(40px);
-  opacity: 0.28;
-  right: -50px;
-  top: -50px;
-  transition: background-color 0.35s ease, opacity 0.35s ease;
+  /* radial-gradient instead of filter:blur() — avoids iOS GPU compositing
+     artifact that renders blurred pseudo-elements as solid rectangles on scroll */
+  background: radial-gradient(circle at center, var(--blue) 0%, transparent 65%);
+  opacity: 0.32;
+  right: -80px;
+  top: -80px;
+  transition: opacity 0.35s ease;
 }
 .card-top {
   display: flex;
@@ -1266,19 +1332,63 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
-.mnemo-screenshot {
+/* Monitor motion wrapper */
+.problem-monitor-wrap {
+  position: relative;
+  z-index: 1;
   width: 100%;
+}
+/* Chip cloud — absolute over monitor, desktop only */
+.problem-chips-cloud {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: none; /* hidden on mobile */
+}
+/* Individual branded chip */
+.problem-chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  background: rgba(17, 20, 19, 0.90);
+  border: 1px solid rgba(90, 179, 165, 0.32);
+  border-radius: 11px;
+  color: #e8edea;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.problem-chip svg {
+  color: rgba(90, 179, 165, 0.85);
+  flex-shrink: 0;
+}
+
+.mnemo-screenshot {
+  /* Use natural CSS width instead of transform:scale.
+     transform:scale causes browser to load low-res image then upscale visually.
+     width:145% makes browser see the real display size → loads correct srcset. */
+  width: 145%;
   height: auto;
   display: block;
-  transform: scale(1.5);
-  transform-origin: center;
-  transition: transform 0.3s ease;
+  margin-left: -22.5%;
   filter: drop-shadow(0 35px 30px rgba(0, 0, 0, 0.55));
 }
 @media (max-width: 1000px) {
   .mnemo-screenshot {
-    transform: scale(1.1);
+    width: 110%;
+    margin-left: -5%;
     filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.45));
   }
 }
@@ -1749,6 +1859,9 @@ p {
   grid-template-columns: 0.85fr 1.15fr;
   gap: 24px;
   align-items: center;
+  /* Perspective makes scale transitions feel like Z-depth movement */
+  perspective: 1400px;
+  overflow: hidden;
 }
 .case-copy {
   padding: var(--spacing-lg) var(--spacing-md);
@@ -2991,7 +3104,7 @@ footer {
     height: 20px;
   }
   .mobile-menu {
-    top: 70px;
+    top: 78px;
     left: 16px;
     right: 16px;
   }
@@ -5400,21 +5513,21 @@ main {
   }
   .process-pagination {
     grid-template-columns: repeat(6, 1fr);
-    gap: 6px;
-    margin-top: 13px;
+    gap: 12px;
+    margin-top: 20px;
   }
   .process-scroll-hint {
     display: none;
   }
   .process-segment b {
-    font-size: 6px;
+    display: none; /* 6px text is illegible — hide on mobile */
   }
   .process-star {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
   .process-note {
-    margin-top: 9px !important;
+    margin-top: 12px !important;
   }
 }
 @media (prefers-reduced-motion: reduce) {

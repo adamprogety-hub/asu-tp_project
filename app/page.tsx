@@ -3,6 +3,7 @@
 import {
   type MouseEvent,
   type ReactNode,
+  forwardRef,
   useEffect,
   useMemo,
   useRef,
@@ -22,12 +23,15 @@ import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
 import {
   Activity,
+  AlertTriangle,
   ArrowDown,
   ArrowDownRight,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
+  Bell,
   BellRing,
+  BookOpen,
   Building2,
   Check,
   ChevronLeft,
@@ -35,6 +39,8 @@ import {
   ChevronDown,
   CircleGauge,
   Clock3,
+  Database,
+  EyeOff,
   Fan,
   Factory,
   FileStack,
@@ -49,6 +55,7 @@ import {
   Paperclip,
   Phone,
   Play,
+  Plus,
   Radio,
   Send,
   Server,
@@ -56,9 +63,11 @@ import {
   SlidersHorizontal,
   Snowflake,
   Thermometer,
+  Unlink,
   Upload,
   User,
   Wifi,
+  WifiOff,
   X,
   Zap,
 } from "lucide-react";
@@ -829,13 +838,13 @@ function AnimatedMiniScada({
               src={`/images/scada-slides/slide-0${variant + 1}.webp`}
               alt={scadaSlides[variant][0]}
               className="scada-slide-img scada-scene-layer"
-              initial={{ opacity: 0, x: direction * 15 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -12 }}
+              // Z-parallax: enters from side + approaches from viewer (scale 0.88→1)
+              initial={{ opacity: 0, x: direction * 50, scale: 0.88 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: direction * -18, scale: 0.97 }}
               transition={{
-                duration: 0.68,
-                delay: 0.18,
-                ease: [0.22, 1, 0.36, 1],
+                duration: 0.72,
+                ease: [0.16, 1, 0.3, 1],
               }}
             />
           </AnimatePresence>
@@ -1696,8 +1705,82 @@ function ProcessFlow({
   );
 }
 
-function StackSlot({ children }: { children: ReactNode }) {
-  return <div className="stack-slot">{children}</div>;
+const StackSlot = forwardRef<HTMLDivElement, { children: ReactNode; className?: string }>(
+  ({ children, className = '' }, ref) => (
+    <div ref={ref} className={`stack-slot${className ? ' ' + className : ''}`}>
+      {children}
+    </div>
+  )
+);
+StackSlot.displayName = 'StackSlot';
+
+/* ── Client journey accordion data ─────────────────────────── */
+const WORK_STEPS = [
+  {
+    n: "01",
+    title: "Аудит — смотрю что есть",
+    img: "/images/steps/step-01-audit.webp",
+    body: "Выезжаю на объект или анализирую схемы удалённо. Фиксирую оборудование, протоколы передачи данных и точки подключения. После — конкретное предложение: что будет сделано, сроки и стоимость.",
+  },
+  {
+    n: "02",
+    title: "Интеграция — подключаю систему",
+    img: "/images/steps/step-02-module.webp",
+    body: "Подключаю оборудование поэтапно — объект продолжает работать во время монтажа. Настраиваю протоколы, пишу адресацию и проверяю передачу данных перед сдачей.",
+  },
+  {
+    n: "03",
+    title: "Запуск — система работает",
+    img: "/images/steps/step-03-system.webp",
+    body: "Ввожу в эксплуатацию, обучаю дежурного инженера реагировать на аварии до выезда. После сдачи — всегда на связи. Расширение системы — по запросу.",
+  },
+] as const;
+
+/* ── Problem chips data ─────────────────────────────────── */
+type LucideIcon = React.ComponentType<{ size?: number; strokeWidth?: number }>;
+const PROBLEM_CHIPS: {
+  label: string;
+  Icon: LucideIcon;
+  top: string;
+  left: string;
+  fly: [number, number, number]; // [x, y, rotate] in px/deg
+}[] = [
+  // Row 1
+  { label: "Авария после жалоб",      Icon: AlertTriangle,    top: "10%", left: "2%",  fly: [-280, -200, -20] },
+  { label: "Нет мониторинга 24/7",    Icon: EyeOff,           top: "8%",  left: "34%", fly: [-30,  -270,  10] },
+  { label: "Диагностика = выезд",     Icon: Gauge,            top: "12%", left: "65%", fly: [300,  -210,  24] },
+  // Row 2
+  { label: "Нет истории данных",      Icon: Database,         top: "40%", left: "0%",  fly: [-320, -20,  -30] },
+  { label: "Реакция после сбоя",      Icon: Bell,             top: "38%", left: "28%", fly: [-80,  -240,  14] },
+  { label: "Нет удалённого доступа",  Icon: WifiOff,          top: "42%", left: "58%", fly: [260,  -40,  -16] },
+  // Row 3
+  { label: "Разные протоколы",        Icon: Unlink,           top: "70%", left: "5%",  fly: [-260,  220, -22] },
+  { label: "Ручной журнал",           Icon: BookOpen,         top: "68%", left: "33%", fly: [50,    290,   8] },
+  { label: "Каждый сам по себе",      Icon: Server,           top: "72%", left: "60%", fly: [300,   210,  20] },
+];
+
+function ProblemChip({
+  chip,
+  progress,
+}: {
+  chip: (typeof PROBLEM_CHIPS)[number];
+  progress: MotionValue<number>;
+}) {
+  const x       = useTransform(progress, [0, 0.62], [0, chip.fly[0]]);
+  const y       = useTransform(progress, [0, 0.62], [0, chip.fly[1]]);
+  const rotate  = useTransform(progress, [0, 0.62], [0, chip.fly[2]]);
+  const opacity = useTransform(progress, [0.30, 0.58], [1, 0]);
+  const scale   = useTransform(progress, [0, 0.62], [1, 0.7]);
+
+  return (
+    <motion.div
+      className="problem-chip"
+      style={{ x, y, rotate, opacity, scale, top: chip.top, left: chip.left }}
+    >
+      <chip.Icon size={13} strokeWidth={1.5} />
+      <span>{chip.label}</span>
+    </motion.div>
+  );
 }
 
 export default function Home() {
@@ -1708,10 +1791,12 @@ export default function Home() {
   const [heroPassed, setHeroPassed] = useState(false);
   const [activeCase, setActiveCase] = useState(0);
   const [caseDirection, setCaseDirection] = useState(1);
+  const [problemStep, setProblemStep] = useState(0);
   const navigationLocked = useRef(false);
   const reduceMotion = useReducedMotion();
+  const problemSlotRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
-  const scaleX = scrollYProgress; // no spring — direct scroll value, no animation loop
+  const scaleX = scrollYProgress;
   const heroCopyY = useTransform(
     scrollYProgress,
     [0, 0.09],
@@ -1739,6 +1824,7 @@ export default function Home() {
     [0.48, 0.78],
     [reduceMotion ? 0 : 54, reduceMotion ? 0 : -54],
   );
+
   const moveCase = (next: number) => {
     const normalized = (next + caseStudies.length) % caseStudies.length;
     setCaseDirection(
@@ -2434,25 +2520,70 @@ export default function Home() {
                 Проверить свой объект <ArrowRight size={17} />
               </a>
             </div>
-            <div
-              className="problem-console"
-            >
-              <Image
-                src="/images/real-mnemo/mnemo-before.webp"
-                alt="Реальная мнемосхема до диспетчеризации"
-                className="mnemo-screenshot"
-                width={720}
-                height={480}
-                loading="lazy"
-                decoding="async"
-                sizes="(max-width: 768px) 100vw, 640px"
-                quality={80}
-              />
+            {/* RIGHT: dark variant of site accordion — same HTML as vendors section */}
+            <div className="problem-steps-col">
+              <div className="work-accordion-dark">
+                {WORK_STEPS.map(({ n, title, img, body }, i) => (
+                  <div
+                    key={n}
+                    className={`accordion-item${problemStep === i ? " open" : ""}`}
+                  >
+                    <button
+                      className="accordion-header"
+                      onClick={() => setProblemStep(problemStep === i ? -1 : i)}
+                      aria-expanded={problemStep === i}
+                    >
+                      <span className="accordion-num">{n}</span>
+                      <span className="accordion-title">{title}</span>
+                      <span className="accordion-icon">
+                        {problemStep === i
+                          ? <X size={18} strokeWidth={1.5} />
+                          : <BrandStar size={16} />}
+                      </span>
+                    </button>
 
+                    <AnimatePresence initial={false}>
+                      {problemStep === i && (
+                        <motion.div
+                          key={n}
+                          className="accordion-content"
+                          initial={{ height: 0 }}
+                          animate={{ height: "auto" }}
+                          exit={{ height: 0 }}
+                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <div className="accordion-body">
+                            <div className="accordion-left">
+                              <p>{body}</p>
+                            </div>
+                            <motion.div
+                              className="step-icon-reveal"
+                              initial={{ scale: 0.68, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0.68, opacity: 0 }}
+                              transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                              <Image
+                                src={img}
+                                alt={title}
+                                width={180}
+                                height={126}
+                                className="step-icon-img"
+                                loading="lazy"
+                                quality={88}
+                              />
+                            </motion.div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
             </div>
+
           </section>
         </StackSlot>
-
         <StackSlot>
           <section
             className="audit section stack-panel panel-ice layer-3"
@@ -2625,13 +2756,14 @@ export default function Home() {
                     <motion.div
                       className="case-copy"
                       key={activeCase}
-                      initial={{ opacity: 0, x: caseDirection * 12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: caseDirection * -8 }}
+                      // Copy: enters from far (scale 0.88) + side — feels like it approaches viewer
+                      initial={{ x: caseDirection * 120, scale: 0.88, opacity: 0 }}
+                      animate={{ x: 0, scale: 1, opacity: 1 }}
+                      // Exit: barely moves — new slide "covers" it like a card on top
+                      exit={{ x: caseDirection * -28, scale: 0.97, opacity: 0 }}
                       transition={{
-                        duration: 0.68,
-                        delay: 0.16,
-                        ease: [0.22, 1, 0.36, 1],
+                        duration: 0.75,
+                        ease: [0.16, 1, 0.3, 1],
                       }}
                     >
                       <h2>
@@ -2642,19 +2774,11 @@ export default function Home() {
                       <p>{caseStudies[activeCase].text}</p>
                       <div className="case-numbers">
                         {caseStudies[activeCase].metrics.map(
-                          ([value, label], index) => (
-                            <motion.div
-                              key={label}
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.3 + index * 0.07,
-                                duration: 0.5,
-                              }}
-                            >
+                          ([value, label]) => (
+                            <div key={label}>
                               <strong>{value}</strong>
                               <span>{label}</span>
-                            </motion.div>
+                            </div>
                           ),
                         )}
                       </div>
@@ -2677,12 +2801,27 @@ export default function Home() {
                       </div>
                     </motion.div>
                   </AnimatePresence>
-                  <motion.div className="case-ui" style={{ y: caseVisualY }}>
-                    <AnimatedMiniScada
-                      variant={caseStudies[activeCase].variant}
-                      direction={caseDirection}
-                    />
-                  </motion.div>
+                  {/* SCADA screen: parallax offset (60px vs 120px) creates depth vs copy */}
+                  <AnimatePresence initial={false} mode="sync">
+                    <motion.div
+                      key={activeCase}
+                      className="case-ui"
+                      style={{ y: caseVisualY }}
+                      initial={{ x: caseDirection * 60, scale: 0.93, opacity: 0 }}
+                      animate={{ x: 0, scale: 1, opacity: 1 }}
+                      exit={{ x: caseDirection * -12, scale: 0.98, opacity: 0 }}
+                      transition={{
+                        duration: 0.75,
+                        delay: 0.04,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    >
+                      <AnimatedMiniScada
+                        variant={caseStudies[activeCase].variant}
+                        direction={caseDirection}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
                 <motion.div
                   className={`case-airflow-sweep ${caseDirection < 0 ? "reverse" : ""}`}
