@@ -267,12 +267,54 @@ const faqs = [
   ],
 ] as const;
 
+/** Base reveal — opacity + translateY only, safe in sticky contexts */
 const reveal = {
-  initial: { opacity: 0, y: 36 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+  initial:     { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0  },
+  viewport:    { once: true, margin: "-60px" },
+  transition:  { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
 } as const;
+
+/** Stagger container */
+const staggerContainer = {
+  initial:     {},
+  whileInView: {},
+  viewport:    { once: true, margin: "-60px" },
+  variants: {
+    hidden:  {},
+    visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  },
+  initial2: "hidden",
+  animate:  "visible",
+} as const;
+
+/** Stagger item — no scale, no blur */
+const staggerItem = {
+  variants: {
+    hidden:  { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1, y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  },
+} as const;
+
+/** Slide from left */
+const slideLeft = {
+  initial:     { opacity: 0, x: -36 },
+  whileInView: { opacity: 1, x: 0   },
+  viewport:    { once: true, margin: "-60px" },
+  transition:  { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+} as const;
+
+/** Slide from right */
+const slideRight = {
+  initial:     { opacity: 0, x: 36 },
+  whileInView: { opacity: 1, x: 0  },
+  viewport:    { once: true, margin: "-60px" },
+  transition:  { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+} as const;
+
 
 function StatusDot({ tone = "ok" }: { tone?: "ok" | "warn" }) {
   return <span className={`status-dot ${tone}`} />;
@@ -1284,7 +1326,13 @@ function FloatingActions({ visible, menuOpen }: { visible: boolean; menuOpen: bo
         setOnDarkBackground(luminance < 0.46);
       }
     };
+    // Throttle: run detectBackground every 4th scroll event.
+    // elementsFromPoint + getComputedStyle force layout — 75% reduction in cost.
+    // 4 frames ≈ 67ms at 60fps — imperceptible for a nav colour change.
+    let scrollTick = 0;
     const scheduleDetection = () => {
+      scrollTick = (scrollTick + 1) % 4;
+      if (scrollTick !== 0) return;
       if (!frame) frame = window.requestAnimationFrame(detectBackground);
     };
     detectBackground();
@@ -1663,11 +1711,7 @@ export default function Home() {
   const navigationLocked = useRef(false);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 25,
-    restDelta: 0.001,
-  });
+  const scaleX = scrollYProgress; // no spring — direct scroll value, no animation loop
   const heroCopyY = useTransform(
     scrollYProgress,
     [0, 0.09],
@@ -1678,26 +1722,13 @@ export default function Home() {
     [0, 0.065],
     [1, reduceMotion ? 1 : 0],
   );
-  const heroCopyBlur = useTransform(
-    scrollYProgress,
-    [0, 0.065],
-    ["blur(0px)", reduceMotion ? "blur(0px)" : "blur(10px)"],
-  );
-  const heroEquipmentY = useTransform(
-    scrollYProgress,
-    [0, 0.075],
-    [0, reduceMotion ? 0 : 95],
-  );
+  // heroCopyBlur removed — filter:blur() rasterizes every scroll frame
   const heroVisualY = useTransform(
     scrollYProgress,
     [0, 0.12],
     [0, reduceMotion ? 0 : -70],
   );
-  const heroVisualScale = useTransform(
-    scrollYProgress,
-    [0, 0.12],
-    [1, reduceMotion ? 1 : 0.965],
-  );
+  // heroVisualScale removed — scale + translate on same element = extra composite layer
   const heroOrbY = useTransform(
     scrollYProgress,
     [0, 0.12],
@@ -1787,6 +1818,8 @@ export default function Home() {
     const entries = panels.map((panel) => ({
       panel,
       anchor: panel.closest<HTMLElement>(".stack-slot, .process-runway"),
+      // Cache tagName check — avoids repeated DOM property access in hot loop
+      isFooter: panel.tagName === "FOOTER",
     }));
     let frame = 0;
     const resetPanelMotion = (panel: HTMLElement) => {
@@ -1803,6 +1836,15 @@ export default function Home() {
     const clamp = (value: number) => Math.max(0, Math.min(1, value));
     const smoothstep = (value: number) => value * value * (3 - 2 * value);
 
+    // State cache — skip all DOM writes when values haven't meaningfully changed.
+    // Main win: when scrolling WITHIN a section (not between panels) the function
+    // exits after the comparison, touching zero DOM properties.
+    const SKIP_THRESHOLD = 0.0015;
+    let prevActiveIndex = -99;
+    let prevEnteringIndex = -99;
+    let prevEnteringProgress = -1;
+    let prevCoverProgress = -1;
+
     const updatePinnedPanels = () => {
       frame = 0;
       if (!media.matches) {
@@ -1814,16 +1856,16 @@ export default function Home() {
         document.documentElement.scrollHeight -
         window.innerHeight -
         window.scrollY;
+
+      // --- READ PHASE (all getBCR calls together, before any writes) ---
       const anchorTops = entries.map(
         ({ anchor }) =>
           anchor?.getBoundingClientRect().top ?? window.innerHeight,
       );
-      const pinnedStates = entries.map(({ panel }, index) => {
+
+      const pinnedStates = entries.map(({ isFooter }, index) => {
         const anchorTop = anchorTops[index];
-        const reachedAnchor = anchorTop <= 8.5;
-        const reachedTerminalPosition =
-          panel.tagName === "FOOTER" && remainingScroll <= 12;
-        return reachedAnchor || reachedTerminalPosition;
+        return anchorTop <= 8.5 || (isFooter && remainingScroll <= 12);
       });
       let activeIndex = -1;
       pinnedStates.forEach((isPinned, index) => {
@@ -1847,6 +1889,20 @@ export default function Home() {
           ? smoothstep(clamp((enteringProgress - 0.08) / 0.82))
           : 0;
 
+      // --- SKIP CHECK — exit early if nothing has changed meaningfully ---
+      if (
+        activeIndex === prevActiveIndex &&
+        enteringIndex === prevEnteringIndex &&
+        Math.abs(enteringProgress - prevEnteringProgress) < SKIP_THRESHOLD &&
+        Math.abs(coverProgress - prevCoverProgress) < SKIP_THRESHOLD
+      ) return;
+
+      prevActiveIndex = activeIndex;
+      prevEnteringIndex = enteringIndex;
+      prevEnteringProgress = enteringProgress;
+      prevCoverProgress = coverProgress;
+
+      // --- WRITE PHASE ---
       entries.forEach(({ panel }, index) => {
         panel.classList.toggle("is-pinned", pinnedStates[index]);
         panel.classList.toggle("is-content-hidden", index < activeIndex);
@@ -1881,86 +1937,6 @@ export default function Home() {
         }
       });
     };
-    let isAutoScrolling = false;
-    let scrollEndTimeout: number;
-
-    const handleScrollSnap = () => {
-      if (isAutoScrolling) return;
-      if (navigationLocked.current) return;
-
-      window.clearTimeout(scrollEndTimeout);
-      scrollEndTimeout = window.setTimeout(() => {
-        if (!media.matches) return;
-
-        // Если верх первой слайд-плашки еще не доехал до верха экрана (не стал липким),
-        // то мы находимся в свободной зоне Hero/логотипов — отключаем доводку полностью!
-        const firstSlot = document.querySelector<HTMLElement>(".stack-slot");
-        if (firstSlot) {
-          const rect = firstSlot.getBoundingClientRect();
-          if (rect.top > 10) {
-            return;
-          }
-        }
-
-        // Игнорируем автодоводчик внутри активной анимации этапов скролла процесса
-        const runway = document.querySelector<HTMLElement>(".process-runway");
-        if (runway) {
-          const rect = runway.getBoundingClientRect();
-          if (rect.top <= 10 && rect.bottom >= window.innerHeight - 10) {
-            return;
-          }
-        }
-
-        // Цели для автодоводки — только stack-slot (секции-слайды начиная с .intro) и процесс
-        const targets = Array.from(
-          document.querySelectorAll<HTMLElement>(".stack-slot, .process-runway")
-        );
-
-        let closestTarget: HTMLElement | null = null;
-        let minDiff = Infinity;
-
-        targets.forEach((target) => {
-          const rect = target.getBoundingClientRect();
-          const diff = Math.abs(rect.top);
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestTarget = target;
-          }
-        });
-
-        if (closestTarget && minDiff > 12) {
-          // Проверяем, помещается ли контент предстоящей секции на экране
-          const panel = (closestTarget as HTMLElement).querySelector<HTMLElement>(".stack-panel") || (closestTarget as HTMLElement);
-          
-          let panelHeight = panel.scrollHeight;
-          // Для process-runway берем высоту самого липкого контейнера
-          if ((closestTarget as HTMLElement).classList.contains("process-runway")) {
-            const processSticky = (closestTarget as HTMLElement).querySelector<HTMLElement>(".process");
-            if (processSticky) {
-              panelHeight = processSticky.scrollHeight;
-            }
-          }
-
-          const fitsOnScreen = panelHeight <= window.innerHeight + 25;
-
-          // Если контент предстоящей секции не влезает на один экран на данном разрешении — отменяем автодоводку (даем скроллить свободно)
-          if (!fitsOnScreen) return;
-
-          const rect = (closestTarget as HTMLElement).getBoundingClientRect();
-          const targetTop = window.scrollY + rect.top;
-
-          isAutoScrolling = true;
-          window.scrollTo({
-            top: targetTop,
-            behavior: "smooth",
-          });
-
-          window.setTimeout(() => {
-            isAutoScrolling = false;
-          }, 800);
-        }
-      }, 150) as any; // Быстрый отклик за 150мс!
-    };
 
     const scheduleUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePinnedPanels);
@@ -1981,7 +1957,6 @@ export default function Home() {
       window.removeEventListener("resize", scheduleUpdate);
       media.removeEventListener("change", scheduleUpdate);
       if (frame) window.cancelAnimationFrame(frame);
-      window.clearTimeout(scrollEndTimeout);
       panels.forEach(resetPanelMotion);
     };
   }, []);
@@ -2226,9 +2201,7 @@ export default function Home() {
         <motion.div
           className="hero-equipment"
           style={{
-            y: heroEquipmentY,
             opacity: heroCopyOpacity,
-            filter: heroCopyBlur,
           }}
           aria-hidden="true"
         >
@@ -2276,7 +2249,6 @@ export default function Home() {
           style={{
             y: heroCopyY,
             opacity: heroCopyOpacity,
-            filter: heroCopyBlur,
           }}
         >
           <div className="hero-copy">
@@ -2313,15 +2285,9 @@ export default function Home() {
 
         <motion.div
           className="hero-visual"
-          style={{ y: heroVisualY, scale: heroVisualScale }}
+          style={{ y: heroVisualY }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 50, rotateX: 5 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <ScadaCarousel />
-          </motion.div>
+          <ScadaCarousel />
         </motion.div>
         <div className="hero-ticker">
           <span>MasterSCADA 4D</span>
@@ -2336,7 +2302,7 @@ export default function Home() {
 
       <div className="stack-root">
         <StackSlot>
-          <motion.section
+          <section
             className="intro section stack-panel panel-paper layer-1"
             ref={(el: HTMLElement | null) => {
               if (!el) return;
@@ -2368,15 +2334,9 @@ export default function Home() {
                   Rb > 0 ? `Q 0 ${H} ${Rb} ${H}` : `L ${Rb} ${H}`,
                 ].join(' ');
 
-                // Approximate perimeter
-                const straight = 2 * (W + H) - 4 * Rb - 2 * Rt * 2;
-                const arcs = (Math.PI / 2) * (2 * Rt + 2 * Rb);
-                const perim = straight + arcs;
-
                 [glowPath, linePath].forEach(p => {
                   p.setAttribute('d', d);
-                  p.style.strokeDasharray = `${perim}`;
-                  (p as any).__perim = perim;
+                  // No dasharray — full border appears simultaneously from all edges
                 });
               };
 
@@ -2384,30 +2344,32 @@ export default function Home() {
               const ro = new ResizeObserver(buildPath);
               ro.observe(el);
 
+              // All edges appear simultaneously — pure opacity, no running line
               const obs = new IntersectionObserver(([entry]) => {
                 el.classList.toggle('neon-active', entry.isIntersecting);
-                [glowPath, linePath].forEach(p => {
-                  const perim: number = (p as any).__perim ?? 9999;
-                  if (entry.isIntersecting) {
+                if (entry.isIntersecting) {
+                  // Start invisible, then fade the full border in at once
+                  [glowPath, linePath].forEach(p => {
                     p.style.transition = 'none';
-                    p.style.strokeDashoffset = `${perim}`;
-                    p.style.opacity = '1';
-                    requestAnimationFrame(() => {
-                      p.style.transition =
-                        'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
-                      p.style.strokeDashoffset = '0';
-                    });
-                  } else {
-                    p.style.transition = 'opacity 0.4s ease';
                     p.style.opacity = '0';
-                  }
-                });
+                  });
+                  requestAnimationFrame(() => requestAnimationFrame(() => {
+                    glowPath.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+                    glowPath.style.opacity = '1';
+                    linePath.style.transition = 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s';
+                    linePath.style.opacity = '1';
+                  }));
+                } else {
+                  glowPath.style.transition = 'opacity 0.7s ease';
+                  glowPath.style.opacity = '0';
+                  linePath.style.transition = 'opacity 0.5s ease';
+                  linePath.style.opacity = '0';
+                }
               }, { threshold: 0.15 });
               obs.observe(el);
             }}
-            {...reveal}
           >
-            {/* SVG border trace — drawn from bottom-left on scroll */}
+            {/* SVG border trace */}
             <svg
               className="intro-neon-svg"
               aria-hidden="true"
@@ -2435,17 +2397,10 @@ export default function Home() {
             </p>
             <div className="benefit-grid" id="result">
               {benefits.map(([n, title, text, Icon], i) => (
-                <motion.article
+                <article
                   key={n}
-                  className="benefit-card"
-                  initial={{ opacity: 0, y: 44, scale: 0.985 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-70px" }}
-                  transition={{
-                    duration: 0.7,
-                    delay: i * 0.09,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                  className="benefit-card reveal-card"
+                  style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   <div className="card-top">
                     <span>{n}</span>
@@ -2458,15 +2413,15 @@ export default function Home() {
                   <div className="toggle-switch" aria-hidden="true">
                     <span className="toggle-thumb" />
                   </div>
-                </motion.article>
+                </article>
               ))}
             </div>
-          </motion.section>
+          </section>
         </StackSlot>
 
         <StackSlot>
           <section className="problem-section stack-panel layer-2">
-            <motion.div className="problem-copy" {...reveal}>
+            <div className="problem-copy">
               <span className="section-tag">/ До диспетчеризации</span>
               <h2>Когда каждая установка работает сама по себе</h2>
               <p>
@@ -2478,13 +2433,9 @@ export default function Home() {
               <a className="text-link white" href="#audit" onClick={(e) => scrollToSection("#audit", e)}>
                 Проверить свой объект <ArrowRight size={17} />
               </a>
-            </motion.div>
-            <motion.div
+            </div>
+            <div
               className="problem-console"
-              initial={{ opacity: 0, x: 55 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-90px" }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
               <Image
                 src="/images/real-mnemo/mnemo-before.webp"
@@ -2498,7 +2449,7 @@ export default function Home() {
                 quality={80}
               />
 
-            </motion.div>
+            </div>
           </section>
         </StackSlot>
 
@@ -2507,7 +2458,7 @@ export default function Home() {
             className="audit section stack-panel panel-ice layer-3"
             id="audit"
           >
-            <motion.div className="audit-card" {...reveal}>
+            <div className="audit-card">
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
                 <h2>Можно ли подключить ваш объект к единой диспетчерской?</h2>
@@ -2529,7 +2480,7 @@ export default function Home() {
                 </ul>
               </div>
               <LeadForm compact />
-            </motion.div>
+            </div>
           </section>
         </StackSlot>
 
@@ -2621,7 +2572,7 @@ export default function Home() {
             className="case section stack-panel panel-mist layer-6"
             id="cases"
           >
-            <motion.div className="case-carousel" {...reveal}>
+            <div className="case-carousel">
               <motion.div
                 className="case-shell"
                 drag="x"
@@ -2752,7 +2703,7 @@ export default function Home() {
                   aria-hidden="true"
                 />
               </motion.div>
-            </motion.div>
+            </div>
           </section>
         </StackSlot>
 
@@ -2789,15 +2740,9 @@ export default function Home() {
                   Rb > 0 ? `Q 0 ${H} ${Rb} ${H}` : `L ${Rb} ${H}`,
                 ].join(' ');
 
-                // Approximate perimeter
-                const straight = 2 * (W + H) - 4 * Rb - 2 * Rt * 2;
-                const arcs = (Math.PI / 2) * (2 * Rt + 2 * Rb);
-                const perim = straight + arcs;
-
                 [glowPath, linePath].forEach(p => {
                   p.setAttribute('d', d);
-                  p.style.strokeDasharray = `${perim}`;
-                  (p as any).__perim = perim;
+                  // No dasharray — full border appears simultaneously from all edges
                 });
               };
 
@@ -2805,24 +2750,27 @@ export default function Home() {
               const ro = new ResizeObserver(buildPath);
               ro.observe(el);
 
+              // All edges appear simultaneously — pure opacity, no running line
               const obs = new IntersectionObserver(([entry]) => {
                 el.classList.toggle('neon-active', entry.isIntersecting);
-                [glowPath, linePath].forEach(p => {
-                  const perim: number = (p as any).__perim ?? 9999;
-                  if (entry.isIntersecting) {
+                if (entry.isIntersecting) {
+                  // Start invisible, then fade the full border in at once
+                  [glowPath, linePath].forEach(p => {
                     p.style.transition = 'none';
-                    p.style.strokeDashoffset = `${perim}`;
-                    p.style.opacity = '1';
-                    requestAnimationFrame(() => {
-                      p.style.transition =
-                        'stroke-dashoffset 2s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease';
-                      p.style.strokeDashoffset = '0';
-                    });
-                  } else {
-                    p.style.transition = 'opacity 0.4s ease';
                     p.style.opacity = '0';
-                  }
-                });
+                  });
+                  requestAnimationFrame(() => requestAnimationFrame(() => {
+                    glowPath.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+                    glowPath.style.opacity = '1';
+                    linePath.style.transition = 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s';
+                    linePath.style.opacity = '1';
+                  }));
+                } else {
+                  glowPath.style.transition = 'opacity 0.7s ease';
+                  glowPath.style.opacity = '0';
+                  linePath.style.transition = 'opacity 0.5s ease';
+                  linePath.style.opacity = '0';
+                }
               }, { threshold: 0.15 });
               obs.observe(el);
             }}
@@ -2842,22 +2790,19 @@ export default function Home() {
               {/* Sharp neon line */}
               <path className="neon-trace-line" />
             </svg>
-            <motion.div className="trust-heading" {...reveal}>
+            <div className="trust-heading">
               <span className="section-tag">/ Инженерный подход</span>
               <h2>
                 Система не станет
                 <br />
                 <span className="title-accent">«чёрным ящиком»</span>
               </h2>
-            </motion.div>
+            </div>
             <div className="trust-grid">
-              <motion.article
-                className="benefit-card"
-                initial={{ opacity: 0, y: 38 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-70px" }}
-                transition={{ duration: 0.7 }}
-              >
+              <article
+                  className="benefit-card reveal-card"
+                  style={{ animationDelay: '0s' }}
+                >
                 <div className="card-top">
                   <span>01</span>
                   <ShieldCheck size={24} />
@@ -2872,14 +2817,11 @@ export default function Home() {
                 <div className="toggle-switch" aria-hidden="true">
                   <span className="toggle-thumb" />
                 </div>
-              </motion.article>
-              <motion.article
-                className="benefit-card"
-                initial={{ opacity: 0, y: 38 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-70px" }}
-                transition={{ duration: 0.7, delay: 0.1 }}
-              >
+              </article>
+              <article
+                  className="benefit-card reveal-card"
+                  style={{ animationDelay: '0.1s' }}
+                >
                 <div className="card-top">
                   <span>02</span>
                   <FileStack size={24} />
@@ -2894,14 +2836,11 @@ export default function Home() {
                 <div className="toggle-switch" aria-hidden="true">
                   <span className="toggle-thumb" />
                 </div>
-              </motion.article>
-              <motion.article
-                className="benefit-card"
-                initial={{ opacity: 0, y: 38 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-70px" }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-              >
+              </article>
+              <article
+                  className="benefit-card reveal-card"
+                  style={{ animationDelay: '0.2s' }}
+                >
                 <div className="card-top">
                   <span>03</span>
                   <SlidersHorizontal size={24} />
@@ -2916,7 +2855,7 @@ export default function Home() {
                 <div className="toggle-switch" aria-hidden="true">
                   <span className="toggle-thumb" />
                 </div>
-              </motion.article>
+              </article>
             </div>
           </section>
         </StackSlot>
@@ -2935,13 +2874,9 @@ export default function Home() {
             </div>
             <div className="faq-list">
               {faqs.map(([q, a], i) => (
-                <motion.div
+                <div
                   className={`faq-item ${faq === i ? "open" : ""}`}
                   key={q}
-                  initial={{ opacity: 0, x: 28 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.55, delay: i * 0.055 }}
                 >
                   <button onClick={() => setFaq(faq === i ? -1 : i)}>
                     <span>0{i + 1}</span>
@@ -2959,7 +2894,7 @@ export default function Home() {
                       </motion.p>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               ))}
             </div>
           </section>
@@ -2969,7 +2904,7 @@ export default function Home() {
             className="contact section stack-panel panel-blue layer-9"
             id="contact"
           >
-            <motion.div className="contact-shell" {...reveal}>
+            <div className="contact-shell">
               <div className="contact-copy">
                 <span className="section-tag light">
                   / Предварительная концепция
@@ -2995,7 +2930,7 @@ export default function Home() {
                 </div>
               </div>
               <LeadForm />
-            </motion.div>
+            </div>
           </section>
         </StackSlot>
 
