@@ -79,7 +79,8 @@ button {
 }
 .nav {
   position: fixed;
-  z-index: 50;
+  z-index: 60;
+
   left: var(--spacing-md);
   right: var(--spacing-md);
   top: 20px;
@@ -262,8 +263,9 @@ button {
 }
 .mobile-menu {
   position: fixed;
-  z-index: 51;
-  top: 88px;
+  z-index: 55;
+  top: 92px;
+
   left: var(--spacing-md);
   right: var(--spacing-md);
   border-radius: var(--radius-lg);
@@ -2850,8 +2852,11 @@ footer {
     height: 20px;
   }
   .mobile-menu {
-    top: 76px;
+    top: 70px;
+    left: 16px;
+    right: 16px;
   }
+
   .hero,
   .problem-section,
   footer {
