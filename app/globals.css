@@ -27,35 +27,31 @@
 
 /* ── Logo SVG ── */
 .pl-logo { overflow: visible; }
-.pl-logo path { fill: var(--ink); transform-origin: 50% 50%; }
+.pl-logo path { fill: var(--ink); }
 
-/* Origami fold — pure 2D (no perspective/rotateY = no GPU rasterization of SVG) */
-@keyframes pl-origami {
-  from {
-    opacity: 0;
-    transform: scaleX(0) translateX(-8px);
-    transform-origin: 0% 50%;
-  }
-  to {
-    opacity: 1;
-    transform: scaleX(1) translateX(0);
-    transform-origin: 0% 50%;
-  }
+/*
+  IMPORTANT: Never use transform on <path> inside a <g transform="scale(...)">
+  — browser rasterizes paths at pre-scale resolution → pixelation.
+  opacity-only animation = SVG rendered as pure vector, always crisp.
+*/
+@keyframes pl-path-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* Star idle pulse */
+/* Star idle pulse — rotate only on the star group wrapper, not the path */
 @keyframes pl-star-idle {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50%       { transform: scale(1.09) rotate(20deg); }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
 }
 
-.pl-p1 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.10s both; }
-.pl-p2 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.22s both; }
-.pl-p3 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.34s both; }
-.pl-p4 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.46s both,
-                    pl-star-idle 2.2s ease-in-out 1.4s infinite; }
-.pl-p5 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.58s both; }
-.pl-p6 { animation: pl-origami 0.65s cubic-bezier(0.22,1,0.36,1) 0.70s both; }
+.pl-p1 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.10s forwards; }
+.pl-p2 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.22s forwards; }
+.pl-p3 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.34s forwards; }
+.pl-p4 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.46s forwards,
+                                pl-star-idle 2s ease-in-out 1.4s infinite; }
+.pl-p5 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.58s forwards; }
+.pl-p6 { opacity: 0; animation: pl-path-in 0.45s ease-out 0.70s forwards; }
 
 /* ── Tagline ── */
 .pl-tagline {
