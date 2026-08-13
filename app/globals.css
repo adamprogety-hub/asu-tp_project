@@ -1924,12 +1924,6 @@ footer {
   color: white;
   border-color: #161918;
 }
-.carousel-arrows .brand-star-icon {
-  transition: transform 0.25s;
-}
-.carousel-arrows button:hover .brand-star-icon {
-  transform: rotate(45deg) scale(1.1);
-}
 .tech-flow {
   height: 150px;
   margin-top: 15px;

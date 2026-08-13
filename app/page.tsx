@@ -866,13 +866,13 @@ function ScadaCarousel() {
             onClick={() => move(active - 1)}
             aria-label="Предыдущая мнемосхема"
           >
-            <BrandStar size={14} />
+            <ChevronLeft />
           </button>
           <button
             onClick={() => move(active + 1)}
             aria-label="Следующая мнемосхема"
           >
-            <BrandStar size={14} />
+            <ChevronRight />
           </button>
         </div>
       </div>
@@ -2657,14 +2657,14 @@ export default function Home() {
                         onClick={() => moveCase(activeCase - 1)}
                         aria-label="Предыдущий проект"
                       >
-                        <BrandStar size={14} />
+                        <ChevronLeft />
                       </button>
                       <b>{String(activeCase + 1).padStart(2, "0")} / 07</b>
                       <button
                         onClick={() => moveCase(activeCase + 1)}
                         aria-label="Следующий проект"
                       >
-                        <BrandStar size={14} />
+                        <ChevronRight />
                       </button>
                     </div>
                   </div>
