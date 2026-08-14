@@ -498,13 +498,13 @@ button {
 }
 .mobile-menu-overlay {
   position: fixed;
-  top: 84px; /* below nav (top:20px + height:64px) */
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(16, 19, 18, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 80;
 }
 .mobile-menu-item {
@@ -3225,9 +3225,6 @@ footer {
     top: 74px; /* nav top:12 + height:52 + 10px gap */
     left: 16px;
     right: 16px;
-  }
-  .mobile-menu-overlay {
-    top: 64px; /* nav top:12 + height:52 */
   }
 
   .hero,
