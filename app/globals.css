@@ -182,7 +182,7 @@ button {
 }
 .nav {
   position: fixed;
-  z-index: 100;
+  z-index: 110;
 
   left: var(--spacing-md);
   right: var(--spacing-md);
