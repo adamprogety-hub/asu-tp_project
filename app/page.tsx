@@ -2140,7 +2140,7 @@ export default function Home() {
   }, [menuOpen]);
 
   return (
-    <main>
+    <main className={menuOpen ? "menu-is-open" : ""}>
       <motion.div className="progress" style={{ scaleX }} />
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
       <nav className="nav">

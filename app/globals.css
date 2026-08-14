@@ -502,10 +502,28 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(16, 19, 18, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(10, 12, 11, 0.5);
   z-index: 80;
+}
+
+/* ── Blur page content when burger menu is open (iOS-safe: no backdrop-filter) ── */
+main.menu-is-open .hero,
+main.menu-is-open .stack-root,
+main.menu-is-open section,
+main.menu-is-open footer {
+  filter: blur(7px) saturate(0.7);
+  transition: filter 0.3s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Unblurred when menu is closed */
+main:not(.menu-is-open) .hero,
+main:not(.menu-is-open) .stack-root,
+main:not(.menu-is-open) section,
+main:not(.menu-is-open) footer {
+  filter: none;
+  transition: filter 0.25s ease;
 }
 .mobile-menu-item {
   display: flex;
@@ -3222,7 +3240,7 @@ footer {
     height: 20px;
   }
   .mobile-menu {
-    top: 74px; /* nav top:12 + height:52 + 10px gap */
+    top: calc(64px + 2vh); /* nav bottom (12+52=64px) + 2vh gap */
     left: 16px;
     right: 16px;
   }
