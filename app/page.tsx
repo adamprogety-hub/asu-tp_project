@@ -2536,9 +2536,7 @@ export default function Home() {
                       <span className="accordion-num">{n}</span>
                       <span className="accordion-title">{title}</span>
                       <span className="accordion-icon">
-                        {problemStep === i
-                          ? <X size={18} strokeWidth={1.5} />
-                          : <BrandStar size={16} />}
+                        <BrandStar size={16} />
                       </span>
                     </button>
 
@@ -2590,6 +2588,94 @@ export default function Home() {
             id="audit"
           >
             <div className="audit-card">
+              {/* Decorative SVG ribbons — volumetric arc stripes referencing AC logo */}
+              <svg
+                className="audit-ribbons"
+                viewBox="0 0 1200 420"
+                preserveAspectRatio="xMidYMid slice"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <defs>
+                  <linearGradient id="aug-rb1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="white" stopOpacity="0.05"/>
+                    <stop offset="30%"  stopColor="white" stopOpacity="0.55"/>
+                    <stop offset="50%"  stopColor="white" stopOpacity="0.72"/>
+                    <stop offset="70%"  stopColor="white" stopOpacity="0.55"/>
+                    <stop offset="100%" stopColor="white" stopOpacity="0.05"/>
+                  </linearGradient>
+                  <linearGradient id="aug-rb2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="white" stopOpacity="0.03"/>
+                    <stop offset="30%"  stopColor="white" stopOpacity="0.38"/>
+                    <stop offset="50%"  stopColor="white" stopOpacity="0.52"/>
+                    <stop offset="70%"  stopColor="white" stopOpacity="0.38"/>
+                    <stop offset="100%" stopColor="white" stopOpacity="0.03"/>
+                  </linearGradient>
+                  <linearGradient id="aug-rb3" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="white" stopOpacity="0"/>
+                    <stop offset="50%"  stopColor="white" stopOpacity="0.32"/>
+                    <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+
+                {/*
+                  Ribbon 1 — main wide ribbon with 2 twist points.
+                  Wide sections (~60px gap), twist pinch points (~7px gap).
+                  Path: top edge forward, then bottom edge reversed.
+                  Twist 1 near x=350 (top≈100, bottom≈107).
+                  Twist 2 near x=850 (top≈145, bottom≈152).
+                */}
+                <path
+                  d="M -20,340
+                     C 100,250 200,80  350,100
+                     C 450,110 540,40  600,40
+                     C 660,40  740,100 850,145
+                     C 950,185 1100,70 1220,60
+                     L 1220,120
+                     C 1100,130 950,160 850,152
+                     C 740,145 660,100 600,100
+                     C 540,100 450,120 350,107
+                     C 200,87  100,310 -20,400
+                     Z"
+                  fill="url(#aug-rb1)"
+                />
+
+                {/*
+                  Ribbon 2 — medium ribbon, offset lower, staggered twists.
+                  Twist 1 near x=420 (6px gap), Twist 2 near x=900 (6px gap).
+                */}
+                <path
+                  d="M -20,270
+                     C 150,200 300,185 420,190
+                     C 520,194 560,235 660,240
+                     C 780,248 860,115 900,120
+                     C 940,125 1100,175 1220,180
+                     L 1220,230
+                     C 1100,225 940,132 900,126
+                     C 860,121 780,298 660,290
+                     C 560,285 520,202 420,196
+                     C 300,191 150,250 -20,320
+                     Z"
+                  fill="url(#aug-rb2)"
+                />
+
+                {/*
+                  Ribbon 3 — thin accent ribbon, 1 tight twist near x=300.
+                  Starts high, pinches to 4px, opens up toward top-right.
+                */}
+                <path
+                  d="M -20,150
+                     C 80,110  200,75  300,80
+                     C 400,84  450,28  500,30
+                     C 650,32  900,-15 1220,-10
+                     L 1220,16
+                     C 900,11  650,58  500,56
+                     C 450,54  400,109 300,84
+                     C 200,80  80,136 -20,176
+                     Z"
+                  fill="url(#aug-rb3)"
+                />
+              </svg>
               <div className="audit-copy">
                 <span className="section-tag">/ Бесплатный экспресс-аудит</span>
                 <h2>Можно ли подключить ваш объект к единой диспетчерской?</h2>
@@ -2715,6 +2801,52 @@ export default function Home() {
                   if (info.offset.x > 60) moveCase(activeCase - 1);
                 }}
               >
+                {/* Ribbon decoration — teal brand stripes on dark bg */}
+                <svg className="case-ribbons" viewBox="0 0 1100 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+                  <defs>
+                    <linearGradient id="cs-rb1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="#5ab3a5" stopOpacity="0"/>
+                      <stop offset="30%"  stopColor="#5ab3a5" stopOpacity="0.12"/>
+                      <stop offset="50%"  stopColor="#5ab3a5" stopOpacity="0.18"/>
+                      <stop offset="70%"  stopColor="#5ab3a5" stopOpacity="0.12"/>
+                      <stop offset="100%" stopColor="#5ab3a5" stopOpacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="cs-rb2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="#5ab3a5" stopOpacity="0"/>
+                      <stop offset="40%"  stopColor="#5ab3a5" stopOpacity="0.08"/>
+                      <stop offset="60%"  stopColor="#5ab3a5" stopOpacity="0.11"/>
+                      <stop offset="100%" stopColor="#5ab3a5" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  {/* Wide ribbon — bottom-left origin, S-curve with 2 twists */}
+                  <path
+                    d="M -20,420
+                       C 120,310 240,130 380,145
+                       C 500,158 560,60  640,55
+                       C 720,50  820,155 920,160
+                       C 1000,164 1060,90 1120,70
+                       L 1120,128
+                       C 1060,148 1000,222 920,218
+                       C 820,213 720,108 640,113
+                       C 560,118 500,218 380,205
+                       C 240,190 120,370 -20,478
+                       Z"
+                    fill="url(#cs-rb1)"
+                  />
+                  {/* Medium ribbon — upper area, tighter curve */}
+                  <path
+                    d="M -20,280
+                       C 100,215 220,80  360,90
+                       C 460,98  520,180 620,175
+                       C 740,169 840,60  1120,-20
+                       L 1120,28
+                       C 840,108 740,117 620,223
+                       C 520,228 460,146 360,138
+                       C 220,128 100,263 -20,328
+                       Z"
+                    fill="url(#cs-rb2)"
+                  />
+                </svg>
                 <div className="case-top">
                   <span className="section-tag light">
                     / Что уже выполнено
@@ -3044,6 +3176,52 @@ export default function Home() {
             id="contact"
           >
             <div className="contact-shell">
+              {/* Ribbon decoration — white stripes, sweep top-left → bottom-right */}
+              <svg className="contact-ribbons" viewBox="0 0 1200 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="ct-rb1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="white" stopOpacity="0"/>
+                    <stop offset="30%"  stopColor="white" stopOpacity="0.08"/>
+                    <stop offset="50%"  stopColor="white" stopOpacity="0.13"/>
+                    <stop offset="70%"  stopColor="white" stopOpacity="0.08"/>
+                    <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="ct-rb2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="white" stopOpacity="0"/>
+                    <stop offset="40%"  stopColor="white" stopOpacity="0.05"/>
+                    <stop offset="60%"  stopColor="white" stopOpacity="0.08"/>
+                    <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                {/* Main ribbon — top-left → bottom-right, 2 twists */}
+                <path
+                  d="M -30,60
+                     C 80,120  200,300 340,295
+                     C 460,290 520,200 620,205
+                     C 720,210 800,360 940,365
+                     C 1040,369 1120,310 1230,340
+                     L 1230,398
+                     C 1120,368 1040,427 940,423
+                     C 800,418 720,268 620,263
+                     C 520,258 460,348 340,353
+                     C 200,358 80,178 -30,118
+                     Z"
+                  fill="url(#ct-rb1)"
+                />
+                {/* Accent ribbon — upper-mid area */}
+                <path
+                  d="M -30,-20
+                     C 100,40  260,180 400,175
+                     C 520,170 580,80  680,78
+                     C 800,76  920,160 1230,130
+                     L 1230,178
+                     C 920,208 800,124 680,126
+                     C 580,128 520,218 400,223
+                     C 260,228 100,88 -30,28
+                     Z"
+                  fill="url(#ct-rb2)"
+                />
+              </svg>
               <div className="contact-copy">
                 <span className="section-tag light">
                   / Предварительная концепция
