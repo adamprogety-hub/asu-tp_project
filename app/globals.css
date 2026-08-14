@@ -237,25 +237,76 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--spacing-xl) 0 var(--spacing-xl) var(--spacing-xl);
+  padding: 0 0 0 var(--spacing-xl);
+  height: 100%;
 }
 .work-accordion-dark {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: 100%;
 }
-/* Dark card overrides */
+/* Each item stretches to fill equal share of column height */
 .work-accordion-dark .accordion-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.09);
   box-shadow: none;
+  position: relative;
+  overflow: hidden;
+}
+/* Header fills the item height when closed */
+.work-accordion-dark .accordion-item .accordion-header {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+/* Ribbon decoration — visible on closed items, unique shape per item */
+.work-accordion-dark .accordion-item:not(.open)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+/* Item 1 — Rising S-curves: ribbons sweep from bottom-left to top-right with two twist points */
+.work-accordion-dark .accordion-item:nth-child(1):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 120' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='a1' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='35%25' stop-color='%235ab3a5' stop-opacity='0.24'/%3E%3Cstop offset='50%25' stop-color='%235ab3a5' stop-opacity='0.32'/%3E%3Cstop offset='65%25' stop-color='%235ab3a5' stop-opacity='0.24'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='a2' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%235ab3a5' stop-opacity='0.16'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10,92 C70,58 155,18 225,22 C275,26 305,6 340,8 C400,10 490,-6 610,2 L610,24 C490,16 400,32 340,28 C305,26 275,48 225,44 C155,40 70,80 -10,114 Z' fill='url(%23a1)'/%3E%3Cpath d='M-10,58 C90,44 185,52 255,55 C300,57 318,78 385,80 C450,82 530,44 610,48 L610,70 C530,66 450,106 385,100 C318,96 300,75 255,73 C185,70 90,62 -10,76 Z' fill='url(%23a2)'/%3E%3Cpath d='M-10,28 C55,16 130,8 195,10 C250,12 268,36 318,38 C392,40 505,-10 610,-6 L610,8 C505,4 392,54 318,52 C268,50 250,26 195,24 C130,22 55,34 -10,46 Z' fill='url(%23a2)'/%3E%3C/svg%3E");
+}
+/* Item 2 — Central crossing: ribbons come from both sides and cross in the middle */
+.work-accordion-dark .accordion-item:nth-child(2):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 120' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='b1' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='35%25' stop-color='%235ab3a5' stop-opacity='0.26'/%3E%3Cstop offset='50%25' stop-color='%235ab3a5' stop-opacity='0.34'/%3E%3Cstop offset='65%25' stop-color='%235ab3a5' stop-opacity='0.26'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='b2' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%235ab3a5' stop-opacity='0.15'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10,22 C110,20 215,66 292,70 C322,71 336,60 352,48 C368,36 384,16 500,12 C548,10 585,14 610,16 L610,36 C585,34 548,30 500,32 C384,36 368,56 352,68 C336,80 322,91 292,90 C215,86 110,40 -10,42 Z' fill='url(%23b1)'/%3E%3Cpath d='M-10,88 C105,86 200,52 268,48 C298,46 316,60 342,66 C370,74 408,88 520,84 C562,82 590,76 610,74 L610,94 C590,96 562,102 520,104 C408,108 370,94 342,84 C316,78 298,64 268,68 C200,74 105,108 -10,110 Z' fill='url(%23b2)'/%3E%3Cpath d='M-10,4 C100,2 220,14 300,18 C342,20 362,8 405,6 C480,2 558,10 610,12 L610,22 C558,20 480,12 405,14 C362,16 342,28 300,26 C220,22 100,10 -10,12 Z' fill='url(%23b2)'/%3E%3C/svg%3E");
+}
+/* Item 3 — Diagonal waterfall: all ribbons flow from top-left to bottom-right */
+.work-accordion-dark .accordion-item:nth-child(3):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 120' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='c1' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='25%25' stop-color='%235ab3a5' stop-opacity='0.28'/%3E%3Cstop offset='75%25' stop-color='%235ab3a5' stop-opacity='0.28'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='c2' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3Cstop offset='40%25' stop-color='%235ab3a5' stop-opacity='0.16'/%3E%3Cstop offset='60%25' stop-color='%235ab3a5' stop-opacity='0.16'/%3E%3Cstop offset='100%25' stop-color='%235ab3a5' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10,5 C80,10 185,32 288,56 C362,74 440,96 540,108 C568,112 594,114 610,114 L610,132 C594,130 568,128 540,124 C440,112 362,90 288,72 C185,48 80,26 -10,21 Z' fill='url(%23c1)'/%3E%3Cpath d='M-10,38 C65,44 148,62 235,80 C305,95 390,104 495,100 C544,98 582,92 610,90 L610,108 C582,110 544,116 495,118 C390,122 305,113 235,98 C148,80 65,62 -10,56 Z' fill='url(%23c2)'/%3E%3Cpath d='M185,0 C265,6 350,22 438,42 C502,57 562,70 610,74 L610,88 C562,84 502,71 438,56 C350,36 265,20 185,14 Z' fill='url(%23c2)'/%3E%3C/svg%3E");
 }
 .work-accordion-dark .accordion-item.open {
   border-color: rgba(90, 179, 165, 0.28);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
+.work-accordion-dark .accordion-item:not(.open)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to right,
+    rgba(19,23,22,0.88) 0%,
+    rgba(19,23,22,0.55) 35%,
+    rgba(19,23,22,0.15) 55%,
+    transparent 72%
+  );
+}
 .work-accordion-dark .accordion-num {
-  color: rgba(90, 179, 165, 0.75);
+  display: none;
 }
 .work-accordion-dark .accordion-title {
   color: #edf2ef;
@@ -1307,7 +1358,7 @@ p {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
   gap: var(--spacing-xl);
-  align-items: center;
+  align-items: stretch;
   overflow: hidden;
 }
 .problem-copy p {
@@ -1694,6 +1745,56 @@ p {
   flex-direction: column;
   gap: 16px;
 }
+/* ── Vertical ribbon decorations on closed accordion items ── */
+.vendors-accordion .accordion-item {
+  position: relative;
+  overflow: hidden;
+}
+.vendors-accordion .accordion-header {
+  position: relative;
+  z-index: 1;
+}
+.vendors-accordion .accordion-item:not(.open)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+/* Item 1 — Vertical S-waves flowing left-to-right across the card */
+.vendors-accordion .accordion-item:nth-child(1):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='v1a' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='30%25' stop-color='%234f7d8f' stop-opacity='0.12'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.18'/%3E%3Cstop offset='70%25' stop-color='%234f7d8f' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='v1b' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,60 C80,55 160,20 240,18 C290,17 310,35 360,38 C430,42 520,25 600,22 L600,34 C520,37 430,54 360,50 C310,47 290,29 240,30 C160,32 80,67 0,72 Z' fill='url(%23v1a)'/%3E%3Cpath d='M0,35 C70,30 150,48 220,50 C265,51 285,38 330,36 C400,32 510,50 600,48 L600,58 C510,60 400,42 330,46 C285,48 265,61 220,60 C150,58 70,40 0,45 Z' fill='url(%23v1b)'/%3E%3Cpath d='M0,10 C100,6 200,22 290,26 C330,28 350,16 400,14 C480,10 560,18 600,20 L600,28 C560,26 480,18 400,22 C350,24 330,36 290,34 C200,30 100,14 0,18 Z' fill='url(%23v1b)'/%3E%3C/svg%3E");
+}
+/* Item 2 — Vertical ribbons crossing/twisting in the horizontal center */
+.vendors-accordion .accordion-item:nth-child(2):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='v2a' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='25%25' stop-color='%234f7d8f' stop-opacity='0.14'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.2'/%3E%3Cstop offset='75%25' stop-color='%234f7d8f' stop-opacity='0.14'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='v2b' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.09'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,15 C120,12 220,52 295,56 C318,57 328,48 342,38 C356,28 368,12 480,8 C530,6 572,12 600,14 L600,26 C572,24 530,18 480,20 C368,24 356,40 342,50 C328,60 318,69 295,68 C220,64 120,24 0,27 Z' fill='url(%23v2a)'/%3E%3Cpath d='M0,55 C110,52 205,28 272,24 C298,22 314,34 336,40 C362,47 400,58 510,54 C554,52 582,48 600,46 L600,58 C582,60 554,64 510,66 C400,70 362,59 336,52 C314,46 298,34 272,36 C205,40 110,64 0,67 Z' fill='url(%23v2b)'/%3E%3Cpath d='M0,3 C90,1 180,10 250,14 C280,16 296,6 330,4 C400,0 500,-4 600,-2 L600,8 C500,6 400,10 330,14 C296,16 280,26 250,24 C180,20 90,11 0,13 Z' fill='url(%23v2b)'/%3E%3C/svg%3E");
+}
+/* Item 3 — Diagonal ribbons flowing top-left to bottom-right */
+.vendors-accordion .accordion-item:nth-child(3):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='v3a' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='30%25' stop-color='%234f7d8f' stop-opacity='0.16'/%3E%3Cstop offset='70%25' stop-color='%234f7d8f' stop-opacity='0.16'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='v3b' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.09'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10,0 C80,5 190,28 300,52 C380,68 470,76 600,78 L600,92 C470,90 380,82 300,66 C190,44 80,21 -10,16 Z' fill='url(%23v3a)'/%3E%3Cpath d='M-10,28 C60,34 155,50 250,66 C325,78 420,82 540,76 C564,74 586,70 600,68 L600,80 C586,82 564,86 540,88 C420,94 325,90 250,78 C155,62 60,46 -10,40 Z' fill='url(%23v3b)'/%3E%3Cpath d='M130,0 C210,6 300,22 390,40 C460,54 540,62 600,64 L600,74 C540,72 460,64 390,50 C300,32 210,16 130,10 Z' fill='url(%23v3b)'/%3E%3C/svg%3E");
+}
+/* Item 4 — Counter-diagonal ribbons (top-right to bottom-left) */
+.vendors-accordion .accordion-item:nth-child(4):not(.open)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='v4a' x1='1' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='30%25' stop-color='%234f7d8f' stop-opacity='0.16'/%3E%3Cstop offset='70%25' stop-color='%234f7d8f' stop-opacity='0.16'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='v4b' x1='1' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3Cstop offset='50%25' stop-color='%234f7d8f' stop-opacity='0.09'/%3E%3Cstop offset='100%25' stop-color='%234f7d8f' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M610,0 C520,5 410,28 300,52 C220,68 130,76 0,78 L0,92 C130,90 220,82 300,66 C410,44 520,21 610,16 Z' fill='url(%23v4a)'/%3E%3Cpath d='M610,28 C540,34 445,50 350,66 C275,78 180,82 60,76 C36,74 14,70 0,68 L0,80 C14,82 36,86 60,88 C180,94 275,90 350,78 C445,62 540,46 610,40 Z' fill='url(%23v4b)'/%3E%3Cpath d='M470,0 C390,6 300,22 210,40 C140,54 60,62 0,64 L0,74 C60,72 140,64 210,50 C300,32 390,16 470,10 Z' fill='url(%23v4b)'/%3E%3C/svg%3E");
+}
+/* White left-vignette overlay for light accordion — title area stays clean */
+.vendors-accordion .accordion-item:not(.open)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to right,
+    rgba(255,255,255,0.96) 0%,
+    rgba(255,255,255,0.72) 38%,
+    rgba(255,255,255,0.22) 58%,
+    transparent 75%
+  );
+}
 .accordion-item {
   background: white;
   border-radius: 24px;
@@ -1717,11 +1818,7 @@ p {
   text-align: left;
 }
 .accordion-num {
-  font-size: 12px;
-  font-weight: 700;
-  color: #4f7d8f;
-  margin-right: 24px;
-  font-family: var(--font-manrope);
+  display: none;
 }
 .accordion-title {
   font-size: 20px;
