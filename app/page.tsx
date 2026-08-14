@@ -21,6 +21,8 @@ import {
 import Image from "next/image";
 import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
+import SplitText from "../components/SplitText";
+import TypingText from "../components/TypingText";
 import {
   Activity,
   AlertTriangle,
