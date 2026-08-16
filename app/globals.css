@@ -5539,7 +5539,8 @@ main {
 @media (max-width: 1000px) {
   .process-runway {
     height: 500svh;
-    margin: 0 8px -24px;
+    /* No side margins — prevents Safari from showing body background through gaps */
+    margin: 0 0 -24px;
   }
   .process-sticky.stack-panel {
     top: 0 !important;
@@ -5548,7 +5549,8 @@ main {
     height: 100svh !important;
     min-height: 100svh !important;
     max-height: 100svh !important;
-    border-radius: 28px 28px 0 0 !important;
+    /* No border-radius on this breakpoint — panel fills full width, no corners to bleed through */
+    border-radius: 0 !important;
     padding: 94px 28px 40px !important;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
   }
@@ -5569,19 +5571,19 @@ main {
     border-radius: 24px;
   }
   .process-runway + .stack-panel {
-    margin-top: -24px !important;
+    margin-top: -1px !important;
   }
 }
 @media (max-width: 680px) {
   .process-runway {
     height: 480svh;
-    margin-left: 6px;
-    margin-right: 6px;
-    margin-bottom: -18px;
+    /* No side margins — fixes Safari background bleed through gaps */
+    margin: 0 0 -1px;
   }
   .process-sticky.stack-panel {
-    padding: 88px 14px 36px !important;
-    border-radius: 24px 24px 0 0 !important;
+    padding: 88px 14px 40px !important;
+    /* No rounded corners: full-width prevents body bg from showing */
+    border-radius: 0 !important;
   }
   .process-sticky .section-heading {
     display: block;
@@ -5758,7 +5760,7 @@ main {
   .process-pagination {
     grid-template-columns: repeat(6, 1fr);
     gap: 12px;
-    margin-top: 20px;
+    margin-top: 28px; /* increased gap: stars ↔ slides */
   }
   .process-scroll-hint {
     display: none;
@@ -5884,7 +5886,7 @@ main {
   .process-deck {
     min-height: 310px;
     max-height: 390px;
-    margin-top: 26px;
+    margin-top: 32px; /* increased gap: heading ↔ slides */
   }
   .process-card {
     padding: 18px 16px;
