@@ -5546,10 +5546,13 @@ main {
     top: 0 !important;
     margin: 0 !important;
     width: 100%;
-    height: 100svh !important;
-    min-height: 100svh !important;
-    max-height: 100svh !important;
-    /* No border-radius on this breakpoint — panel fills full width, no corners to bleed through */
+    /* dvh = dynamic viewport height — updates as Safari chrome hides/shows.
+       svh is too short when user scrolls (chrome collapses, viewport grows),
+       causing background to bleed under the panel at the bottom. */
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    /* No border-radius — panel fills full width, no corners to bleed through */
     border-radius: 0 !important;
     padding: 94px 28px 40px !important;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -5581,8 +5584,11 @@ main {
     margin: 0 0 -1px;
   }
   .process-sticky.stack-panel {
-    padding: 88px 14px 40px !important;
-    /* No rounded corners: full-width prevents body bg from showing */
+    /* dvh keeps panel full-height even when Safari chrome collapses on scroll */
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding: 88px 14px 64px !important; /* 64px bottom gives stars breathing room */
     border-radius: 0 !important;
   }
   .process-sticky .section-heading {
