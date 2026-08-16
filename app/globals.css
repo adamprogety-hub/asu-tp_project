@@ -182,7 +182,7 @@ button {
 }
 .nav {
   position: fixed;
-  z-index: 110;
+  z-index: 99999;
 
   left: var(--spacing-md);
   right: var(--spacing-md);
@@ -194,9 +194,18 @@ button {
   justify-content: space-between;
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-lg);
   box-shadow: 0 12px 40px rgba(28, 36, 31, 0.08);
+}
+
+/* When burger menu is open — solid white nav, no blur, always visible */
+main.menu-is-open .nav {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18) !important;
 }
 .logo {
   display: flex;
@@ -296,6 +305,10 @@ button {
 .work-accordion-dark .accordion-item.open {
   border-color: rgba(90, 179, 165, 0.28);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+.work-accordion-dark .accordion-item.open .accordion-header {
+  flex: none;
+  height: auto;
 }
 .work-accordion-dark .accordion-item:not(.open)::after {
   content: '';
@@ -483,8 +496,8 @@ button {
 }
 .mobile-menu {
   position: fixed;
-  z-index: 90;
-  top: 92px;
+  z-index: 9001;
+  top: 108px; /* nav desktop bottom (20+64=84px) + 24px gap = spacing-md */
 
   left: var(--spacing-md);
   right: var(--spacing-md);
@@ -498,32 +511,14 @@ button {
 }
 .mobile-menu-overlay {
   position: fixed;
-  top: 0;
+  top: 0;    /* full screen overlay */
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 12, 11, 0.5);
-  z-index: 80;
-}
-
-/* ── Blur page content when burger menu is open (iOS-safe: no backdrop-filter) ── */
-main.menu-is-open .hero,
-main.menu-is-open .stack-root,
-main.menu-is-open section,
-main.menu-is-open footer {
-  filter: blur(7px) saturate(0.7);
-  transition: filter 0.3s ease;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Unblurred when menu is closed */
-main:not(.menu-is-open) .hero,
-main:not(.menu-is-open) .stack-root,
-main:not(.menu-is-open) section,
-main:not(.menu-is-open) footer {
-  filter: none;
-  transition: filter 0.25s ease;
+  background: rgba(10, 12, 11, 0.65);
+  backdrop-filter: blur(16px) saturate(0.6);
+  -webkit-backdrop-filter: blur(16px) saturate(0.6);
+  z-index: 9000; /* site < overlay < menu < nav */
 }
 .mobile-menu-item {
   display: flex;
@@ -1283,17 +1278,60 @@ p {
   .reveal-card { opacity: 1 !important; animation: none !important; }
 }
 
-.benefit-card:hover,
+/* ── Active state (triggered via scroll IntersectionObserver on mobile, or active card) ── */
 .benefit-card.card-active {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   background: #151817 !important;
   border-color: #222524 !important;
 }
-.benefit-card:hover:after,
 .benefit-card.card-active:after {
   background: #5ab3a5;
   opacity: 0.15;
 }
+.benefit-card.card-active h3 {
+  color: #ffffff !important;
+}
+.benefit-card.card-active p {
+  color: #a3a8a5 !important;
+}
+.benefit-card.card-active .card-top {
+  color: #a3a8a5 !important;
+}
+.benefit-card.card-active .toggle-switch {
+  background: #5ab3a5 !important;
+}
+.benefit-card.card-active .toggle-thumb {
+  transform: translateX(14px) !important;
+}
+
+/* ── Hover state (Desktop only with fine pointer / mouse — strictly disabled on mobile touch) ── */
+@media (hover: hover) and (pointer: fine) {
+  .benefit-card:hover {
+    transform: translateY(-6px);
+    background: #151817 !important;
+    border-color: #222524 !important;
+  }
+  .benefit-card:hover:after {
+    background: #5ab3a5;
+    opacity: 0.15;
+  }
+  .benefit-card:hover h3 {
+    color: #ffffff !important;
+  }
+  .benefit-card:hover p {
+    color: #a3a8a5 !important;
+  }
+  .benefit-card:hover .card-top {
+    color: #a3a8a5 !important;
+  }
+  .benefit-card:hover .toggle-switch {
+    background: #5ab3a5 !important;
+  }
+  .benefit-card:hover .toggle-thumb {
+    transform: translateX(14px) !important;
+  }
+}
+
 .benefit-card:after {
   content: "";
   position: absolute;
@@ -1327,18 +1365,6 @@ p {
   max-width: 260px;
   transition: color 0.35s ease;
 }
-.benefit-card:hover h3,
-.benefit-card.card-active h3 {
-  color: #ffffff !important;
-}
-.benefit-card:hover p,
-.benefit-card.card-active p {
-  color: #a3a8a5 !important;
-}
-.benefit-card:hover .card-top,
-.benefit-card.card-active .card-top {
-  color: #a3a8a5 !important;
-}
 
 /* ── Toggle Switch (iOS / Android style) ── */
 .toggle-switch {
@@ -1364,14 +1390,7 @@ p {
   transform: translateX(0);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.benefit-card:hover .toggle-switch,
-.benefit-card.card-active .toggle-switch {
-  background: #5ab3a5 !important;
-}
-.benefit-card:hover .toggle-thumb,
-.benefit-card.card-active .toggle-thumb {
-  transform: translateX(14px) !important;
-}
+
 .problem-section {
   margin: 0 var(--spacing-sm);
   border-radius: var(--radius-xl);
@@ -2093,6 +2112,8 @@ p {
 .neon-active .faq-item:nth-child(4) { animation-delay: 0.21s; }
 .stack-panel.is-pinned .faq-item:nth-child(5),
 .neon-active .faq-item:nth-child(5) { animation-delay: 0.28s; }
+/* Mobile fallback: is-pinned never fires when stack scroll is disabled */
+.faq-item.faq-visible { animation-play-state: running; }
 @media (prefers-reduced-motion: reduce) {
   .faq-item { opacity: 1 !important; animation: none !important; }
 }
@@ -3173,6 +3194,20 @@ footer {
   .nav-right {
     display: none;
   }
+  .nav {
+    left: 16px;
+    right: 16px;
+    top: 16px;
+    height: 56px;
+    padding: 0 var(--spacing-xs) 0 16px;
+    border-radius: 18px;
+  }
+  .mobile-menu {
+    top: 98px; /* 16px top + 56px nav + 26px gap = 98px */
+    left: 16px;
+    right: 16px;
+    border-radius: 22px;
+  }
   .hero {
     min-height: auto;
     padding-top: 130px;
@@ -3219,13 +3254,14 @@ footer {
   .nav {
     left: 16px;
     right: 16px;
-    top: 12px;
-    height: 52px;
-    padding: 0 var(--spacing-xs);
+    top: 16px;
+    height: 54px;
+    padding: 0 14px;
+    border-radius: 18px;
   }
   .logo {
     font-size: 15px;
-    gap: 4px;
+    gap: 6px;
   }
   .menu-button {
     padding: 0;
@@ -3240,9 +3276,10 @@ footer {
     height: 20px;
   }
   .mobile-menu {
-    top: calc(64px + 2vh); /* nav bottom (12+52=64px) + 2vh gap */
+    top: 100px; /* nav bottom (16+54=70px) + 30px gap = 100px */
     left: 16px;
     right: 16px;
+    border-radius: 22px;
   }
 
   .hero,
@@ -3419,6 +3456,77 @@ footer {
   }
   .accordion-left p {
     margin-bottom: 16px;
+  }
+
+  /* Problem steps dark accordion mobile fix */
+  .problem-steps-col {
+    padding: 0 !important;
+    margin-top: 24px;
+    width: 100%;
+    height: auto !important;
+  }
+  .work-accordion-dark {
+    gap: 12px;
+    height: auto !important;
+  }
+  .work-accordion-dark .accordion-item {
+    flex: none !important;
+    height: auto !important;
+    min-height: auto !important;
+    border-radius: 20px;
+    overflow: hidden; /* keep hidden for clip during close animation */
+  }
+  .work-accordion-dark .accordion-content {
+    overflow: hidden; /* framer-motion clips here during collapse */
+  }
+  .work-accordion-dark .accordion-header {
+    flex: none !important;
+    height: auto !important;
+    min-height: 64px;
+    padding: 18px 20px;
+  }
+  .work-accordion-dark .accordion-item.open .accordion-header {
+    flex: none !important;
+    height: auto !important;
+  }
+  .work-accordion-dark .accordion-title {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .work-accordion-dark .accordion-body {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 0 20px 24px !important;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1) !important;
+    padding-top: 16px !important;
+    height: auto !important;
+  }
+  .work-accordion-dark .accordion-left {
+    width: 100% !important;
+  }
+  .work-accordion-dark .accordion-left p {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+    color: rgba(179, 193, 185, 0.92) !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .work-accordion-dark .step-icon-reveal {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 0 4px !important;
+  }
+  .work-accordion-dark .step-icon-img {
+    width: 100% !important;
+    max-width: 220px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
   }
   .vendors-container {
     grid-template-columns: 1fr;

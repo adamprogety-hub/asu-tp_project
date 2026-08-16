@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   motion,
@@ -2092,6 +2093,46 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // FAQ items: на мобильных .is-pinned не срабатывает — нужен отдельный IO
+    const media = window.matchMedia("(max-width: 1000px)");
+    let faqObserver: IntersectionObserver | null = null;
+
+    const setupFaqObserver = () => {
+      if (faqObserver) faqObserver.disconnect();
+
+      if (media.matches) {
+        faqObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("faq-visible");
+                // Однократно — после появления больше не следим
+                faqObserver?.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: "0px 0px -15% 0px", threshold: 0.1 }
+        );
+        const faqItems = document.querySelectorAll(".faq-item");
+        faqItems.forEach((item) => faqObserver?.observe(item));
+      } else {
+        // На десктопе убираем класс — там работает is-pinned
+        document.querySelectorAll(".faq-item").forEach((item) => item.classList.remove("faq-visible"));
+      }
+    };
+
+    setupFaqObserver();
+    media.addEventListener("change", setupFaqObserver);
+    const timer = setTimeout(setupFaqObserver, 600);
+
+    return () => {
+      if (faqObserver) faqObserver.disconnect();
+      media.removeEventListener("change", setupFaqObserver);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const hero = document.querySelector(".hero");
     if (!hero) return;
     const observer = new IntersectionObserver(
@@ -2102,40 +2143,20 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  // Portal mount state for SSR safety
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     if (menuOpen) {
-      // iOS Safari: position:fixed trick instead of overflow:hidden
-      // to prevent breaking touch events on the overlay
-      const scrollY = window.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
+      // Simple overflow lock — does NOT create stacking context issues
+      // that body:position:fixed causes with position:fixed children
+      document.documentElement.style.overflow = "hidden";
     } else {
-      // Guard: only restore if scrollToSection hasn't already done it
-      if (document.body.style.position === "fixed") {
-        const top = document.body.style.top;
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        if (top) {
-          window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
-        }
-      }
+      document.documentElement.style.overflow = "";
     }
     return () => {
-      // Guard: only clean up if still locked (component unmount safety)
-      if (document.body.style.position === "fixed") {
-        const top = document.body.style.top;
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        if (top) {
-          window.scrollTo({ top: parseInt(top || "0") * -1, behavior: "instant" as ScrollBehavior });
-        }
-      }
+      document.documentElement.style.overflow = "";
     };
   }, [menuOpen]);
 
@@ -2143,84 +2164,7 @@ export default function Home() {
     <main className={menuOpen ? "menu-is-open" : ""}>
       <motion.div className="progress" style={{ scaleX }} />
       <FloatingActions visible={heroPassed} menuOpen={menuOpen} />
-      <nav className="nav">
-        <a className="logo" href="#top" aria-label="acengine.ru — на главную" onClick={(e) => scrollToSection("#top", e)}>
-          <AcEngineLogo size={36} className="logo-svg" style={{ color: "var(--ink)" }} />
-          <span className="logo-divider" />
-          <span className="logo-text">acengine.ru</span>
-        </a>
-        <div className="nav-right">
-          <a href="tel:+79958878310" className="nav-contact-link">
-            <Phone size={16} strokeWidth={1.8} />
-            <span>+7 995 887-83-10</span>
-          </a>
-          <a href="mailto:PetroffSCADA@yandex.ru" className="nav-contact-link">
-            <Mail size={16} strokeWidth={1.8} />
-            <span>PetroffSCADA@yandex.ru</span>
-          </a>
-          <div className="nav-dropdown-wrap">
-            <button
-              className={`nav-dropdown-btn${navDropOpen ? " is-open" : ""}`}
-              onClick={() => setNavDropOpen(!navDropOpen)}
-              aria-label="Навигация по сайту"
-            >
-              <span>Навигация</span>
-              <ChevronDown size={14} strokeWidth={1.5} />
-            </button>
-            <AnimatePresence>
-              {navDropOpen && (
-                <motion.div
-                  className="nav-dropdown-panel"
-                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                  transition={{ duration: 0.18, ease: [0.25, 0, 0.1, 1] }}
-                >
-                  <a href="#result" className="nav-drop-item" onClick={(e) => scrollToSection("#result", e)}>
-                    <CircleGauge size={15} strokeWidth={1.5} />
-                    <span>Возможности</span>
-                  </a>
-                  <a href="#process" className="nav-drop-item" onClick={(e) => scrollToSection("#process", e)}>
-                    <ListChecks size={15} strokeWidth={1.5} />
-                    <span>Как работаю</span>
-                  </a>
-                  <a href="#cases" className="nav-drop-item" onClick={(e) => scrollToSection("#cases", e)}>
-                    <LayoutDashboard size={15} strokeWidth={1.5} />
-                    <span>Что уже выполнено</span>
-                  </a>
-                  <a href="#audit" className="nav-drop-item" onClick={(e) => scrollToSection("#audit", e)}>
-                    <ShieldCheck size={15} strokeWidth={1.5} />
-                    <span>Бесплатный аудит</span>
-                  </a>
-                  <a href="#faq" className="nav-drop-item" onClick={(e) => scrollToSection("#faq", e)}>
-                    <MessageCircle size={15} strokeWidth={1.5} />
-                    <span>Вопросы</span>
-                  </a>
-                  <a href="#about" className="nav-drop-item" onClick={(e) => scrollToSection("#about", e)}>
-                    <User size={15} strokeWidth={1.5} />
-                    <span>Меня зовут Павел</span>
-                  </a>
-                  <div className="nav-drop-divider" />
-                  <a href="#contact" className="nav-drop-item nav-drop-cta" onClick={(e) => scrollToSection("#contact", e)}>
-                    <Send size={15} strokeWidth={1.5} />
-                    <span>Обсудить объект</span>
-                  </a>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <a className="nav-cta" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
-            Обсудить объект <ArrowDownRight size={16} />
-          </a>
-        </div>
-        <button
-          className="menu-button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Открыть меню"
-        >
-          {menuOpen ? <X /> : <Menu />}
-        </button>
-      </nav>
+
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -2282,6 +2226,98 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Nav rendered via portal directly into document.body — 100% above all stacking contexts */}
+      {mounted && createPortal(
+        <nav
+          className="nav"
+          style={menuOpen ? {
+            background: "#ffffff",
+            backdropFilter: "none",
+            WebkitBackdropFilter: "none",
+            zIndex: 99999,
+            boxShadow: "none",
+          } : undefined}
+        >
+          <a className="logo" href="#top" aria-label="acengine.ru — на главную" onClick={(e) => scrollToSection("#top", e)}>
+            <AcEngineLogo size={36} className="logo-svg" style={{ color: "var(--ink)" }} />
+            <span className="logo-divider" />
+            <span className="logo-text">acengine.ru</span>
+          </a>
+          <div className="nav-right">
+            <a href="tel:+79958878310" className="nav-contact-link">
+              <Phone size={16} strokeWidth={1.8} />
+              <span>+7 995 887-83-10</span>
+            </a>
+            <a href="mailto:PetroffSCADA@yandex.ru" className="nav-contact-link">
+              <Mail size={16} strokeWidth={1.8} />
+              <span>PetroffSCADA@yandex.ru</span>
+            </a>
+            <div className="nav-dropdown-wrap">
+              <button
+                className={`nav-dropdown-btn${navDropOpen ? " is-open" : ""}`}
+                onClick={() => setNavDropOpen(!navDropOpen)}
+                aria-label="Навигация по сайту"
+              >
+                <span>Навигация</span>
+                <ChevronDown size={14} strokeWidth={1.5} />
+              </button>
+              <AnimatePresence>
+                {navDropOpen && (
+                  <motion.div
+                    className="nav-dropdown-panel"
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: [0.25, 0, 0.1, 1] }}
+                  >
+                    <a href="#result" className="nav-drop-item" onClick={(e) => scrollToSection("#result", e)}>
+                      <CircleGauge size={15} strokeWidth={1.5} />
+                      <span>Возможности</span>
+                    </a>
+                    <a href="#process" className="nav-drop-item" onClick={(e) => scrollToSection("#process", e)}>
+                      <ListChecks size={15} strokeWidth={1.5} />
+                      <span>Как работаю</span>
+                    </a>
+                    <a href="#cases" className="nav-drop-item" onClick={(e) => scrollToSection("#cases", e)}>
+                      <LayoutDashboard size={15} strokeWidth={1.5} />
+                      <span>Что уже выполнено</span>
+                    </a>
+                    <a href="#audit" className="nav-drop-item" onClick={(e) => scrollToSection("#audit", e)}>
+                      <ShieldCheck size={15} strokeWidth={1.5} />
+                      <span>Бесплатный аудит</span>
+                    </a>
+                    <a href="#faq" className="nav-drop-item" onClick={(e) => scrollToSection("#faq", e)}>
+                      <MessageCircle size={15} strokeWidth={1.5} />
+                      <span>Вопросы</span>
+                    </a>
+                    <a href="#about" className="nav-drop-item" onClick={(e) => scrollToSection("#about", e)}>
+                      <User size={15} strokeWidth={1.5} />
+                      <span>Меня зовут Павел</span>
+                    </a>
+                    <div className="nav-drop-divider" />
+                    <a href="#contact" className="nav-drop-item nav-drop-cta" onClick={(e) => scrollToSection("#contact", e)}>
+                      <Send size={15} strokeWidth={1.5} />
+                      <span>Обсудить объект</span>
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            <a className="nav-cta" href="#contact" onClick={(e) => scrollToSection("#contact", e)}>
+              Обсудить объект <ArrowDownRight size={16} />
+            </a>
+          </div>
+          <button
+            className="menu-button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Открыть меню"
+          >
+            {menuOpen ? <X /> : <Menu />}
+          </button>
+        </nav>,
+        document.body
+      )}
 
       <section className="hero" id="top">
         <motion.div className="hero-orb one" style={{ y: heroOrbY }} />
