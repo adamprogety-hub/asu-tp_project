@@ -5584,15 +5584,20 @@ main {
     margin: 0 0 -1px;
   }
   .process-sticky.stack-panel {
-    /* dvh keeps panel full-height even when Safari chrome collapses on scroll */
+    /* Switch to flex: grid 1fr-row collapses when Safari chrome shows on scroll-up,
+       causing stars to cramp. Flex gives deck a stable flex:1 grow and a fixed
+       margin-bottom gap before pagination regardless of viewport height. */
+    display: flex !important;
+    flex-direction: column !important;
     height: 100dvh !important;
     min-height: 100dvh !important;
     max-height: 100dvh !important;
-    padding: 88px 14px 64px !important; /* 64px bottom gives stars breathing room */
+    padding: 88px 14px 48px !important;
     border-radius: 0 !important;
   }
   .process-sticky .section-heading {
     display: block;
+    flex: 0 0 auto;
   }
   .process-sticky .section-heading .section-tag {
     margin-bottom: 12px;
@@ -5606,10 +5611,17 @@ main {
     display: none;
   }
   .process-deck {
-    width: calc(100% - 12px);
-    min-height: 0;
+    flex: 1 1 auto;  /* grow to fill remaining space */
+    width: 100%;
+    min-height: 260px;
     max-height: 400px;
-    margin-top: 12px;
+    margin-top: 16px;
+    margin-bottom: 28px; /* fixed gap between deck bottom and pagination stars */
+  }
+  .process-pagination {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: 0 !important; /* gap is controlled by deck's margin-bottom */
   }
   .process-card {
     padding: 22px 20px;
@@ -5635,18 +5647,11 @@ main {
     width: 100%;
     justify-content: space-between;
   }
-  .process-progress,
-  .process-note {
-    width: calc(100% - 12px);
-  }
-  .process-progress {
-    margin-top: 12px;
-  }
   .process-note {
     display: none;
   }
   .process-runway + .stack-panel {
-    margin-top: -18px !important;
+    margin-top: -1px !important;
   }
 }
 @media (max-height: 760px) and (min-width: 681px) {
