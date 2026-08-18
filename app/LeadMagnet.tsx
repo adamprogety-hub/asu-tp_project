@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Download, Check, ArrowRight } from 'lucide-react';
 import { useTrack } from '@/hooks/useTrack';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PrivacyLink } from './CookieConsent';
 
 const CHECKLISTS = [
   {
@@ -41,6 +42,7 @@ type ChecklistId = typeof CHECKLISTS[number]['id'];
 export function LeadMagnet() {
   const [selected, setSelected] = useState<ChecklistId>('all');
   const [email, setEmail] = useState('');
+  const [consent, setConsent] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,6 +64,10 @@ export function LeadMagnet() {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) {
       setError('Введите корректный email');
+      return;
+    }
+    if (!consent) {
+      setError('Необходимо согласие с политикой конфиденциальности');
       return;
     }
     setError('');
@@ -170,9 +176,18 @@ export function LeadMagnet() {
               {error && <span className="lm-error">{error}</span>}
             </div>
 
-            <p className="lm-consent">
-              Нажимая «Скачать», вы соглашаетесь на получение материалов от acengine.ru. Без спама.
-            </p>
+            <label className="lm-consent-row">
+              <input
+                type="checkbox"
+                className="lm-consent-check"
+                checked={consent}
+                onChange={e => { setConsent(e.target.checked); setError(''); }}
+              />
+              <span className="lm-consent-text">
+                Я даю согласие на обработку персональных данных и принимаю{' '}
+                <PrivacyLink className="lm-consent-link">Политику конфиденциальности</PrivacyLink>
+              </span>
+            </label>
 
             <button type="submit" className="lm-submit" disabled={loading}>
               {loading ? (

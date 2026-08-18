@@ -686,9 +686,17 @@ h2,
 h3 {
   margin-top: 0;
   line-height: 1.15;
+  text-wrap: balance;   /* prevents orphaned words in headings */
+}
+/* Отступ между заголовком и следующим за ним текстом/списком */
+h2 + p, h3 + p,
+h2 + ul, h3 + ul,
+h2 + ol, h3 + ol {
+  margin-top: 16px;
 }
 p {
   margin-top: 0;
+  text-wrap: pretty;    /* prevents single orphan on last line */
 }
 .hero h1 {
   font-family: var(--font-manrope);
@@ -2319,10 +2327,33 @@ p {
   color: #ff8f8f;
   padding-left: 4px;
 }
-.lm-consent {
-  font-size: 10px;
-  color: rgba(255,255,255,0.35);
+.lm-consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+.lm-consent-check {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--acid);
+  cursor: pointer;
+}
+.lm-consent-text {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
   line-height: 1.5;
+}
+.lm-consent-link {
+  color: rgba(255,255,255,0.65);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;  /* keep «Политику конфиденциальности» on one line */
+}
+.lm-consent-link:hover {
+  color: #fff;
 }
 .lm-submit {
   display: flex;
