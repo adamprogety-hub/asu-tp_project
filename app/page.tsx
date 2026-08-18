@@ -1251,7 +1251,7 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
 }
 
 const contactLinks = {
-  telegram: "https://t.me/petrovegineering",
+  telegram: "https://t.me/PetrovEngineering",
 };
 
 const contactPhone = {
