@@ -68,11 +68,24 @@ export function LeadMagnet() {
     setLoading(true);
 
     try {
+      // Трекаем в Google Sheets
       await track('lead_magnet_download', {
         email: email.trim(),
         checklist: selected,
         checklist_label: CHECKLISTS.find(c => c.id === selected)?.label ?? '',
       });
+
+      // Отправляем email-уведомление Павлу через SMTP (как в нижней форме)
+      await fetch('/api/send-lead-magnet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          checklist: selected,
+          checklist_label: CHECKLISTS.find(c => c.id === selected)?.label ?? '',
+        }),
+      }).catch(err => console.error('[LeadMagnet] notify error:', err));
+
 
       const files =
         selected === 'all'
