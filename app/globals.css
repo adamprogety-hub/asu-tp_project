@@ -1217,12 +1217,11 @@ p {
 .section h2,
 .problem-section h2 {
   font-family: var(--font-manrope);
-  font-size: clamp(42px, 5.3vw, 80px);
-  font-weight: 470;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  margin-bottom: var(--spacing-sm);
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
+
 .intro h2 {
   margin-bottom: var(--spacing-sm);
 }
@@ -1569,7 +1568,7 @@ p {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: var(--spacing-xl);
-  align-items: center;
+  align-items: start;
   position: relative;
   overflow: hidden;
 }
@@ -1590,9 +1589,10 @@ p {
   position: relative;
 }
 .audit-copy h2 {
-  font-size: clamp(38px, 4.2vw, 64px);
-  letter-spacing: -0.035em;
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
   margin-bottom: var(--spacing-sm);
+  line-height: 1.2;
 }
 .audit-copy p {
   color: var(--text-muted-light);
@@ -1766,12 +1766,11 @@ p {
   padding: 0;
 }
 .vendors-left-col .section-heading h2 {
-  font-size: clamp(42px, 5vw, 68px);
-  margin-top: 12px;
-  line-height: 1.15;
-  letter-spacing: -0.035em;
-  font-weight: 470;
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
+
 .vendors-left-col .section-lead {
   font-size: 18px;
   line-height: 1.6;
@@ -2026,10 +2025,11 @@ p {
   justify-content: center;
 }
 .case-copy h2 {
-  font-size: clamp(42px, 5vw, 74px);
-  letter-spacing: -0.035em;
-  margin-bottom: var(--spacing-sm);
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
+
 .case-copy > p {
   color: var(--text-muted-dark);
   max-width: 520px;
@@ -2085,7 +2085,9 @@ p {
   gap: 10vw;
 }
 .faq-title h2 {
-  letter-spacing: -0.035em;
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   margin-bottom: var(--spacing-sm);
 }
 .faq-title p {
@@ -2097,21 +2099,14 @@ p {
 }
 .faq-item {
   border-bottom: 1px solid #ced2ce;
-  /* CSS stagger reveal */
+  /* быстрое появление без задержки */
   opacity: 0;
-  animation: card-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: card-reveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-play-state: paused;
 }
 .stack-panel.is-pinned .faq-item,
 .neon-active .faq-item { animation-play-state: running; }
-.stack-panel.is-pinned .faq-item:nth-child(2),
-.neon-active .faq-item:nth-child(2) { animation-delay: 0.07s; }
-.stack-panel.is-pinned .faq-item:nth-child(3),
-.neon-active .faq-item:nth-child(3) { animation-delay: 0.14s; }
-.stack-panel.is-pinned .faq-item:nth-child(4),
-.neon-active .faq-item:nth-child(4) { animation-delay: 0.21s; }
-.stack-panel.is-pinned .faq-item:nth-child(5),
-.neon-active .faq-item:nth-child(5) { animation-delay: 0.28s; }
+/* убраны stagger-задержки — все вопросы появляются одновременно */
 /* Mobile fallback: is-pinned never fires when stack scroll is disabled */
 .faq-item.faq-visible { animation-play-state: running; }
 @media (prefers-reduced-motion: reduce) {
@@ -2167,6 +2162,7 @@ p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-xl);
+  align-items: start;
   position: relative;
   overflow: hidden;
 }
@@ -2186,10 +2182,11 @@ p {
   position: relative;
 }
 .contact-copy h2 {
-  font-size: clamp(45px, 5.5vw, 82px);
+  font-size: clamp(36px, 4vw, 54px);
   letter-spacing: -0.035em;
   margin-bottom: var(--spacing-sm);
 }
+
 .contact-copy > p {
   color: var(--text-muted-dark);
   max-width: 520px;
@@ -2214,6 +2211,190 @@ p {
 .contact .lead-form {
   color: var(--ink);
 }
+
+/* ── LeadMagnet ─────────────────────────────────────────────────────────── */
+.lm-card {
+  background: linear-gradient(145deg, #161918, #1e2220);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.lm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lm-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lm-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  color: #fff;
+}
+.lm-option:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.09);
+}
+.lm-option--active {
+  border-color: var(--acid);
+  background: rgba(200, 242, 81, 0.08);
+}
+.lm-option-num {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acid);
+  flex-shrink: 0;
+  width: 28px;
+}
+.lm-option-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.lm-option-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+}
+.lm-option-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+}
+.lm-option-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--acid);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.lm-option--active .lm-option-check { opacity: 1; }
+
+.lm-field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+.lm-input {
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-size: 15px;
+  color: #fff;
+  font-family: var(--font-onest), sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.lm-input::placeholder { color: rgba(255,255,255,0.35); }
+.lm-input:focus { border-color: rgba(255,255,255,0.4); }
+.lm-input--error { border-color: #ff6b6b !important; }
+.lm-error {
+  font-size: 11px;
+  color: #ff8f8f;
+  padding-left: 4px;
+}
+.lm-consent {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.5;
+}
+.lm-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--acid);
+  color: var(--ink);
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-manrope), sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 2px;
+}
+.lm-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+.lm-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.lm-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(16,19,18,0.3);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: lm-spin 0.7s linear infinite;
+}
+@keyframes lm-spin { to { transform: rotate(360deg); } }
+
+/* Success state */
+.lm-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px 0;
+}
+.lm-success-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--acid);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lm-success-title {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+.lm-success-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+}
+.lm-back {
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.7);
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.lm-back:hover { border-color: rgba(255,255,255,0.45); color: #fff; }
+
 footer {
   margin: 0 var(--spacing-sm) var(--spacing-sm);
   background: #c4e5f3;
@@ -5353,10 +5534,11 @@ main {
   align-items: end;
 }
 .process-sticky .section-heading h2 {
-  font-size: clamp(38px, 4.1vw, 66px);
-  line-height: 1.15;
-  margin-bottom: 0;
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
+
 .process-sticky .section-heading p {
   max-width: 460px;
   font-size: 14px;
@@ -5367,7 +5549,8 @@ main {
   height: 100%;
   min-height: 320px;
   max-height: 470px;
-  margin: clamp(24px, 3.5vh, 40px) auto 0;
+  margin: auto auto 0;
+  align-self: center;
   perspective: 1400px;
 }
 .process-card {
@@ -6441,13 +6624,11 @@ footer.footer-dark.about-footer {
 }
 .founder-heading h2 {
   font-family: var(--font-manrope);
-  font-size: clamp(42px, 5.3vw, 80px);
-  font-weight: 460;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  margin: 0;
-  color: #fff;
+  font-size: clamp(26px, 2.8vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
+
 .founder-heading > p {
   max-width: 520px;
   margin: 0;

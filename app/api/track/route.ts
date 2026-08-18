@@ -11,6 +11,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing event or user_id' }, { status: 400 });
     }
 
+    // CWV events are not needed in the business sheet — silently drop them
+    if (typeof body.event === 'string' && body.event.startsWith('cwv_')) {
+      return NextResponse.json({ ok: true });
+    }
+
     // Forward to Google Apps Script
     const res = await fetch(GAS_URL, {
       method: 'POST',

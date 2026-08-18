@@ -25,6 +25,7 @@ import { AcEngineLogo } from "./AcEngineLogo";
 import SplitText from "../components/SplitText";
 import TypingText from "../components/TypingText";
 import { useTrack } from "../hooks/useTrack";
+import { LeadMagnet } from "./LeadMagnet";
 import {
   Activity,
   AlertTriangle,
@@ -2765,26 +2766,25 @@ export default function Home() {
                 />
               </svg>
               <div className="audit-copy">
-                <span className="section-tag">/ Бесплатный экспресс-аудит</span>
-                <h2>Можно ли подключить ваш объект к единой диспетчерской?</h2>
+                <span className="section-tag">/ Для тех, кто ещё оценивает</span>
+                <h2>Объект теряет деньги на вентиляции — или нет?</h2>
                 <p>
-                  Пришлите перечень оборудования, схемы или фотографии шкафов. Я
-                  отмечу, что можно сохранить, где нужна модернизация и какие
-                  данные получится вывести.
+                  Проверьте свою ситуацию за 5 минут. Три чеклиста для разных ролей —
+                  узнаете готов ли объект и какие вопросы задать подрядчику.
                 </p>
                 <ul>
                   <li>
-                    <Check /> Карта подключения
+                    <Check /> PDF — одна страница
                   </li>
                   <li>
-                    <Check /> Состав проекта
+                    <Check /> Бесплатно
                   </li>
                   <li>
-                    <Check /> Недостающие данные
+                    <Check /> Без регистрации
                   </li>
                 </ul>
               </div>
-              <LeadForm compact />
+              <LeadMagnet />
             </div>
           </section>
         </StackSlot>
@@ -3281,7 +3281,6 @@ export default function Home() {
                     <stop offset="100%" stopColor="white" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
-                {/* Main ribbon — top-left → bottom-right, 2 twists */}
                 <path
                   d="M -30,60
                      C 80,120  200,300 340,295
@@ -3296,7 +3295,6 @@ export default function Home() {
                      Z"
                   fill="url(#ct-rb1)"
                 />
-                {/* Accent ribbon — upper-mid area */}
                 <path
                   d="M -30,-20
                      C 100,40  260,180 400,175
