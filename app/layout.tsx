@@ -3,6 +3,7 @@ import { Manrope, Onest } from "next/font/google";
 import "./globals.css";
 import { CookieConsent, PrivacyModal } from "./CookieConsent";
 import { Preloader } from "./Preloader";
+import { WebVitals } from "../components/WebVitals";
 import Script from "next/script";
 
 const onest = Onest({
@@ -305,6 +306,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
       <body>
         <Preloader />
+        <WebVitals />
         {children}
         <CookieConsent />
         <PrivacyModal />
