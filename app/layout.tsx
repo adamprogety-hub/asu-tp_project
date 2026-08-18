@@ -24,8 +24,33 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://acengine.ru"),
-  title: "acengine.ru — диспетчеризация вентиляции",
-  description: "Проектирование и внедрение систем диспетчеризации вентиляции коммерческих объектов: SCADA, архивы, аварии и удалённый контроль.",
+
+  // ── Title & Description ──────────────────────────────────────────────────
+  title: {
+    default: "Диспетчеризация вентиляции коммерческих объектов | acengine.ru",
+    template: "%s | acengine.ru",
+  },
+  description:
+    "Проектирование и внедрение SCADA-систем для вентиляции: мониторинг, аварийные уведомления, архив параметров и удалённый контроль. Бизнес-центры, торговые объекты, склады и производства.",
+
+  // ── Canonical ────────────────────────────────────────────────────────────
+  alternates: {
+    canonical: "https://acengine.ru",
+  },
+
+  // ── Keywords ─────────────────────────────────────────────────────────────
+  keywords: [
+    "диспетчеризация вентиляции",
+    "SCADA вентиляция",
+    "АСУ ТП вентиляция",
+    "мониторинг вентиляции",
+    "диспетчеризация систем вентиляции",
+    "удалённый контроль вентиляции",
+    "диспетчеризация вентиляции бизнес-центр",
+    "Modbus BACnet OPC вентиляция",
+  ],
+
+  // ── Icons ────────────────────────────────────────────────────────────────
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -35,15 +60,41 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
     apple: "/apple-touch-icon.png",
   },
+
+  // ── OpenGraph ────────────────────────────────────────────────────────────
   openGraph: {
-    title: "acengine.ru — вентиляция под контролем",
-    description: "Вся вентиляция объекта в одном понятном интерфейсе.",
-    images: [{ url: "/og.jpg", width: 1664, height: 933 }],
+    title: "Диспетчеризация вентиляции коммерческих объектов — acengine.ru",
+    description:
+      "SCADA-система для вентиляции: вся инженерия объекта в одном интерфейсе. Аварии, архив, удалённый доступ.",
+    url: "https://acengine.ru",
+    siteName: "acengine.ru",
+    images: [{ url: "/og.jpg", width: 1664, height: 933, alt: "Диспетчеризация вентиляции — acengine.ru" }],
     type: "website",
+    locale: "ru_RU",
   },
-  twitter: { card: "summary_large_image", images: ["/og.jpg"] },
+
+  // ── Twitter ──────────────────────────────────────────────────────────────
+  twitter: {
+    card: "summary_large_image",
+    title: "Диспетчеризация вентиляции | acengine.ru",
+    description: "SCADA-система для вентиляции коммерческих объектов.",
+    images: ["/og.jpg"],
+  },
+
+  // ── Robots ───────────────────────────────────────────────────────────────
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+
+  // ── Geo & other ──────────────────────────────────────────────────────────
   other: {
-    // Resource hints — pre-establish connection to Metrika CDN
+    "geo.region":    "RU",
+    "geo.placename": "Россия",
+    "geo.position":  "55.7558;37.6176",
+    "ICBM":          "55.7558, 37.6176",
+    // Resource hints
     "link-preconnect-metrika": "<link rel='preconnect' href='https://mc.yandex.ru'>",
   },
 };
@@ -53,6 +104,121 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru" className={`${onest.variable} ${manrope.variable}`}>
 
       <head>
+      {/* JSON-LD: LocalBusiness — для Knowledge Panel Яндекса и Google */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "@id": "https://acengine.ru/#business",
+              name: "acengine.ru — диспетчеризация вентиляции",
+              description:
+                "Проектирование и внедрение SCADA-систем для вентиляции коммерческих объектов: мониторинг, аварийные уведомления, архив параметров.",
+              url: "https://acengine.ru",
+              telephone: "+79958878310",
+              email: "PetroffSCADA@yandex.ru",
+              image: "https://acengine.ru/og.jpg",
+              logo: "https://acengine.ru/favicon-512x512.png",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "RU",
+                addressLocality: "Москва",
+              },
+              areaServed: {
+                "@type": "Country",
+                name: "Россия",
+              },
+              serviceType: "Диспетчеризация систем вентиляции",
+              priceRange: "₽₽",
+              openingHoursSpecification: {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+                opens: "09:00",
+                closes: "18:00",
+              },
+              sameAs: [
+                "https://t.me/asphxdel",
+              ],
+            }),
+          }}
+        />
+
+        {/* JSON-LD: FAQPage — для FAQ-блока прямо в поисковой выдаче */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Можно подключить существующие шкафы?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Во многих случаях — да. Это зависит от контроллеров, протоколов связи и доступа к программе. Сначала провожу экспресс-аудит и точно отмечаю, что можно сохранить.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Нужно менять всю автоматику?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Нет. Проектирую модернизацию точечно: сохраняю исправное оборудование, добавляю модули связи или заменяю только устаревшие компоненты.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Что будет при отключении интернета?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Локальные контроллеры продолжают автономно выполнять алгоритмы и защиты. Временно недоступным становится только удалённый контроль.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Можно объединить разных производителей?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Да, если оборудование поддерживает совместимые протоколы или может быть подключено через шлюзы: Modbus, BACnet, OPC UA и другие.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Можно начать с одной установки?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Да. Пилот на одной-двух установках позволяет проверить архитектуру, интерфейс и экономический эффект перед масштабированием.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
+        {/* JSON-LD: Person — специалист АСУ ТП */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Павел Петров",
+              jobTitle: "Специалист по диспетчеризации вентиляции и АСУ ТП",
+              url: "https://acengine.ru",
+              email: "PetroffSCADA@yandex.ru",
+              telephone: "+79958878310",
+              sameAs: ["https://t.me/asphxdel"],
+              worksFor: {
+                "@type": "Organization",
+                name: "acengine.ru",
+                url: "https://acengine.ru",
+              },
+            }),
+          }}
+        />
+
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
         <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />

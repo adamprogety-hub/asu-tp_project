@@ -24,6 +24,7 @@ import { CookieSettingsButton, PrivacyLink } from "./CookieConsent";
 import { AcEngineLogo } from "./AcEngineLogo";
 import SplitText from "../components/SplitText";
 import TypingText from "../components/TypingText";
+import { useTrack } from "../hooks/useTrack";
 import {
   Activity,
   AlertTriangle,
@@ -935,6 +936,7 @@ function ScadaCarousel() {
 }
 
 function LeadForm({ compact = false }: { compact?: boolean }) {
+  const { track } = useTrack();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [contact, setContact] = useState("");
@@ -1031,6 +1033,37 @@ function LeadForm({ compact = false }: { compact?: boolean }) {
 
           if (response.ok) {
             setSent(true);
+            // ── Track lead submission (обезличено — никаких личных данных) ──
+            const isEmail = contact.includes('@');
+
+            // Длина описания: только бакет, не текст
+            const descRaw  = (formData.get('description') as string | null) ?? '';
+            const descLen  = descRaw.trim().length;
+            const descBucket = descLen === 0 ? 'empty'
+                             : descLen < 60  ? 'short'   // 1-60 символов
+                             : descLen < 200 ? 'medium'  // 61-200
+                             :                'long';    // 201+
+
+            // Тип объекта из дропдауна — не персональные данные
+            const objectType  = (formData.get('objectType') as string | null) ?? '';
+            const unitsRaw    = (formData.get('unitsCount') as string | null) ?? '';
+            const unitsCount  = unitsRaw ? parseInt(unitsRaw, 10) : null;
+
+            // Расширения файлов — без имён файлов
+            const fileExts = files
+              .map(f => f.name.split('.').pop()?.toLowerCase() ?? 'unknown')
+              .filter((v, i, a) => a.indexOf(v) === i)  // уникальные
+              .join(',');
+
+            track('lead_form_submit', {
+              contact_type:     isEmail ? 'email' : 'phone',
+              form_type:        compact ? 'compact' : 'full',
+              object_type:      objectType || 'not_selected',
+              units_count:      unitsCount,
+              description:      descBucket,
+              files_count:      files.length,
+              file_types:       fileExts || 'none',
+            });
             setFiles([]);
           } else {
             const data = await response.json().catch(() => ({}));
@@ -1670,7 +1703,7 @@ function ProcessFlow({
         <div className="section-heading split">
           <div>
             <span className="section-tag">/ Полный цикл</span>
-            <h2>Закрываю весь технический контур проекта</h2>
+            <h2>Полный технический контур SCADA-проекта</h2>
           </div>
           <p>
             Шесть последовательных этапов — от первого сигнала в шкафу до
@@ -1787,6 +1820,7 @@ function ProblemChip({
 }
 
 export default function Home() {
+  const { track } = useTrack();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navDropOpen, setNavDropOpen] = useState(false);
   const [scenario, setScenario] = useState(0);
@@ -2214,11 +2248,19 @@ export default function Home() {
               Обсудить объект <ArrowDownRight size={17} />
             </a>
             <div className="mobile-menu-contacts">
-              <a href="tel:+79958878310" className="mobile-contact-item">
+              <a
+                href="tel:+79958878310"
+                className="mobile-contact-item"
+                onClick={() => track('click_phone', { location: 'mobile_menu' })}
+              >
                 <Phone size={16} strokeWidth={1.8} />
                 <span>+7 995 887-83-10</span>
               </a>
-              <a href="mailto:PetroffSCADA@yandex.ru" className="mobile-contact-item">
+              <a
+                href="mailto:PetroffSCADA@yandex.ru"
+                className="mobile-contact-item"
+                onClick={() => track('click_email', { location: 'mobile_menu' })}
+              >
                 <Mail size={16} strokeWidth={1.8} />
                 <span>PetroffSCADA@yandex.ru</span>
               </a>
@@ -2245,11 +2287,19 @@ export default function Home() {
             <span className="logo-text">acengine.ru</span>
           </a>
           <div className="nav-right">
-            <a href="tel:+79958878310" className="nav-contact-link">
+            <a
+              href="tel:+79958878310"
+              className="nav-contact-link"
+              onClick={() => track('click_phone', { location: 'nav' })}
+            >
               <Phone size={16} strokeWidth={1.8} />
               <span>+7 995 887-83-10</span>
             </a>
-            <a href="mailto:PetroffSCADA@yandex.ru" className="nav-contact-link">
+            <a
+              href="mailto:PetroffSCADA@yandex.ru"
+              className="nav-contact-link"
+              onClick={() => track('click_email', { location: 'nav' })}
+            >
               <Mail size={16} strokeWidth={1.8} />
               <span>PetroffSCADA@yandex.ru</span>
             </a>
@@ -2382,14 +2432,14 @@ export default function Home() {
               aria-label="SCADA и HVAC для коммерческих объектов"
             >
               <span className="hero-label primary">SCADA / HVAC</span>
-              <span className="hero-label secondary">Коммерческие объекты</span>
+              <span className="hero-label secondary">SCADA · АСУ ТП · Диспетчеризация</span>
             </div>
             <h1>
-              Вся вентиляция
+              Диспетчеризация
               <br />
-              объекта — <span className="title-accent">в одном</span>
+              вентиляции — <span className="title-accent">в одном</span>
               <br />
-              понятном интерфейсе
+              интерфейсе
             </h1>
             <p>
               Объединяю установки, существующую автоматику, SCADA, архивы и
@@ -2512,7 +2562,7 @@ export default function Home() {
             <h2>
               Не просто визуализация.
               <br />
-              <span>Рабочий инструмент эксплуатации.</span>
+              <span>Рабочий инструмент мониторинга вентиляции.</span>
             </h2>
             <p className="section-lead">
               После моего проекта дежурный инженер видит состояние всего объекта
@@ -2547,7 +2597,7 @@ export default function Home() {
           <section className="problem-section stack-panel layer-2">
             <div className="problem-copy">
               <span className="section-tag">/ До диспетчеризации</span>
-              <h2>Когда каждая установка работает сама по себе</h2>
+              <h2>Проблема: каждая установка вентиляции работает сама по себе</h2>
               <p>
                 На большинстве объектов, с которыми ко мне приходят, о проблеме
                 узнают после жалоб. Диагностика требует выезда, история
@@ -2747,7 +2797,7 @@ export default function Home() {
               <div className="vendors-left-col">
                 <div className="section-heading">
                   <span className="section-tag">/ Вендоры и платформы</span>
-                  <h2>Работаю с тем, что подходит объекту</h2>
+                  <h2>Оборудование и протоколы для диспетчеризации вентиляции</h2>
                   <p className="section-lead">
                     Подбираю оборудование для новых систем и подключаю автоматику, которая уже установлена. Не привязываю проект к одному производителю.
                   </p>
@@ -3102,7 +3152,7 @@ export default function Home() {
             <div className="trust-heading">
               <span className="section-tag">/ Инженерный подход</span>
               <h2>
-                Система не станет
+                SCADA-система не станет
                 <br />
                 <span className="title-accent">«чёрным ящиком»</span>
               </h2>
@@ -3176,7 +3226,7 @@ export default function Home() {
           >
             <div className="faq-title">
               <span className="section-tag">/ FAQ</span>
-              <h2>Частые вопросы</h2>
+              <h2>Частые вопросы о диспетчеризации вентиляции</h2>
               <p>
                 Коротко о совместимости, отказоустойчивости и формате работы.
               </p>
@@ -3265,11 +3315,11 @@ export default function Home() {
                   / Предварительная концепция
                 </span>
                 <h2>
-                  Давайте соберём
+                  Подключить вентиляцию
                   <br />
-                  ваш объект
+                  объекта
                   <br />
-                  <span className="title-accent">в одну систему</span>
+                  <span className="title-accent">к диспетчеризации</span>
                 </h2>
                 <p>
                   Вы общаетесь напрямую со мной — я и проектирую решение,
@@ -3351,6 +3401,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="footer-credit"
+                  onClick={() => track('click_telegram', { location: 'footer', handle: 'asphxdel' })}
                 >
                   Илья Хаймин
                 </a>
