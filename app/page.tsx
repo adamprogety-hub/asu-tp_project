@@ -26,6 +26,7 @@ import SplitText from "../components/SplitText";
 import TypingText from "../components/TypingText";
 import { useTrack } from "../hooks/useTrack";
 import { LeadMagnet } from "./LeadMagnet";
+import { FounderVideo } from "./FounderVideo";
 import {
   Activity,
   AlertTriangle,
@@ -3360,29 +3361,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="founder-content">
-                <div
-                  className="founder-video"
-                  aria-label="Место для приветственного видео Павла"
-                >
-                  <div className="founder-video-grid" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <span className="founder-video-label">
-                    <i /> Приветственное видео
-                  </span>
-                  <div className="founder-play">
-                    <Play fill="currentColor" />
-                  </div>
-                  <div className="founder-video-caption">
-                    <strong>Знакомство без презентаций</strong>
-                    <span>Скоро здесь появится видео · 02:14</span>
-                  </div>
-                </div>
+                <FounderVideo />
               </div>
             </div>
             <div className="footer-row">
