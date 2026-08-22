@@ -4657,15 +4657,14 @@ body {
   isolation: isolate;
   background:
     /* Матовая виньетка (затемнение по краям) */
-    radial-gradient(circle, transparent 35%, rgba(25, 27, 29, 0.16) 100%) no-repeat,
-    /* Матовый стальной/титановый синий свет слева */
-    radial-gradient(circle at 20% 45%, rgba(70, 88, 108, 0.26) 0%, transparent 55%) no-repeat,
+    radial-gradient(circle, transparent 35%, rgba(25, 27, 29, 0.12) 100%) no-repeat fixed,
+    /* Матовый теплый медный/терракотовый свет слева */
+    radial-gradient(circle at 20% 45%, rgba(184, 115, 85, 0.18) 0%, transparent 55%) no-repeat fixed,
     /* Матовый бордовый свет справа */
-    radial-gradient(circle at 80% 40%, rgba(138, 28, 52, 0.2) 0%, transparent 60%) no-repeat,
+    radial-gradient(circle at 80% 40%, rgba(138, 28, 52, 0.16) 0%, transparent 60%) no-repeat fixed,
     /* Базовый градиент металлик */
-    linear-gradient(135deg, #e5e9f0 0%, #f3ebef 48%, #dcd1d5 100%) no-repeat;
+    linear-gradient(135deg, #e5e9f0 0%, #f3ebef 48%, #dcd1d5 100%) no-repeat fixed;
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  background-attachment: fixed;
 }
 body:before,
 body:after {
