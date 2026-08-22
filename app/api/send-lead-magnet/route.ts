@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const smtpPort     = parseInt(process.env.SMTP_PORT || '465', 10);
     const smtpUser     = process.env.SMTP_USER;
     const smtpPassword = process.env.SMTP_PASSWORD;
-    const smtpTo       = process.env.SMTP_TO || 'PetroffSCADA@yandex.ru';
+    const smtpTo       = process.env.SMTP_TO || 'info@acengine.ru';
 
     const checklistName = checklist_label || checklist || '—';
     const now = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });

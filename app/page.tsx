@@ -2259,12 +2259,12 @@ export default function Home() {
                 <span>+7 995 887-83-10</span>
               </a>
               <a
-                href="mailto:PetroffSCADA@yandex.ru"
+                href="mailto:info@acengine.ru"
                 className="mobile-contact-item"
                 onClick={() => track('click_email', { location: 'mobile_menu' })}
               >
                 <Mail size={16} strokeWidth={1.8} />
-                <span>PetroffSCADA@yandex.ru</span>
+                <span>info@acengine.ru</span>
               </a>
             </div>
           </motion.div>
@@ -2298,12 +2298,12 @@ export default function Home() {
               <span>+7 995 887-83-10</span>
             </a>
             <a
-              href="mailto:PetroffSCADA@yandex.ru"
+              href="mailto:info@acengine.ru"
               className="nav-contact-link"
               onClick={() => track('click_email', { location: 'nav' })}
             >
               <Mail size={16} strokeWidth={1.8} />
-              <span>PetroffSCADA@yandex.ru</span>
+              <span>info@acengine.ru</span>
             </a>
             <div className="nav-dropdown-wrap">
               <button

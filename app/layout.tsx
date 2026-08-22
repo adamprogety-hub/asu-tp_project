@@ -118,7 +118,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 "Проектирование и внедрение SCADA-систем для вентиляции коммерческих объектов: мониторинг, аварийные уведомления, архив параметров.",
               url: "https://acengine.ru",
               telephone: "+79958878310",
-              email: "PetroffSCADA@yandex.ru",
+               email: "info@acengine.ru",
               image: "https://acengine.ru/og.jpg",
               logo: "https://acengine.ru/favicon-512x512.png",
               address: {
@@ -208,7 +208,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               name: "Павел Петров",
               jobTitle: "Специалист по диспетчеризации вентиляции и АСУ ТП",
               url: "https://acengine.ru",
-              email: "PetroffSCADA@yandex.ru",
+               email: "info@acengine.ru",
               telephone: "+79958878310",
               sameAs: ["https://t.me/asphxdel"],
               worksFor: {
@@ -228,17 +228,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://mc.yandex.ru" />
         <link rel="dns-prefetch" href="https://mc.yandex.ru" />
 
-        {/* Critical inline CSS for instant above-the-fold render (eliminates 740ms render blocking penalty) */}
         <style id="critical-css" dangerouslySetInnerHTML={{ __html: `
           :root {
-            --ink: #101312;
-            --muted: #6e7470;
-            --line: #dfe2de;
-            --paper: #f5f6f3;
-            --blue: #b9dff1;
-            --blue-2: #dff2fa;
-            --acid: #c8f251;
-            --dark: #141716;
+            --ink: #1f2224;
+            --muted: #5e6668;
+            --line: #d8dcde;
+            --paper: #eaecee;
+            --blue: #e5d8dc;
+            --blue-2: #f5edf0;
+            --acid: #8a1c34;
+            --acid-light: #b83a52;
+            --dark: #191b1d;
             --white: #fff;
             --spacing-xs: 0.5rem;
             --spacing-sm: 1rem;
