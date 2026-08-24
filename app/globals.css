@@ -3811,14 +3811,16 @@ footer {
     padding-right: 15px;
   }
   .contact {
-    padding: 40px 10px 48px;
+    padding: 106px 10px 48px !important;
   }
 
   .contact-shell {
     padding: 38px 20px;
   }
   .contact-copy h2 {
-    font-size: 45px;
+    font-size: clamp(28px, 9.2vw, 36px) !important;
+    line-height: 1.15;
+    overflow-wrap: break-word;
   }
   footer {
     padding: 50px 20px 25px;
