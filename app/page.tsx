@@ -1614,7 +1614,8 @@ function ProcessCard({
             className="process-card-step-img"
             sizes="(max-width: 768px) 100vw, 40vw"
             style={{ objectFit: "cover" }}
-            loading="lazy"
+            priority={index < 2}
+            loading={index >= 2 ? "lazy" : undefined}
           />
         </div>
       </div>
@@ -2386,8 +2387,8 @@ export default function Home() {
             initial={{ opacity: 0, x: -150, rotate: -18, scale: 0.92 }}
             animate={{ opacity: 1, x: 0, rotate: -10, scale: 1 }}
             transition={{
-              duration: 1.15,
-              delay: 0.22,
+              duration: 0.65,
+              delay: 0.1,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
@@ -2405,8 +2406,8 @@ export default function Home() {
             initial={{ opacity: 0, x: 150, rotate: 18, scale: 0.92 }}
             animate={{ opacity: 1, x: 0, rotate: 9, scale: 1 }}
             transition={{
-              duration: 1.15,
-              delay: 0.3,
+              duration: 0.65,
+              delay: 0.18,
               ease: [0.22, 1, 0.36, 1],
             }}
           >

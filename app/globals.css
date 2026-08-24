@@ -1255,19 +1255,26 @@ p {
   background: #fff;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: 0.35s;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: grid;
   grid-template-rows: auto 1fr;
   gap: var(--spacing-md);
   text-align: left;
+
+  /* Force GPU compositing layer to prevent flickering/blinking in iOS Safari */
+  will-change: transform, background-color, border-color;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 /* CSS-only stagger reveal — replaces Framer Motion whileInView.
-   Cards start invisible and animate in when parent gets neon-active.
-   No JS compositor layers created. */
+   Cards start invisible and animate in when parent gets neon-active. */
 @keyframes card-reveal {
-  from { opacity: 0; translate: 0 24px; }
-  to   { opacity: 1; translate: 0 0; }
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 .reveal-card {
   opacity: 0;
@@ -1285,13 +1292,12 @@ p {
 
 /* ── Active state (triggered via scroll IntersectionObserver on mobile, or active card) ── */
 .benefit-card.card-active {
-  transform: translateY(-4px);
+  transform: translate3d(0, -4px, 0);
   background: #151817 !important;
   border-color: #222524 !important;
 }
 .benefit-card.card-active:after {
-  background: var(--acid);
-  opacity: 0.15;
+  opacity: 0.18; /* Only change opacity on GPU layer, no background-type changes */
 }
 .benefit-card.card-active h3 {
   color: #ffffff !important;
@@ -1306,19 +1312,18 @@ p {
   background: var(--acid) !important;
 }
 .benefit-card.card-active .toggle-thumb {
-  transform: translateX(14px) !important;
+  transform: translate3d(14px, 0, 0) !important;
 }
 
 /* ── Hover state (Desktop only with fine pointer / mouse — strictly disabled on mobile touch) ── */
 @media (hover: hover) and (pointer: fine) {
   .benefit-card:hover {
-    transform: translateY(-6px);
+    transform: translate3d(0, -6px, 0);
     background: #151817 !important;
     border-color: #222524 !important;
   }
   .benefit-card:hover:after {
-    background: var(--acid);
-    opacity: 0.15;
+    opacity: 0.18;
   }
   .benefit-card:hover h3 {
     color: #ffffff !important;
@@ -1333,7 +1338,7 @@ p {
     background: var(--acid) !important;
   }
   .benefit-card:hover .toggle-thumb {
-    transform: translateX(14px) !important;
+    transform: translate3d(14px, 0, 0) !important;
   }
 }
 
@@ -1343,13 +1348,14 @@ p {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  /* radial-gradient instead of filter:blur() — avoids iOS GPU compositing
-     artifact that renders blurred pseudo-elements as solid rectangles on scroll */
-  background: radial-gradient(circle at center, var(--blue) 0%, transparent 65%);
-  opacity: 0.32;
+  /* Keep background type constant (radial-gradient with acid color) to prevent repaint flash in Safari */
+  background: radial-gradient(circle at center, var(--acid) 0%, transparent 65%);
+  opacity: 0.03;
   right: -80px;
   top: -80px;
   transition: opacity 0.35s ease;
+  will-change: opacity;
+  pointer-events: none;
 }
 .card-top {
   display: flex;

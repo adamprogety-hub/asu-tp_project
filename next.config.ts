@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // ─── Image Optimisation ───────────────────────────────────────────
   images: {
-    // Auto-convert to AVIF (smallest) then WebP as fallback
-    formats: ["image/avif", "image/webp"],
+    // WebP is generated much faster on the CPU during cold starts, avoiding LCP delays
+    formats: ["image/webp", "image/avif"],
 
     // Responsive breakpoints for srcSet generation
     deviceSizes: [375, 640, 768, 1024, 1280, 1440, 1536, 1920],
