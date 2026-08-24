@@ -2075,16 +2075,9 @@ p {
 }
 .faq-item {
   border-bottom: 1px solid #ced2ce;
-  /* быстрое появление без задержки */
-  opacity: 0;
-  animation: card-reveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-play-state: paused;
+  position: relative;
+  opacity: 1;
 }
-.stack-panel.is-pinned .faq-item,
-.neon-active .faq-item { animation-play-state: running; }
-/* убраны stagger-задержки — все вопросы появляются одновременно */
-/* Mobile fallback: is-pinned never fires when stack scroll is disabled */
-.faq-item.faq-visible { animation-play-state: running; }
 @media (prefers-reduced-motion: reduce) {
   .faq-item { opacity: 1 !important; animation: none !important; }
 }
