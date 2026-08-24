@@ -398,8 +398,7 @@ main.menu-is-open .nav {
   top: calc(100% + 18px);
   right: 0;
   min-width: 230px;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.98);
   border: 1px solid rgba(16, 19, 18, 0.1);
   border-radius: var(--radius-lg);
   box-shadow: 0 16px 48px rgba(16, 19, 18, 0.12);
@@ -655,9 +654,8 @@ main.menu-is-open .nav {
   border: 1px solid #171a19;
 }
 .hero-label.secondary {
-  background: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(17, 20, 19, 0.19);
-  backdrop-filter: blur(14px);
 }
 .status-dot {
   width: 8px;
@@ -1136,16 +1134,13 @@ p {
   pointer-events: none;
   z-index: 1;
   overflow: visible;
-  /* opacity controlled per-path in JS for simultaneous edge glow */
-}
-.neon-active .intro-neon-svg {
-  /* active state marker — JS controls individual path opacities */
 }
 .neon-trace-glow {
   fill: none;
   stroke: rgba(227, 30, 36, 0.22);
   stroke-width: 32;
   stroke-linecap: round;
+  opacity: 1;
 }
 .neon-trace-line {
   display: none !important;
@@ -1173,12 +1168,12 @@ p {
   50%       { opacity: 0.82; }
 }
 
-/* Hide the default white inset top border when neon is active */
-.stack-panel.neon-active {
+/* Hide the default white inset top border on neon panels */
+.stack-panel.view-animated-panel {
   box-shadow: 0 -18px 56px rgba(21, 30, 25, 0.13) !important;
 }
 @media (max-width: 1000px) {
-  .stack-panel.neon-active {
+  .stack-panel.view-animated-panel {
     box-shadow: 0 -14px 38px rgba(21, 30, 25, 0.13) !important;
   }
 }
@@ -1242,15 +1237,13 @@ p {
   gap: var(--spacing-md);
   text-align: left;
 
-  /* Force GPU compositing layer to prevent flickering/blinking in iOS Safari */
-  will-change: transform, background-color, border-color;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
 }
 
-/* CSS-only stagger reveal — replaces Framer Motion whileInView.
-   Cards start invisible and animate in when parent gets neon-active. */
+/* CSS-only stagger reveal. Older desktop browsers use the sticky-panel
+   fallback below; modern browsers bind progress directly to the viewport. */
 @keyframes card-reveal {
   from { opacity: 0; transform: translate3d(0, 24px, 0); }
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -1262,36 +1255,71 @@ p {
 }
 /* Trigger: when the panel becomes pinned (active at top) */
 .stack-panel.is-pinned .reveal-card,
-.neon-active .reveal-card {
+.view-animated-panel.is-pinned .reveal-card {
   animation-play-state: running;
 }
-@media (prefers-reduced-motion: reduce) {
-  .reveal-card { opacity: 1 !important; animation: none !important; }
+
+@keyframes neon-view-reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* ── Active state (triggered via scroll IntersectionObserver on mobile, or active card) ── */
-.benefit-card.card-active {
-  transform: translate3d(0, -4px, 0);
-  background: #151817 !important;
-  border-color: #222524 !important;
+@keyframes faq-view-reveal {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
-.benefit-card.card-active:after {
-  opacity: 0.18; /* Only change opacity on GPU layer, no background-type changes */
+
+@supports (animation-timeline: view()) {
+  .view-animated-panel .neon-trace-glow {
+    animation: neon-view-reveal 1s linear both;
+    animation-timeline: view(block);
+    animation-range: entry 0% entry 38%;
+  }
+
+  .reveal-card {
+    animation: card-reveal 1s linear both;
+    animation-timeline: view(block);
+    animation-range: entry 4% entry 34%;
+    animation-play-state: running;
+  }
+
+  .benefit-grid .reveal-card:nth-child(2),
+  .trust-grid .reveal-card:nth-child(2) {
+    animation-range: entry 8% entry 38%;
+  }
+
+  .benefit-grid .reveal-card:nth-child(3),
+  .trust-grid .reveal-card:nth-child(3) {
+    animation-range: entry 12% entry 42%;
+  }
+
+  .benefit-grid .reveal-card:nth-child(4) {
+    animation-range: entry 16% entry 46%;
+  }
+
+  .faq-item {
+    animation: faq-view-reveal 1s linear both;
+    animation-timeline: view(block);
+    animation-range: entry 5% entry 32%;
+  }
 }
-.benefit-card.card-active h3 {
-  color: #ffffff !important;
+
+@media (max-width: 1000px) {
+  @supports not (animation-timeline: view()) {
+    .reveal-card {
+      opacity: 1;
+      animation: none;
+    }
+  }
 }
-.benefit-card.card-active p {
-  color: #a3a8a5 !important;
-}
-.benefit-card.card-active .card-top {
-  color: #a3a8a5 !important;
-}
-.benefit-card.card-active .toggle-switch {
-  background: var(--acid) !important;
-}
-.benefit-card.card-active .toggle-thumb {
-  transform: translate3d(14px, 0, 0) !important;
+@media (prefers-reduced-motion: reduce) {
+  .reveal-card,
+  .faq-item,
+  .view-animated-panel .neon-trace-glow {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
 }
 
 /* ── Hover state (Desktop only with fine pointer / mouse — strictly disabled on mobile touch) ── */
@@ -1333,7 +1361,6 @@ p {
   right: -80px;
   top: -80px;
   transition: opacity 0.35s ease;
-  will-change: opacity;
   pointer-events: none;
 }
 .card-top {
@@ -1439,7 +1466,7 @@ p {
   align-items: center;
   gap: 7px;
   padding: 9px 15px;
-  background: rgba(17, 20, 19, 0.90);
+  background: rgba(17, 20, 19, 0.94);
   border: 1px solid rgba(184, 58, 82, 0.35);
   border-radius: 11px;
   color: #e8edea;
@@ -1447,8 +1474,6 @@ p {
   font-weight: 500;
   letter-spacing: 0.01em;
   white-space: nowrap;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   pointer-events: none;
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.35),
@@ -2441,8 +2466,7 @@ footer {
   gap: var(--spacing-md);
   border: 1px solid rgba(255, 255, 255, 0.82);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 12px 35px rgba(39, 64, 75, 0.1);
 }
 .carousel-caption {
@@ -3120,11 +3144,9 @@ footer {
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  will-change: transform, opacity, filter;
 }
 .equipment-piece {
   position: absolute;
-  will-change: transform;
 }
 .equipment-piece img {
   display: block;
@@ -3157,11 +3179,9 @@ footer {
 .hero-copy-scroll {
   position: relative;
   z-index: 2;
-  will-change: transform, opacity;
 }
 .hero-visual,
 .case-ui {
-  will-change: transform;
 }
 .case-carousel {
   border-radius: 28px;
@@ -4015,8 +4035,7 @@ footer {
   padding: var(--spacing-md);
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: var(--radius-lg);
-  background: rgba(247, 249, 246, 0.94);
-  backdrop-filter: blur(24px);
+  background: rgba(247, 249, 246, 0.98);
   box-shadow: 0 24px 80px rgba(23, 32, 27, 0.22);
 }
 .cookie-kicker {
@@ -4635,7 +4654,6 @@ body:after {
   position: fixed;
   z-index: -1;
   pointer-events: none;
-  will-change: transform;
   border-radius: 46% 54% 57% 43%/44% 39% 61% 56%;
 }
 body:before {
@@ -4685,10 +4703,9 @@ main {
   grid-template-columns: 1fr auto !important;
 }
 .hero-label.primary {
-  background: rgba(255, 255, 255, 0.52);
+  background: rgba(255, 255, 255, 0.85);
   color: #171a19;
   border-color: rgba(17, 20, 19, 0.19);
-  backdrop-filter: blur(14px);
 }
 .floating-actions {
   position: fixed;
@@ -4715,9 +4732,8 @@ main {
   height: 56px;
   border: 1px solid rgba(255, 255, 255, 0.86);
   border-radius: 50%;
-  background: rgba(247, 249, 246, 0.88);
+  background: rgba(247, 249, 246, 0.96);
   color: #171a19;
-  backdrop-filter: blur(18px);
   box-shadow: 0 14px 38px rgba(21, 30, 25, 0.16);
   display: grid;
   place-items: center;
@@ -4766,8 +4782,7 @@ main {
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 18px;
-  background: rgba(247, 249, 246, 0.95);
-  backdrop-filter: blur(22px);
+  background: rgba(247, 249, 246, 0.98);
   box-shadow: 0 24px 70px rgba(21, 30, 25, 0.22);
   transform-origin: 100% 100%;
   overflow: hidden;
@@ -4851,8 +4866,7 @@ main {
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 18px;
-  background: rgba(247, 249, 246, 0.96);
-  backdrop-filter: blur(22px);
+  background: rgba(247, 249, 246, 0.98);
   box-shadow: 0 24px 70px rgba(21, 30, 25, 0.22);
   transform-origin: 100% 100%;
   overflow: hidden;
@@ -5883,7 +5897,6 @@ main {
   width: 18px;
   height: 18px;
   display: block;
-  will-change: transform;
 }
 .process-scroll-hint {
   margin-left: 12px;
@@ -6078,7 +6091,6 @@ main {
   grid-area: 1/1;
   min-width: 0;
   transform-origin: 50% 50%;
-  will-change: filter, transform, opacity;
 }
 .case-grid {
   position: relative;
@@ -6087,13 +6099,11 @@ main {
   grid-column: 1;
   grid-row: 1;
   min-width: 0;
-  will-change: filter, transform, opacity;
 }
 .case-grid > .case-ui {
   grid-column: 2;
   grid-row: 1;
   min-width: 0;
-  will-change: filter, transform, opacity;
 }
 .case-top-right > span {
   display: block;
@@ -6219,7 +6229,6 @@ main {
 .scada-scene-layer {
   grid-area: 1/1;
   min-width: 0;
-  will-change: transform, opacity;
 }
 .airflow-sweep,
 .case-airflow-sweep {
@@ -6230,7 +6239,6 @@ main {
   width: 32%;
   height: 124%;
   pointer-events: none;
-  will-change: transform, opacity;
   transform: skewX(-10deg);
   background: linear-gradient(
     90deg,

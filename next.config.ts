@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Minimal production server with only traced runtime dependencies.
+  output: "standalone",
+
   // ─── Image Optimisation ───────────────────────────────────────────
   images: {
     // WebP is generated much faster on the CPU during cold starts, avoiding LCP delays

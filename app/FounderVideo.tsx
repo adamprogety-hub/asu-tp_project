@@ -1,18 +1,28 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
 
 export function FounderVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
 
   function handlePlay() {
-    const v = videoRef.current;
-    if (!v) return;
+    setHasLoaded(true);
     setPlaying(true);
-    v.play();
   }
+
+  useEffect(() => {
+    if (hasLoaded && playing) {
+      const v = videoRef.current;
+      if (v) {
+        v.play().catch((err) => {
+          console.warn("Video playback was prevented:", err);
+        });
+      }
+    }
+  }, [hasLoaded, playing]);
 
   return (
     <div className="founder-video" onClick={!playing ? handlePlay : undefined} style={{ cursor: playing ? 'default' : 'pointer' }}>
@@ -30,24 +40,26 @@ export function FounderVideo() {
       )}
 
       {/* video element */}
-      <video
-        ref={videoRef}
-        src="/founder.mp4"
-        playsInline
-        controls={playing}
-        preload="metadata"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: playing ? 1 : 0,
-          transition: 'opacity 0.4s ease',
-          borderRadius: 'inherit',
-        }}
-        onEnded={() => setPlaying(false)}
-      />
+      {hasLoaded && (
+        <video
+          ref={videoRef}
+          src="/founder.mp4"
+          playsInline
+          controls={playing}
+          preload="auto"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: playing ? 1 : 0,
+            transition: 'opacity 0.4s ease',
+            borderRadius: 'inherit',
+          }}
+          onEnded={() => setPlaying(false)}
+        />
+      )}
 
       {/* play button */}
       {!playing && (
