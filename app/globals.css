@@ -5579,26 +5579,12 @@ main {
   will-change: transform, opacity;
   overflow: hidden;
 }
-.process-card:after {
-  content: "";
-  position: absolute;
-  width: 420px;
-  height: 420px;
-  right: -180px;
-  top: -240px;
-  border-radius: 50%;
-  background: rgba(185, 223, 241, 0.12);
-  filter: blur(18px);
-  pointer-events: none;
-}
+/* Glowing light leaks removed to keep the background solid and minimal */
 .process-card.accent {
   background: var(--acid);
   color: var(--white);
   border-color: rgba(255, 255, 255, 0.72);
   box-shadow: 0 34px 90px rgba(138, 28, 52, 0.25);
-}
-.process-card.accent:after {
-  background: rgba(255, 255, 255, 0.36);
 }
 .process-card-top {
   position: relative;
@@ -6022,25 +6008,7 @@ main {
   border-radius: 16px;
   object-fit: cover;
 }
-.process-card-icon-zone:before {
-  content: "";
-  position: absolute;
-  inset: 6% 0 6% 12%;
-  border-radius: 20px;
-  background: radial-gradient(
-    circle at 62% 48%,
-    rgba(185, 223, 241, 0.1),
-    transparent 62%
-  );
-  opacity: 0.65;
-}
-.process-card.accent .process-card-icon-zone:before {
-  background: radial-gradient(
-    circle at 62% 48%,
-    rgba(255, 255, 255, 0.28),
-    transparent 62%
-  );
-}
+/* Overlay glows removed to keep image card background clean as requested */
 .process-card-top {
   gap: 18px;
 }
