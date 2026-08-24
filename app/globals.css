@@ -1151,7 +1151,7 @@ p {
   display: none !important;
 }
 
-/* ── Settled inset glow (after trace) ── */
+/* ── Settled inset glow (native permanent glow, no scroll attachment) ── */
 .intro::before,
 .trust::before {
   content: '';
@@ -1159,28 +1159,18 @@ p {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s ease 2s;
   z-index: 0;
   box-shadow:
     inset 0  8px 50px rgba(138, 28, 52, 0.30),
     inset 0 -8px 50px rgba(138, 28, 52, 0.25),
     inset  8px 0 50px rgba(138, 28, 52, 0.22),
     inset -8px 0 50px rgba(138, 28, 52, 0.22);
-}
-.intro.neon-active::before,
-.trust.neon-active::before {
-  opacity: 1;
-  animation: intro-neon-pulse 4s ease-in-out 2s infinite;
-}
-.intro:not(.neon-active)::before,
-.trust:not(.neon-active)::before {
-  transition: opacity 0.9s ease 0s;
-  animation: none;
+  /* Permanent breathing glow on the graphics layer */
+  animation: intro-neon-pulse 5s ease-in-out infinite;
 }
 @keyframes intro-neon-pulse {
-  0%, 100% { opacity: 0.45; }
-  50%       { opacity: 0.9; }
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.82; }
 }
 
 /* Hide the default white inset top border when neon is active */
