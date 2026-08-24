@@ -29,24 +29,24 @@ export default function HeroServer() {
         <div className="hero-copy">
           <div
             className="hero-labels"
-            aria-label="SCADA и HVAC для коммерческих объектов"
+            aria-label="Автоматизация и диспетчеризация HVAC"
           >
-            <span className="hero-label primary">SCADA / HVAC</span>
+            <span className="hero-label primary">Павел Петров</span>
             <span className="hero-label secondary">
-              SCADA · АСУ ТП · Диспетчеризация
+              АСУ ТП · SCADA · Диспетчеризация
             </span>
           </div>
           <h1>
-            Диспетчеризация
+            Автоматизация
             <br />
-            вентиляции — <span className="title-accent">в одном</span>
+            и <span className="title-accent">диспетчеризация</span>
             <br />
-            интерфейсе
+            полного цикла
           </h1>
           <p>
-            Объединяю установки, существующую автоматику, SCADA, архивы и
-            аварийные уведомления в систему, которой удобно пользоваться каждый
-            день.
+            Полный цикл разработки АСУ ТП от проекта до пусконаладки. Перевожу
+            сложные вентиляционные системы объектов в один удобный
+            SCADA-интерфейс.
           </p>
           <div className="hero-actions">
             <a className="button dark" href="#contact">
