@@ -1550,72 +1550,41 @@ function FloatingActions({ visible, menuOpen }: { visible: boolean; menuOpen: bo
 function ProcessCard({
   step,
   index,
-  activeIndex,
+  progress,
   reduceMotion,
   scrollToSection,
 }: {
   step: (typeof steps)[number];
   index: number;
-  activeIndex: number;
+  progress: MotionValue<number>;
   reduceMotion: boolean | null;
   scrollToSection: (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => void;
 }) {
+  const position = useTransform(
+    progress,
+    (value) => index - value * (steps.length - 1),
+  );
+  const x = useTransform(position, (delta) => {
+    if (reduceMotion) return 0;
+    if (delta < 0) return `${Math.max(-124, delta * 124)}%`;
+    return Math.min(delta, 3) * 28;
+  });
+  const rotate = useTransform(position, (delta) => {
+    if (reduceMotion || delta <= 0) return 0;
+    return Math.min(delta, 3) * (index % 2 === 0 ? -1.15 : 1.15);
+  });
+  const opacity = useTransform(position, (delta) => {
+    if (reduceMotion || delta >= -0.28) return 1;
+    if (delta <= -1.04) return 0;
+    const progress = (delta + 1.04) / 0.76;
+    return progress * progress * (3 - 2 * progress);
+  });
   const [number, title, text, price] = step;
-
-  // Calculate positioning on desktop based on activeIndex
-  const delta = index - activeIndex;
-  
-  let x = 0;
-  let rotate = 0;
-  let scale = 1;
-  let opacity = 1;
-  let zIndex = steps.length - index;
-
-  if (delta < 0) {
-    // Slid out to the left
-    x = -130; // %
-    rotate = -10;
-    opacity = 0;
-  } else if (delta === 0) {
-    // Current active slide
-    x = 0;
-    rotate = 0;
-    scale = 1;
-    opacity = 1;
-    zIndex = 20; // Bring to front
-  } else {
-    // Slated stack to the right
-    x = delta * 24; // px offset
-    rotate = delta * 1.5; // slight card fan rotation
-    scale = 1 - delta * 0.035; // depth shrink
-    opacity = 1;
-    zIndex = steps.length - index;
-  }
 
   return (
     <motion.article
       className={`process-card${number === "05" ? " accent" : ""}`}
-      animate={reduceMotion ? {
-        x: 0,
-        rotate: 0,
-        scale: 1,
-        opacity: activeIndex === index ? 1 : 0,
-        zIndex: activeIndex === index ? 20 : 0
-      } : {
-        x: typeof x === 'number' ? `${x}px` : x,
-        rotate,
-        scale,
-        opacity,
-      }}
-      style={{
-        zIndex,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 110,
-        damping: 20,
-        mass: 0.8
-      }}
+      style={{ x, rotate, opacity, zIndex: steps.length - index }}
     >
       <div className="process-card-layout">
         <div className="process-card-left">
@@ -1672,42 +1641,32 @@ function BrandStar({ size = 16, className = "" }: { size?: number; className?: s
 }
 
 function ProcessSegment({
+
   index,
-  activeIndex,
-  onClick,
+  progress,
 }: {
   index: number;
-  activeIndex: number;
-  onClick: () => void;
+  progress: MotionValue<number>;
 }) {
-  const isCompleted = index <= activeIndex;
+  const fillValue = useTransform(progress, (value) =>
+    Math.max(0, Math.min(1, value * (steps.length - 1) - index + 1)),
+  );
+  // Star is "active" when fillValue > 0.5
+  const starFill = useTransform(fillValue, [0, 0.5, 1], ["#d9ddda", "#101312", "#101312"]);
+  const starScale = useTransform(fillValue, [0, 0.5, 1], [0.75, 1.1, 1]);
 
   return (
-    <button
-      className={`process-segment ${isCompleted ? "active" : ""}`}
-      onClick={onClick}
-      type="button"
-      aria-label={`Перейти к шагу ${index + 1}`}
-      style={{
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        padding: 0,
-        outline: "none"
-      }}
-    >
+    <span className="process-segment">
       <b>{String(index + 1).padStart(2, "0")}</b>
+      {/* 4-pointed brand star instead of progress bar line */}
       <motion.svg
         className="process-star"
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
-        animate={{
-          scale: index === activeIndex ? 1.25 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        style={{ scale: starScale }}
         aria-hidden="true"
       >
-        <path
+        <motion.path
           d="M50 5
              C50 5, 56 38, 62 44
              C68 50, 95 50, 95 50
@@ -1717,10 +1676,10 @@ function ProcessSegment({
              C32 50, 5 50, 5 50
              C5 50, 32 50, 38 44
              C44 38, 50 5, 50 5 Z"
-          fill={isCompleted ? "#101312" : "#d9ddda"}
+          style={{ fill: starFill }}
         />
       </motion.svg>
-    </button>
+    </span>
   );
 }
 
@@ -1729,11 +1688,20 @@ function ProcessFlow({
 }: {
   scrollToSection: (id: string, event?: MouseEvent<HTMLAnchorElement | HTMLDivElement>) => void;
 }) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+  });
+  const deckProgress = useSpring(scrollYProgress, {
+    stiffness: 95,
+    damping: 26,
+    restDelta: 0.001,
+  });
 
   return (
-    <section className="process-runway" id="process">
+    <section className="process-runway" id="process" ref={ref}>
       <div className="process process-sticky stack-panel panel-paper layer-4">
         <div className="section-heading split">
           <div>
@@ -1745,51 +1713,27 @@ function ProcessFlow({
             готового экрана диспетчерской.
           </p>
         </div>
-        
-        <div className="process-deck-container">
-          <button 
-            className="process-nav-btn prev"
-            onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
-            disabled={activeIndex === 0}
-            type="button"
-            aria-label="Предыдущий шаг"
-          >
-            <ChevronLeft size={24} />
-          </button>
-
-          <div className="process-deck" aria-label="Этапы и стоимость работ">
-            {steps.map((step, index) => (
-              <ProcessCard
-                key={step[0]}
-                step={step}
-                index={index}
-                activeIndex={activeIndex}
-                reduceMotion={reduceMotion}
-                scrollToSection={scrollToSection}
-              />
-            ))}
-          </div>
-
-          <button 
-            className="process-nav-btn next"
-            onClick={() => setActiveIndex((p) => Math.min(steps.length - 1, p + 1))}
-            disabled={activeIndex === steps.length - 1}
-            type="button"
-            aria-label="Следующий шаг"
-          >
-            <ChevronRight size={24} />
-          </button>
+        <div className="process-deck" aria-label="Этапы и стоимость работ">
+          {steps.map((step, index) => (
+            <ProcessCard
+              key={step[0]}
+              step={step}
+              index={index}
+              progress={deckProgress}
+              reduceMotion={reduceMotion}
+              scrollToSection={scrollToSection}
+            />
+          ))}
         </div>
-
         <div className="process-pagination" aria-hidden="true">
           {steps.map((step, index) => (
             <ProcessSegment
               key={step[0]}
               index={index}
-              activeIndex={activeIndex}
-              onClick={() => setActiveIndex(index)}
+              progress={deckProgress}
             />
           ))}
+          <span className="process-scroll-hint">Листайте вниз</span>
         </div>
         <p className="process-note">
           Ориентировочная стоимость типового стартового объёма. Оборудование,

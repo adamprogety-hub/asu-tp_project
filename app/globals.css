@@ -5504,23 +5504,23 @@ main {
   }
 }
 
-/* Custom slider-based process deck */
+/* Scroll-driven process deck */
 .process-runway {
   position: relative;
-  height: auto;
+  height: 560svh;
   z-index: 4;
   margin-top: -1px;
 }
 .process-sticky.stack-panel {
-  position: relative !important;
-  height: auto !important;
-  min-height: auto !important;
-  max-height: none !important;
-  padding: clamp(60px, 8vh, 90px) max(5vw, 110px) clamp(60px, 8vh, 90px) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 32px;
-  overflow: visible !important;
+  position: sticky !important;
+  top: 8px;
+  height: calc(100svh - 8px) !important;
+  min-height: calc(100svh - 8px) !important;
+  max-height: calc(100svh - 8px) !important;
+  padding: clamp(92px, 10vh, 116px) max(5vw, 110px) clamp(54px, 6vh, 72px) !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  overflow: hidden !important;
 }
 .process-sticky .section-heading {
   grid-template-columns: 1.05fr 0.55fr;
@@ -5536,40 +5536,6 @@ main {
 .process-sticky .section-heading p {
   max-width: 460px;
   font-size: 14px;
-}
-.process-deck-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(20px, 3vw, 48px);
-  width: 100%;
-  max-width: min(1280px, 92vw);
-  margin: 0 auto;
-}
-.process-nav-btn {
-  background: transparent;
-  border: 1px solid rgba(16, 19, 18, 0.15);
-  border-radius: 50%;
-  width: 54px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #101312;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  flex-shrink: 0;
-  z-index: 10;
-}
-.process-nav-btn:hover:not(:disabled) {
-  background: #101312;
-  color: #fff;
-  border-color: #101312;
-  transform: scale(1.05);
-}
-.process-nav-btn:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
 }
 .process-deck {
   position: relative;
@@ -5735,107 +5701,107 @@ main {
 
 @media (max-width: 1000px) {
   .process-runway {
-    height: auto !important;
+    height: 500svh;
+    /* No side margins — prevents Safari from showing body background through gaps */
     margin: 0 0 -24px;
   }
   .process-sticky.stack-panel {
-    position: relative !important;
     top: 0 !important;
     margin: 0 !important;
     width: 100%;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
+    /* dvh = dynamic viewport height — updates as Safari chrome hides/shows.
+       svh is too short when user scrolls (chrome collapses, viewport grows),
+       causing background to bleed under the panel at the bottom. */
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    /* No border-radius — panel fills full width, no corners to bleed through */
     border-radius: 0 !important;
-    padding: 60px 16px 40px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 24px;
-    overflow: visible !important;
+    padding: 94px 28px 40px !important;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
   }
   .process-sticky .section-heading {
-    display: block;
-    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 0.65fr;
+    gap: 30px;
   }
-  .process-sticky .section-heading p {
-    margin-top: 16px;
-    max-width: 100%;
-  }
-  .process-deck-container {
-    display: block !important;
-    width: 100%;
-  }
-  .process-nav-btn {
-    display: none !important;
+  .process-deck,
+  .process-progress,
+  .process-note {
+    width: calc(100% - 28px);
   }
   .process-deck {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 24px !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
-    position: relative !important;
-    perspective: none !important;
-    margin: 24px 0 !important;
+    max-height: 500px;
   }
   .process-card {
-    position: relative !important;
-    inset: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    transform: none !important;
-    opacity: 1 !important;
     border-radius: 24px;
-    padding: 24px 20px;
-    box-shadow: 0 10px 30px rgba(22, 29, 25, 0.06) !important;
-  }
-  .process-card-layout {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 20px;
-  }
-  .process-card-icon-zone {
-    padding: 0 !important;
-    height: 200px;
-  }
-  .process-pagination {
-    display: none !important;
-  }
-  .process-note {
-    width: 100% !important;
-    margin-top: 12px !important;
   }
   .process-runway + .stack-panel {
     margin-top: -1px !important;
   }
 }
 @media (max-width: 680px) {
+  .process-runway {
+    height: 480svh;
+    /* No side margins — fixes Safari background bleed through gaps */
+    margin: 0 0 -1px;
+  }
   .process-sticky.stack-panel {
-    padding: 48px 12px 32px !important;
+    /* Switch to flex: grid 1fr-row collapses when Safari chrome shows on scroll-up,
+       causing stars to cramp. Flex gives deck a stable flex:1 grow and a fixed
+       margin-bottom gap before pagination regardless of viewport height. */
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding: 88px 14px 48px !important;
+    border-radius: 0 !important;
+  }
+  .process-sticky .section-heading {
+    display: block;
+    flex: 0 0 auto;
+  }
+  .process-sticky .section-heading .section-tag {
+    margin-bottom: 12px;
+    padding: 6px 9px;
   }
   .process-sticky .section-heading h2 {
-    font-size: 30px;
+    font-size: 35px;
     line-height: 1.15;
   }
+  .process-sticky .section-heading p {
+    display: none;
+  }
+  .process-deck {
+    flex: 1 1 auto;  /* grow to fill remaining space */
+    width: 100%;
+    min-height: 260px;
+    max-height: 400px;
+    margin-top: 16px;
+    margin-bottom: 28px; /* fixed gap between deck bottom and pagination stars */
+  }
+  .process-pagination {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: 0 !important; /* gap is controlled by deck's margin-bottom */
+  }
   .process-card {
-    padding: 20px 16px;
+    padding: 22px 20px;
+    border-radius: 22px;
   }
   .process-card-copy h3 {
-    font-size: 32px;
+    font-size: clamp(40px, 13vw, 60px);
+    margin-bottom: 12px;
   }
   .process-card-copy p {
     font-size: 13px;
   }
   .process-card-footer {
-    flex-direction: column;
     align-items: stretch;
-    gap: 16px;
+    flex-direction: column;
+    gap: 14px;
     padding-top: 14px;
-  }
-  .process-price {
-    margin-bottom: 0;
   }
   .process-price strong {
     font-size: 25px;
