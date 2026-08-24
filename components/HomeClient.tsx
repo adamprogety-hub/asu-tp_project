@@ -17,7 +17,6 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import Image from "next/image";
 import { CookieSettingsButton, PrivacyLink } from "../app/CookieConsent";
 import { AcEngineLogo } from "../app/AcEngineLogo";
 import { useTrack } from "../hooks/useTrack";
@@ -1164,14 +1163,13 @@ export default function HomeClient({ hero }: { hero: ReactNode }) {
                               exit={{ scale: 0.68, opacity: 0 }}
                               transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                             >
-                              <Image
+                              <img
                                 src={img}
                                 alt={title}
                                 width={180}
                                 height={126}
                                 className="step-icon-img"
                                 loading="lazy"
-                                quality={88}
                               />
                             </motion.div>
                           </div>

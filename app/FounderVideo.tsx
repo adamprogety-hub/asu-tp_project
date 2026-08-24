@@ -26,6 +26,24 @@ export function FounderVideo() {
 
   return (
     <div className="founder-video" onClick={!playing ? handlePlay : undefined} style={{ cursor: playing ? 'default' : 'pointer' }}>
+      {/* poster image as background placeholder */}
+      {!playing && (
+        <img
+          src="/founder-poster.jpg"
+          alt="Павел Петров в щитовой"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: 0.55, // 55% opacity to blend with the dark background gradients and grids
+            transition: 'opacity 0.4s ease',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* decorative grid */}
       <div className="founder-video-grid" aria-hidden>
         {Array.from({ length: 6 }).map((_, i) => <span key={i} />)}

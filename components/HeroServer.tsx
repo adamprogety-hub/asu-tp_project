@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
 import ScadaCarousel from "./ScadaCarousel";
 
@@ -9,23 +8,19 @@ export default function HeroServer() {
       <div className="hero-orb two" />
       <div className="hero-equipment" aria-hidden="true">
         <div className="equipment-piece cabinet">
-          <Image
+          <img
             src="/images/hero/control-cabinet.webp"
             alt=""
             width={520}
             height={420}
-            priority
-            quality={85}
           />
         </div>
         <div className="equipment-piece industrial-fan">
-          <Image
+          <img
             src="/images/hero/industrial-fan.webp"
             alt=""
             width={420}
             height={360}
-            priority
-            quality={85}
           />
         </div>
       </div>

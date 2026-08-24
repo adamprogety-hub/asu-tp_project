@@ -9,7 +9,6 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 const steps = [
@@ -111,14 +110,11 @@ function ProcessCard({
           </div>
         </div>
         <div className="process-card-icon-zone" aria-hidden="true">
-          <Image
+          <img
             src={`/images/process-slides/step-${number}.webp`}
             alt={title}
-            fill
             className="process-card-step-img"
-            sizes="(max-width: 768px) 100vw, 40vw"
-            style={{ objectFit: "cover" }}
-            priority={index < 2}
+            style={{ objectFit: "cover", position: "absolute", inset: 0, width: "100%", height: "100%" }}
             loading={index >= 2 ? "lazy" : undefined}
           />
         </div>
