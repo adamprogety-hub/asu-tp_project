@@ -1349,6 +1349,32 @@ p {
   }
 }
 
+/* ── Active state (Scroll-triggered active cards on mobile/tablets) ── */
+.benefit-card.active {
+  transform: translate3d(0, -6px, 0);
+  background: #151817 !important;
+  border-color: #222524 !important;
+}
+.benefit-card.active:after {
+  opacity: 0.18;
+}
+.benefit-card.active h3 {
+  color: #ffffff !important;
+}
+.benefit-card.active p {
+  color: #a3a8a5 !important;
+}
+.benefit-card.active .card-top {
+  color: #a3a8a5 !important;
+}
+.benefit-card.active .toggle-switch {
+  background: var(--acid) !important;
+}
+.benefit-card.active .toggle-thumb {
+  transform: translate3d(14px, 0, 0) !important;
+}
+
+
 .benefit-card:after {
   content: "";
   position: absolute;

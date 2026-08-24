@@ -829,6 +829,32 @@ export default function HomeClient({ hero }: { hero: ReactNode }) {
     observer.observe(hero);
     return () => observer.disconnect();
   }, []);
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 1024px)").matches;
+    if (!isMobile) return;
+
+    const cards = document.querySelectorAll(".benefit-card");
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          } else {
+            entry.target.classList.remove("active");
+          }
+        });
+      },
+      {
+        rootMargin: "-35% 0px -35% 0px",
+        threshold: 0,
+      }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, []);
 
   // Server snapshot omits the portal; client snapshot enables it without an effect render.
   const mounted = useSyncExternalStore(
