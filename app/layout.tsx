@@ -234,10 +234,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             --muted: #5e6668;
             --line: #d8dcde;
             --paper: #eaecee;
-            --blue: #e5d8dc;
-            --blue-2: #f5edf0;
-            --acid: #8a1c34;
-            --acid-light: #b83a52;
+            --blue: #e8dadb;
+            --blue-2: #f7eff0;
+            --acid: #e31e24;
+            --acid-light: #f23c42;
             --dark: #191b1d;
             --white: #fff;
             --spacing-xs: 0.5rem;
